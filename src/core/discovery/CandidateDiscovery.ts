@@ -164,7 +164,8 @@ export class CandidateDiscovery {
     candidates: Map<string, CandidateSignals>
   ): Promise<void> {
     // Search for keywords in file content using FTS
-    for (const keyword of task.keywords.slice(0, 10)) { // Limit to top 10 keywords
+    // Use more keywords to catch synonym expansions (e.g., "pagare" → "payment")
+    for (const keyword of task.keywords.slice(0, 30)) { // Use top 30 keywords including synonyms
       const results = this.db.searchContent(keyword, 20);
       for (const result of results) {
         this.addCandidate(candidates, result.path, { keywordMatch: true });

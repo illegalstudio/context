@@ -1,5 +1,7 @@
 // Keyword extraction using rule-based approach (no AI needed)
 
+import { SynonymExpander } from './dictionaries/index.js';
+
 // Case conversion utilities
 function snakeToCamel(str: string): string {
   return str
@@ -108,6 +110,12 @@ export interface ExtractedEntities {
 }
 
 export class KeywordExtractor {
+  private synonymExpander: SynonymExpander;
+
+  constructor() {
+    this.synonymExpander = new SynonymExpander();
+  }
+
   extract(text: string): ExtractedKeywords {
     const normalizedText = text.toLowerCase();
 
@@ -115,10 +123,13 @@ export class KeywordExtractor {
     const entities = this.extractEntities(text);
 
     // Extract keywords (after removing entities to avoid duplication)
-    const keywords = this.extractKeywords(text, entities);
+    const rawKeywords = this.extractKeywords(text, entities);
 
-    // Detect domains
-    const domains = this.detectDomains(normalizedText);
+    // Expand keywords with synonyms and translations
+    const keywords = this.synonymExpander.expandAll(rawKeywords);
+
+    // Detect domains (use expanded keywords for better matching)
+    const domains = this.detectDomains(normalizedText, keywords);
 
     // Detect change type
     const changeType = this.detectChangeType(normalizedText);
@@ -250,12 +261,14 @@ export class KeywordExtractor {
       .slice(0, 20);
   }
 
-  private detectDomains(text: string): string[] {
+  private detectDomains(text: string, expandedKeywords: string[]): string[] {
     const detectedDomains: string[] = [];
+    const keywordSet = new Set(expandedKeywords.map(k => k.toLowerCase()));
 
-    for (const [domain, keywords] of Object.entries(DOMAIN_KEYWORDS)) {
-      for (const keyword of keywords) {
-        if (text.includes(keyword)) {
+    for (const [domain, domainKeywords] of Object.entries(DOMAIN_KEYWORDS)) {
+      for (const keyword of domainKeywords) {
+        // Check both the original text and the expanded keywords
+        if (text.includes(keyword) || keywordSet.has(keyword)) {
           detectedDomains.push(domain);
           break;
         }
