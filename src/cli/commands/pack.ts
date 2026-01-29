@@ -74,12 +74,19 @@ export async function packCommand(options: PackOptions): Promise<void> {
     // Discover candidates
     spinner.start('Discovering relevant files...');
     const discovery = new CandidateDiscovery(db, cwd);
+    await discovery.init(); // Initialize discovery rules
+    const loadedRules = discovery.getLoadedRuleNames();
     const candidateSignals = await discovery.discover({
       task,
       stacktraceEntries,
       diffEntries,
     });
     spinner.succeed(`Found ${candidateSignals.size} candidate files`);
+
+    // Log loaded discovery rules
+    if (loadedRules.length > 0) {
+      logger.dim(`Discovery rules: ${loadedRules.join(', ')}`);
+    }
 
     // Score and rank
     spinner.start('Scoring and ranking...');

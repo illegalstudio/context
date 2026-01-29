@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import type { FileMetadata } from '../../types/index.js';
+import { CtxIgnore } from './CtxIgnore.js';
 
 // Language detection by extension
 const LANGUAGE_MAP: Record<string, string> = {
@@ -44,53 +45,11 @@ const LANGUAGE_MAP: Record<string, string> = {
   '.dockerfile': 'dockerfile',
 };
 
-// Default exclude patterns
-const DEFAULT_EXCLUDE_PATTERNS = [
-  'node_modules',
-  'vendor',
-  '.git',
-  '.context',
-  'dist',
-  'build',
-  'out',
-  '.next',
-  '.nuxt',
-  '__pycache__',
-  '.pytest_cache',
-  'coverage',
-  '.nyc_output',
-  'target', // Rust
-  '.idea',
-  '.vscode',
-  '.DS_Store',
-  'package-lock.json',
-  'yarn.lock',
-  'pnpm-lock.yaml',
-  'composer.lock',
-  'Gemfile.lock',
-  'Cargo.lock',
-  'poetry.lock',
-];
-
-// Files to never include (security)
-const NEVER_INCLUDE = [
-  '.env',
-  '.env.local',
-  '.env.development',
-  '.env.production',
-  '.env.test',
-  'credentials.json',
-  'secrets.json',
-  'secrets.yaml',
-  'secrets.yml',
-  '*.pem',
-  '*.key',
-  '*.p12',
-  '*.pfx',
-  'id_rsa',
-  'id_dsa',
-  'id_ecdsa',
-  'id_ed25519',
+// Essential exclusions - these are ALWAYS excluded regardless of .ctxignore
+// (user cannot override these for safety/functionality reasons)
+const ESSENTIAL_EXCLUDES = [
+  '.git',      // Never index git internals
+  '.context',  // Never index our own data
 ];
 
 export interface ScanOptions {
@@ -101,20 +60,26 @@ export interface ScanOptions {
 
 export class FileScanner {
   private rootDir: string;
-  private excludePatterns: Set<string>;
+  private essentialExcludes: Set<string>;
   private includeLanguages: Set<string> | null;
   private maxFileSize: number;
+  private ctxIgnore: CtxIgnore;
 
   constructor(rootDir: string, options: ScanOptions = {}) {
     this.rootDir = path.resolve(rootDir);
-    this.excludePatterns = new Set([
-      ...DEFAULT_EXCLUDE_PATTERNS,
-      ...(options.excludePatterns || []),
-    ]);
+    // Essential excludes cannot be overridden
+    this.essentialExcludes = new Set(ESSENTIAL_EXCLUDES);
+    // Additional excludes from options (if any) - these supplement .ctxignore
+    if (options.excludePatterns) {
+      for (const pattern of options.excludePatterns) {
+        this.essentialExcludes.add(pattern);
+      }
+    }
     this.includeLanguages = options.includeLanguages
       ? new Set(options.includeLanguages)
       : null;
     this.maxFileSize = options.maxFileSize || 1024 * 1024; // 1MB default
+    this.ctxIgnore = new CtxIgnore(this.rootDir);
   }
 
   async scan(): Promise<FileMetadata[]> {
@@ -147,26 +112,27 @@ export class FileScanner {
   }
 
   private shouldExclude(name: string, relativePath: string): boolean {
-    // Check if path segment matches exclude pattern
+    // Check essential excludes first (cannot be overridden)
     const segments = relativePath.split(path.sep);
     for (const segment of segments) {
-      if (this.excludePatterns.has(segment)) {
+      if (this.essentialExcludes.has(segment)) {
         return true;
       }
     }
 
-    // Check never-include patterns
-    for (const pattern of NEVER_INCLUDE) {
-      if (pattern.startsWith('*')) {
-        if (name.endsWith(pattern.slice(1))) {
-          return true;
-        }
-      } else if (name === pattern || name.startsWith(pattern)) {
-        return true;
-      }
+    // Check .ctxignore patterns (user-controllable)
+    if (this.ctxIgnore.isIgnored(relativePath)) {
+      return true;
     }
 
     return false;
+  }
+
+  /**
+   * Check if .ctxignore file was loaded
+   */
+  hasCustomIgnores(): boolean {
+    return this.ctxIgnore.hasCustomIgnores();
   }
 
   private async processFile(fullPath: string, relativePath: string): Promise<FileMetadata | null> {

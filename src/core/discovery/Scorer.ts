@@ -3,13 +3,15 @@ import type { Candidate, CandidateSignals, ResolvedTask } from '../../types/inde
 
 // Signal weights for scoring
 const WEIGHTS = {
-  stacktraceHit: 0.35,  // Appears in stacktrace (very strong)
-  diffHit: 0.25,        // Modified in diff (strong)
-  symbolMatch: 0.15,    // Contains matching symbol
-  keywordMatch: 0.10,   // Contains matching keywords
+  stacktraceHit: 0.30,  // Appears in stacktrace (very strong)
+  diffHit: 0.22,        // Modified in diff (strong)
+  symbolMatch: 0.12,    // Contains matching symbol
+  keywordMatch: 0.08,   // Contains matching keywords
   graphRelated: 0.05,   // Related via import graph
   testFile: 0.05,       // Is a test file for candidates
-  gitHotspot: 0.05,     // High git churn
+  gitHotspot: 0.04,     // High git churn
+  relatedFile: 0.10,    // Found by discovery rule (view, component, etc.)
+  exampleUsage: 0.04,   // Example of similar pattern usage
 };
 
 // Bonus multipliers
@@ -122,6 +124,8 @@ export class Scorer {
     if (signals.graphRelated) score += WEIGHTS.graphRelated;
     if (signals.testFile) score += WEIGHTS.testFile;
     if (signals.gitHotspot) score += WEIGHTS.gitHotspot;
+    if (signals.relatedFile) score += WEIGHTS.relatedFile;
+    if (signals.exampleUsage) score += WEIGHTS.exampleUsage;
 
     return score;
   }
@@ -187,6 +191,12 @@ export class Scorer {
     }
     if (signals.gitHotspot) {
       reasons.push('high git activity (hotspot)');
+    }
+    if (signals.relatedFile) {
+      reasons.push('related file (view, component, migration)');
+    }
+    if (signals.exampleUsage) {
+      reasons.push('example of similar pattern');
     }
     if (this.isEntryPoint(filePath)) {
       reasons.push('entry point (controller/handler)');

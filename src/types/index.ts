@@ -68,6 +68,8 @@ export interface CandidateSignals {
   graphRelated: boolean;
   testFile: boolean;
   gitHotspot: boolean;
+  relatedFile: boolean;    // Found by a discovery rule (view, component, etc.)
+  exampleUsage: boolean;   // Example of similar pattern usage
 }
 
 export interface Excerpt {

@@ -1,6 +1,9 @@
 import path from 'path';
 import { ContextDatabase } from '../../storage/Database.js';
 import type { ResolvedTask, Candidate, CandidateSignals, StacktraceEntry, DiffEntry } from '../../types/index.js';
+import { DiscoveryLoader } from './DiscoveryLoader.js';
+import type { DiscoveryContext as RuleDiscoveryContext } from './DiscoveryRule.js';
+import { CtxIgnore } from '../indexer/CtxIgnore.js';
 
 export interface DiscoveryContext {
   task: ResolvedTask;
@@ -11,10 +14,28 @@ export interface DiscoveryContext {
 export class CandidateDiscovery {
   private db: ContextDatabase;
   private rootDir: string;
+  private discoveryLoader: DiscoveryLoader;
+  private ctxIgnore: CtxIgnore;
 
   constructor(db: ContextDatabase, rootDir: string) {
     this.db = db;
     this.rootDir = rootDir;
+    this.discoveryLoader = new DiscoveryLoader(rootDir);
+    this.ctxIgnore = new CtxIgnore(rootDir);
+  }
+
+  /**
+   * Initialize the discovery system (load rules)
+   */
+  async init(): Promise<void> {
+    await this.discoveryLoader.init();
+  }
+
+  /**
+   * Get the names of loaded discovery rules
+   */
+  getLoadedRuleNames(): string[] {
+    return this.discoveryLoader.getAppliedRuleNames();
   }
 
   async discover(context: DiscoveryContext): Promise<Map<string, CandidateSignals>> {
@@ -35,7 +56,52 @@ export class CandidateDiscovery {
     // Add test files for discovered candidates
     await this.discoverTestFiles(candidates);
 
+    // Run modular discovery rules (Laravel, Statamic, etc.)
+    await this.runDiscoveryRules(context.task, candidates);
+
+    // Filter out ignored files (from .ctxignore)
+    this.filterIgnoredCandidates(candidates);
+
     return candidates;
+  }
+
+  /**
+   * Run modular discovery rules and merge their results
+   */
+  private async runDiscoveryRules(
+    task: ResolvedTask,
+    candidates: Map<string, CandidateSignals>
+  ): Promise<void> {
+    const ruleContext: RuleDiscoveryContext = {
+      task,
+      candidates,
+      db: this.db,
+      rootDir: this.rootDir,
+    };
+
+    const discovered = await this.discoveryLoader.runAll(ruleContext);
+
+    // Merge discovered candidates
+    for (const [filePath, signals] of discovered) {
+      this.addCandidate(candidates, filePath, signals);
+    }
+  }
+
+  /**
+   * Filter out candidates that match .ctxignore patterns
+   */
+  private filterIgnoredCandidates(candidates: Map<string, CandidateSignals>): void {
+    const toRemove: string[] = [];
+
+    for (const filePath of candidates.keys()) {
+      if (this.ctxIgnore.isIgnored(filePath)) {
+        toRemove.push(filePath);
+      }
+    }
+
+    for (const filePath of toRemove) {
+      candidates.delete(filePath);
+    }
   }
 
   private async discoverFromStacktrace(
@@ -220,6 +286,8 @@ export class CandidateDiscovery {
       graphRelated: false,
       testFile: false,
       gitHotspot: false,
+      relatedFile: false,
+      exampleUsage: false,
     };
 
     candidates.set(filePath, {
