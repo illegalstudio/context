@@ -97,6 +97,7 @@ export interface PackManifest {
 export interface PackOptions {
   task?: string;
   error?: string;
+  since?: string;
   diff?: string;
   file?: string;
   symbol?: string;
@@ -108,6 +109,7 @@ export interface PackOptions {
   snapshot?: 'none' | 'excerpts' | 'full';
   budgetTokens?: number;
   interactive?: boolean;
+  verbose?: boolean;
 }
 
 export interface IndexerConfig {
