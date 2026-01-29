@@ -1,5 +1,53 @@
 // Keyword extraction using rule-based approach (no AI needed)
 
+// Case conversion utilities
+function snakeToCamel(str: string): string {
+  return str
+    .split('_')
+    .map((part, i) => i === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+}
+
+function snakeToPascal(str: string): string {
+  return str
+    .split('_')
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+}
+
+function camelToSnake(str: string): string {
+  return str
+    .replace(/([A-Z])/g, '_$1')
+    .toLowerCase()
+    .replace(/^_/, '');
+}
+
+function pascalToSnake(str: string): string {
+  return camelToSnake(str);
+}
+
+// Generate all case variants for a term
+export function generateCaseVariants(term: string): string[] {
+  const variants = new Set<string>();
+  variants.add(term);
+  variants.add(term.toLowerCase());
+
+  // If it looks like snake_case
+  if (term.includes('_')) {
+    variants.add(snakeToCamel(term));      // manage_credit -> manageCredit
+    variants.add(snakeToPascal(term));     // manage_credit -> ManageCredit
+    variants.add(term.replace(/_/g, ''));  // manage_credit -> managecredit
+  }
+
+  // If it looks like CamelCase or PascalCase
+  if (/[a-z][A-Z]/.test(term) || /^[A-Z][a-z]/.test(term)) {
+    variants.add(camelToSnake(term));      // ManageCredit -> manage_credit
+    variants.add(term.toLowerCase());       // ManageCredit -> managecredit
+  }
+
+  return [...variants].filter(v => v.length > 0);
+}
+
 // Common stopwords to remove
 const STOPWORDS = new Set([
   // English
@@ -90,25 +138,42 @@ export class KeywordExtractor {
     const routePatterns: string[] = [];
     const errorCodes: string[] = [];
 
-    // CamelCase class names (e.g., UserController, StripeService)
-    const camelCasePattern = /\b([A-Z][a-z]+(?:[A-Z][a-z]+)+)\b/g;
     let match;
+
+    // CamelCase/PascalCase class names (e.g., UserController, StripeService)
+    const camelCasePattern = /\b([A-Z][a-z]+(?:[A-Z][a-z]+)+)\b/g;
     while ((match = camelCasePattern.exec(text)) !== null) {
-      classNames.push(match[1]);
+      // Add the match and all its variants
+      const variants = generateCaseVariants(match[1]);
+      classNames.push(...variants);
+    }
+
+    // snake_case identifiers (e.g., manage_credit, user_profile)
+    // These are likely table names, model names, or file references
+    const snakeCasePattern = /\b([a-z][a-z0-9]*(?:_[a-z0-9]+)+)\b/g;
+    while ((match = snakeCasePattern.exec(text)) !== null) {
+      // Skip if it's a common programming term
+      if (!STOPWORDS.has(match[1])) {
+        // Add all variants (snake_case, CamelCase, PascalCase)
+        const variants = generateCaseVariants(match[1]);
+        classNames.push(...variants);
+      }
     }
 
     // Method/function names (e.g., handleWebhook, processPayment)
     // Look for patterns like ClassName.methodName or ::methodName
     const methodPattern = /(?:\.|\:\:)([a-z][a-zA-Z0-9]+)/g;
     while ((match = methodPattern.exec(text)) !== null) {
-      methodNames.push(match[1]);
+      const variants = generateCaseVariants(match[1]);
+      methodNames.push(...variants);
     }
 
-    // Also look for standalone method-like patterns
+    // Also look for standalone method-like patterns (camelCase)
     const standaloneMethodPattern = /\b([a-z][a-zA-Z0-9]*(?:[A-Z][a-z0-9]+)+)\b/g;
     while ((match = standaloneMethodPattern.exec(text)) !== null) {
       if (!classNames.includes(match[1])) {
-        methodNames.push(match[1]);
+        const variants = generateCaseVariants(match[1]);
+        methodNames.push(...variants);
       }
     }
 
@@ -139,8 +204,8 @@ export class KeywordExtractor {
     }
 
     return {
-      classNames: [...new Set(classNames)],
-      methodNames: [...new Set(methodNames)],
+      classNames: [...new Set(classNames)].filter(n => n.length > 2),
+      methodNames: [...new Set(methodNames)].filter(n => n.length > 2),
       fileNames: [...new Set(fileNames)],
       routePatterns: [...new Set(routePatterns)],
       errorCodes: [...new Set(errorCodes)],

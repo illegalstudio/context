@@ -53,6 +53,7 @@ public/storage
     await Promise.all([
       discoverViewsFromControllers(ctx, found),
       discoverControllersFromRoutes(ctx, found),
+      discoverControllersFromRoutesByKeyword(ctx, found), // NEW: proactive route discovery
       discoverMigrationsFromModels(ctx, found),
       discoverRelatedModels(ctx, found),
       discoverFormRequests(ctx, found),
@@ -135,6 +136,147 @@ async function discoverControllersFromRoutes(
           }
         }
       }
+    } catch {
+      // Skip if can't read file
+    }
+  }
+}
+
+/**
+ * Proactively read route files (web.php, api.php) and find controllers
+ * related to the task keywords. This enables discovery even when route
+ * files aren't in the initial candidate set.
+ */
+async function discoverControllersFromRoutesByKeyword(
+  ctx: DiscoveryContext,
+  found: Map<string, CandidateSignals>
+): Promise<void> {
+  const routeFiles = ['routes/web.php', 'routes/api.php'];
+  const allFiles = ctx.db.getAllFiles();
+
+  // Build a set of keywords to match against routes
+  const taskKeywords = new Set<string>();
+  for (const keyword of ctx.task.keywords) {
+    if (keyword.length > 2) {
+      taskKeywords.add(keyword.toLowerCase());
+    }
+  }
+  for (const domain of ctx.task.domains) {
+    if (domain.length > 2) {
+      taskKeywords.add(domain.toLowerCase());
+    }
+  }
+  for (const symbol of ctx.task.symbols) {
+    if (symbol.length > 2) {
+      taskKeywords.add(symbol.toLowerCase());
+    }
+  }
+
+  if (taskKeywords.size === 0) return;
+
+  for (const routeFile of routeFiles) {
+    const routeFullPath = path.join(ctx.rootDir, routeFile);
+    if (!fs.existsSync(routeFullPath)) continue;
+
+    try {
+      const content = fs.readFileSync(routeFullPath, 'utf-8');
+
+      // Also add the route file itself if it matches keywords
+      const contentLower = content.toLowerCase();
+      let routeFileRelevant = false;
+      for (const keyword of taskKeywords) {
+        if (contentLower.includes(keyword)) {
+          routeFileRelevant = true;
+          break;
+        }
+      }
+
+      if (routeFileRelevant && !ctx.candidates.has(routeFile) && !found.has(routeFile)) {
+        found.set(routeFile, {
+          ...createDefaultSignals(),
+          relatedFile: true,
+        });
+      }
+
+      // Parse routes and match against keywords
+      // Pattern 1: Route::method('/path', [Controller::class, 'method'])
+      const routePattern1 = /Route::\w+\(\s*['"]([^'"]+)['"]\s*,\s*\[\s*([A-Z][a-zA-Z]+Controller)::class\s*,\s*['"]([a-zA-Z_]+)['"]\s*\]/g;
+      let match;
+
+      while ((match = routePattern1.exec(content)) !== null) {
+        const routePath = match[1];
+        const controller = match[2];
+        const method = match[3];
+
+        // Check if route path, controller, or method matches any keyword
+        const combined = `${routePath} ${controller} ${method}`.toLowerCase();
+        const isRelevant = [...taskKeywords].some(kw => combined.includes(kw));
+
+        if (isRelevant) {
+          // Find the controller file
+          for (const file of allFiles) {
+            if (ctx.candidates.has(file.path) || found.has(file.path)) continue;
+
+            if (file.path.endsWith(`${controller}.php`)) {
+              found.set(file.path, {
+                ...createDefaultSignals(),
+                relatedFile: true,
+              });
+            }
+          }
+        }
+      }
+
+      // Pattern 2: Route::method('/path', 'Controller@method')
+      const routePattern2 = /Route::\w+\(\s*['"]([^'"]+)['"]\s*,\s*['"]([A-Z][a-zA-Z]+Controller)@([a-zA-Z_]+)['"]\s*\)/g;
+
+      while ((match = routePattern2.exec(content)) !== null) {
+        const routePath = match[1];
+        const controller = match[2];
+        const method = match[3];
+
+        const combined = `${routePath} ${controller} ${method}`.toLowerCase();
+        const isRelevant = [...taskKeywords].some(kw => combined.includes(kw));
+
+        if (isRelevant) {
+          for (const file of allFiles) {
+            if (ctx.candidates.has(file.path) || found.has(file.path)) continue;
+
+            if (file.path.endsWith(`${controller}.php`)) {
+              found.set(file.path, {
+                ...createDefaultSignals(),
+                relatedFile: true,
+              });
+            }
+          }
+        }
+      }
+
+      // Pattern 3: Route::method('/path', [Controller::class, 'method']) - single line
+      // Also captures Route::resource, Route::apiResource
+      const routePattern3 = /Route::(?:get|post|put|patch|delete|any|resource|apiResource)\s*\(\s*['"]([^'"]+)['"][^)]*?([A-Z][a-zA-Z]+Controller)/g;
+
+      while ((match = routePattern3.exec(content)) !== null) {
+        const routePath = match[1];
+        const controller = match[2];
+
+        const combined = `${routePath} ${controller}`.toLowerCase();
+        const isRelevant = [...taskKeywords].some(kw => combined.includes(kw));
+
+        if (isRelevant) {
+          for (const file of allFiles) {
+            if (ctx.candidates.has(file.path) || found.has(file.path)) continue;
+
+            if (file.path.endsWith(`${controller}.php`)) {
+              found.set(file.path, {
+                ...createDefaultSignals(),
+                relatedFile: true,
+              });
+            }
+          }
+        }
+      }
+
     } catch {
       // Skip if can't read file
     }

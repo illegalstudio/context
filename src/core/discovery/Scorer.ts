@@ -10,14 +10,14 @@ const WEIGHTS = {
   graphRelated: 0.05,   // Related via import graph
   testFile: 0.05,       // Is a test file for candidates
   gitHotspot: 0.04,     // High git churn
-  relatedFile: 0.10,    // Found by discovery rule (view, component, etc.)
+  relatedFile: 0.12,    // Found by discovery rule or two-hop reference
   exampleUsage: 0.04,   // Example of similar pattern usage
 };
 
 // Bonus multipliers
 const BONUSES = {
   // File is an entry point (controller, handler, etc.)
-  entryPoint: 1.2,
+  entryPoint: 1.3,
   // File is in same directory as a strong hit
   sameDirectory: 1.1,
   // Multiple signals combined
