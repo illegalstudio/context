@@ -6,7 +6,7 @@ import { DOMAIN_KEYWORDS } from '../resolver/KeywordExtractor.js';
 const WEIGHTS = {
   stacktraceHit: 0.30,  // Appears in stacktrace (very strong)
   diffHit: 0.22,        // Modified in diff (strong)
-  symbolMatch: 0.12,    // Contains matching symbol
+  symbolMatch: 0.20,    // Contains matching symbol (increased - exact method/class mention is strong signal)
   keywordMatch: 0.08,   // Contains matching keywords
   graphRelated: 0.05,   // Related via import graph
   testFile: 0.05,       // Is a test file for candidates
@@ -19,6 +19,10 @@ const WEIGHTS = {
 const BONUSES = {
   // File is an entry point (controller, handler, etc.)
   entryPoint: 1.3,
+  // File is a model/entity (often core domain logic)
+  modelFile: 1.2,
+  // File contains an explicitly mentioned symbol (method/class name from task)
+  symbolMention: 1.25,
   // File is in same directory as a strong hit
   sameDirectory: 1.1,
   // Multiple signals combined
@@ -71,13 +75,18 @@ export class Scorer {
     // Sort by score descending
     candidates.sort((a, b) => b.score - a.score);
 
-    // Separate main files and test files
+    // Separate files by type, keeping track of reserved files
+    const reservedFiles: Candidate[] = [];  // Files with exact symbol mention (always included)
     const mainFiles: Candidate[] = [];
     const testFiles: Candidate[] = [];
     const configFiles: Candidate[] = [];
 
     for (const candidate of candidates) {
-      if (this.isTestFile(candidate.path)) {
+      // Files with exactSymbolMention are ALWAYS included (reserved slots)
+      // These are files where the user explicitly mentioned a method/class name
+      if (candidate.signals.exactSymbolMention && !this.isTestFile(candidate.path)) {
+        reservedFiles.push(candidate);
+      } else if (this.isTestFile(candidate.path)) {
         testFiles.push(candidate);
       } else if (this.isConfigFile(candidate.path)) {
         configFiles.push(candidate);
@@ -89,13 +98,24 @@ export class Scorer {
     // Build final list with balanced representation
     const result: Candidate[] = [];
 
-    // Add main files (majority)
-    const mainLimit = Math.floor(maxFiles * 0.7);
-    result.push(...mainFiles.slice(0, mainLimit));
+    // 1. First add reserved files (exact symbol mentions) - these are ALWAYS included
+    const reservedPaths = new Set<string>();
+    for (const reserved of reservedFiles) {
+      if (!reservedPaths.has(reserved.path)) {
+        result.push(reserved);
+        reservedPaths.add(reserved.path);
+      }
+    }
 
-    // Add test files (if enabled)
+    // 2. Add main files (majority of remaining slots)
+    const remainingSlots = maxFiles - result.length;
+    const mainLimit = Math.floor(remainingSlots * 0.7);
+    const mainToAdd = mainFiles.filter(f => !reservedPaths.has(f.path)).slice(0, mainLimit);
+    result.push(...mainToAdd);
+
+    // 3. Add test files (if enabled)
     if (options.includeTests !== false) {
-      const testLimit = Math.floor(maxFiles * 0.2);
+      const testLimit = Math.floor(remainingSlots * 0.2);
       // Filter to only tests that test our included files
       const includedPaths = new Set(result.map(c => c.path));
       const relevantTests = testFiles.filter(t =>
@@ -104,9 +124,9 @@ export class Scorer {
       result.push(...relevantTests.slice(0, testLimit));
     }
 
-    // Add config files (if enabled and relevant)
+    // 4. Add config files (if enabled and relevant)
     if (options.includeConfig !== false) {
-      const configLimit = Math.floor(maxFiles * 0.1);
+      const configLimit = Math.floor(remainingSlots * 0.1);
       // Filter to relevant config files
       const relevantConfig = configFiles.filter(c =>
         this.configIsRelevant(c.path, task)
@@ -178,6 +198,16 @@ export class Scorer {
     // Entry point bonus
     if (this.isEntryPoint(filePath)) {
       score *= BONUSES.entryPoint;
+    }
+
+    // Model file bonus
+    if (this.isModelFile(filePath)) {
+      score *= BONUSES.modelFile;
+    }
+
+    // Symbol mention bonus (explicit method/class mentioned in task)
+    if (signals.symbolMatch) {
+      score *= BONUSES.symbolMention;
     }
 
     // Domain relevance bonus - scaled by how many keywords matched that domain
@@ -283,7 +313,9 @@ export class Scorer {
     if (signals.diffHit) {
       reasons.push('modified in current changes');
     }
-    if (signals.symbolMatch) {
+    if (signals.exactSymbolMention) {
+      reasons.push('contains explicitly mentioned symbol (reserved)');
+    } else if (signals.symbolMatch) {
       reasons.push('contains matching symbol');
     }
     if (signals.keywordMatch) {
@@ -306,6 +338,9 @@ export class Scorer {
     }
     if (this.isEntryPoint(filePath)) {
       reasons.push('entry point (controller/handler)');
+    }
+    if (this.isModelFile(filePath)) {
+      reasons.push('model/entity file');
     }
     if (this.isDomainRelevant(filePath, task.domains)) {
       reasons.push(`domain relevant (${task.domains.join(', ')})`);
@@ -353,6 +388,17 @@ export class Scorer {
       /index\.[a-z]+$/,
       /main\.[a-z]+$/,
       /app\.[a-z]+$/,
+    ];
+    return patterns.some(p => p.test(filePath));
+  }
+
+  private isModelFile(filePath: string): boolean {
+    const patterns = [
+      /Models?\//i,           // app/Models/ or Model/
+      /Entities?\//i,         // app/Entities/ or Entity/
+      /\.model\./i,           // *.model.ts, *.model.js
+      /Model\.[a-z]+$/i,      // *Model.php, *Model.ts
+      /Entity\.[a-z]+$/i,     // *Entity.php, *Entity.ts
     ];
     return patterns.some(p => p.test(filePath));
   }

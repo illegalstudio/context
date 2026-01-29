@@ -61,6 +61,8 @@ export const synonymGroups: string[][] = [
   ['message', 'msg', 'chat'],
   ['email', 'mail'],
   ['phone', 'tel', 'mobile', 'cell'],
+  ['sms', 'text', 'textmessage', 'mobile'],
+  ['otp', 'code', 'verification', 'pin', 'validate', 'validation'],
 
   // === Technical ===
   ['error', 'exception', 'failure', 'fault', 'bug'],
@@ -87,6 +89,11 @@ export const synonymGroups: string[][] = [
   ['audio', 'sound', 'music'],
   ['test', 'spec', 'check'],
   ['mock', 'stub', 'fake', 'dummy'],
+
+  // === Moderation ===
+  ['report', 'flag', 'complaint'],
+  ['ban', 'suspend', 'block', 'banned', 'suspended', 'blocked'],
+  ['abuse', 'violation', 'spam'],
 
   // === Status ===
   ['active', 'enabled', 'on'],

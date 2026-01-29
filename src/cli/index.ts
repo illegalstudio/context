@@ -5,6 +5,12 @@ import { initCommand } from './commands/init.js';
 import { indexCommand } from './commands/index.js';
 import { packCommand } from './commands/pack.js';
 import { openCommand } from './commands/open.js';
+import {
+  domainsListCommand,
+  domainsAddCommand,
+  domainsRemoveCommand,
+  domainsEnableCommand,
+} from './commands/domains.js';
 
 const program = new Command();
 
@@ -68,6 +74,44 @@ program
   .option('-f, --file <name>', 'Open specific file (e.g., PACK.md)')
   .action(async (options) => {
     await openCommand(options);
+  });
+
+// domains command with subcommands
+const domainsCmd = program
+  .command('domains')
+  .description('Manage domain definitions for task analysis');
+
+domainsCmd
+  .command('list')
+  .description('List all active domains')
+  .option('-a, --all', 'Show all domains including disabled')
+  .option('-v, --verbose', 'Show keywords for each domain')
+  .action(async (options) => {
+    await domainsListCommand(options);
+  });
+
+domainsCmd
+  .command('add <name>')
+  .description('Add a custom domain')
+  .requiredOption('-k, --keywords <keywords>', 'Comma-separated keywords')
+  .option('-d, --description <description>', 'Domain description')
+  .action(async (name, options) => {
+    const keywords = options.keywords.split(',').map((k: string) => k.trim().toLowerCase());
+    await domainsAddCommand(name, keywords, options.description);
+  });
+
+domainsCmd
+  .command('remove <name>')
+  .description('Remove a custom domain (or disable a built-in domain)')
+  .action(async (name) => {
+    await domainsRemoveCommand(name);
+  });
+
+domainsCmd
+  .command('enable <name>')
+  .description('Enable a previously disabled domain')
+  .action(async (name) => {
+    await domainsEnableCommand(name);
   });
 
 // Parse arguments

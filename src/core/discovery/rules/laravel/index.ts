@@ -31,6 +31,52 @@ public/hot
 public/storage
 `.trim(),
 
+  /**
+   * Laravel-specific domains for task analysis
+   */
+  domains: [
+    {
+      name: 'eloquent',
+      description: 'Laravel Eloquent ORM',
+      keywords: ['eloquent', 'model', 'relation', 'scope', 'accessor', 'mutator', 'cast', 'factory', 'seeder', 'hasMany', 'belongsTo', 'morphTo'],
+    },
+    {
+      name: 'blade',
+      description: 'Laravel Blade templates',
+      keywords: ['blade', 'template', 'view', 'component', 'slot', 'directive', 'layout', 'section', 'yield'],
+    },
+    {
+      name: 'artisan',
+      description: 'Laravel Artisan commands',
+      keywords: ['artisan', 'command', 'console', 'schedule', 'cron', 'tinker'],
+    },
+    {
+      name: 'filament',
+      description: 'Filament admin panel',
+      keywords: ['filament', 'resource', 'widget', 'page', 'panel', 'admin', 'form', 'table', 'infolist'],
+    },
+    {
+      name: 'livewire',
+      description: 'Laravel Livewire components',
+      keywords: ['livewire', 'wire', 'alpine', 'reactive', 'emit', 'dispatch'],
+    },
+    {
+      name: 'nova',
+      description: 'Laravel Nova admin',
+      keywords: ['nova', 'resource', 'lens', 'action', 'filter', 'metric', 'card'],
+    },
+    {
+      name: 'sanctum',
+      description: 'Laravel Sanctum authentication',
+      keywords: ['sanctum', 'token', 'ability', 'personalAccessToken', 'spa'],
+    },
+    {
+      name: 'horizon',
+      description: 'Laravel Horizon queue management',
+      keywords: ['horizon', 'supervisor', 'balance', 'queue', 'redis'],
+    },
+  ],
+
   appliesTo(rootDir: string): boolean {
     const composerPath = path.join(rootDir, 'composer.json');
     if (!fs.existsSync(composerPath)) return false;

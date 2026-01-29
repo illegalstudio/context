@@ -70,21 +70,21 @@ const STOPWORDS = new Set([
 ]);
 
 // Domain keywords that indicate specific areas
-// Exported so Scorer can use them for domain relevance bonus
-export const DOMAIN_KEYWORDS: Record<string, string[]> = {
-  auth: ['auth', 'authentication', 'login', 'logout', 'session', 'token', 'jwt', 'oauth', 'password', 'permission', 'role', 'credential', 'sanctum', 'passport'],  // Note: 'user' and 'access' removed - too generic
-  payments: ['payment', 'stripe', 'checkout', 'charge', 'invoice', 'subscription', 'billing', 'price', 'cart', 'order', 'webhook', 'refund', 'paypal', 'transaction'],
-  api: ['api', 'endpoint', 'route', 'rest', 'graphql', 'request', 'response', 'controller', 'middleware', 'cors', 'rate', 'limit'],
-  database: ['database', 'db', 'query', 'migration', 'model', 'schema', 'table', 'column', 'index', 'eloquent', 'sql', 'orm', 'relation', 'foreign'],
-  cache: ['cache', 'redis', 'memcache', 'session', 'store', 'ttl', 'invalidate', 'flush'],
-  queue: ['queue', 'job', 'worker', 'dispatch', 'listener', 'event', 'async', 'background', 'schedule', 'cron'],
-  email: ['email', 'mail', 'smtp', 'notification', 'template', 'send', 'inbox', 'mailer'],
-  storage: ['storage', 'file', 'upload', 'download', 's3', 'disk', 'filesystem', 'image', 'media', 'asset'],
-  testing: ['test', 'spec', 'mock', 'stub', 'fixture', 'assert', 'expect', 'unit', 'integration', 'e2e', 'coverage'],
-  security: ['security', 'xss', 'csrf', 'injection', 'sanitize', 'escape', 'validate', 'encrypt', 'decrypt', 'hash', 'vulnerability'],
-  performance: ['performance', 'slow', 'fast', 'optimize', 'speed', 'latency', 'cache', 'index', 'query', 'n+1'],
-  ui: ['ui', 'component', 'view', 'template', 'blade', 'react', 'vue', 'frontend', 'css', 'style', 'layout'],
-};
+// This is kept for backward compatibility - prefer using DomainManager for new code
+// The actual domain definitions are now in ./domains/builtin.ts
+import { getCoreDomainKeywords } from './domains/index.js';
+
+// Re-export for backward compatibility with Scorer and other modules
+// Initially loaded with core domains, then updated by TaskResolver with full domains
+export let DOMAIN_KEYWORDS: Record<string, string[]> = getCoreDomainKeywords();
+
+/**
+ * Update the domain keywords (called by TaskResolver with DomainManager data)
+ * This merges core + framework + custom domains
+ */
+export function setDomainKeywords(keywords: Record<string, string[]>): void {
+  DOMAIN_KEYWORDS = keywords;
+}
 
 // Change type indicators
 const CHANGE_TYPE_KEYWORDS: Record<string, string[]> = {

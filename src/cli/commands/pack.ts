@@ -46,6 +46,7 @@ export async function packCommand(options: PackOptions): Promise<void> {
     // Resolve task
     spinner.start('Analyzing task...');
     const resolver = new TaskResolver(cwd);
+    await resolver.init();  // Initialize domain detection (loads framework-specific domains)
     const { task, stacktraceEntries, diffEntries } = await resolver.resolve(options);
     spinner.succeed('Task analyzed');
 

@@ -65,6 +65,7 @@ export interface CandidateSignals {
   stacktraceHit: boolean;
   diffHit: boolean;
   symbolMatch: boolean;
+  exactSymbolMention: boolean;  // File contains a symbol explicitly mentioned in the task (method/class name)
   keywordMatch: boolean;
   graphRelated: boolean;
   testFile: boolean;

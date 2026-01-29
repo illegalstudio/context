@@ -32,6 +32,52 @@ coverage/
 .turbo/
 `.trim(),
 
+  /**
+   * Node.js ecosystem domains
+   */
+  domains: [
+    {
+      name: 'express',
+      description: 'Express.js routing and middleware',
+      keywords: ['express', 'router', 'middleware', 'req', 'res', 'next', 'app.use', 'app.get', 'app.post'],
+    },
+    {
+      name: 'prisma',
+      description: 'Prisma ORM',
+      keywords: ['prisma', 'schema', 'migration', 'client', 'model', 'findMany', 'create', 'update', 'delete'],
+    },
+    {
+      name: 'nextjs',
+      description: 'Next.js framework',
+      keywords: ['nextjs', 'getServerSideProps', 'getStaticProps', 'getStaticPaths', 'useRouter', 'Image', 'Link', 'Head', 'app router', 'page router'],
+    },
+    {
+      name: 'nestjs',
+      description: 'NestJS framework',
+      keywords: ['nestjs', 'controller', 'service', 'module', 'guard', 'pipe', 'interceptor', 'decorator', 'injectable'],
+    },
+    {
+      name: 'react',
+      description: 'React components and hooks',
+      keywords: ['react', 'useState', 'useEffect', 'useContext', 'useReducer', 'useMemo', 'useCallback', 'useRef', 'component', 'jsx', 'tsx'],
+    },
+    {
+      name: 'redux',
+      description: 'Redux state management',
+      keywords: ['redux', 'store', 'reducer', 'action', 'dispatch', 'selector', 'slice', 'thunk', 'saga', 'toolkit'],
+    },
+    {
+      name: 'vue',
+      description: 'Vue.js framework',
+      keywords: ['vue', 'ref', 'reactive', 'computed', 'watch', 'onMounted', 'defineComponent', 'setup', 'template'],
+    },
+    {
+      name: 'graphql',
+      description: 'GraphQL API',
+      keywords: ['graphql', 'query', 'mutation', 'subscription', 'resolver', 'schema', 'type', 'apollo', 'gql'],
+    },
+  ],
+
   appliesTo(rootDir: string): boolean {
     return fs.existsSync(path.join(rootDir, 'package.json'));
   },

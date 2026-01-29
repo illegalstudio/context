@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type { DiscoveryRule, DiscoveryContext } from './DiscoveryRule.js';
+import type { DiscoveryRule, DiscoveryContext, FrameworkDomain } from './DiscoveryRule.js';
 import { createDefaultSignals, mergeSignals } from './DiscoveryRule.js';
 import type { CandidateSignals } from '../../types/index.js';
 import { builtInRules } from './rules/index.js';
@@ -186,5 +186,33 @@ export class DiscoveryLoader {
    */
   getRuleCount(): number {
     return this.rules.length;
+  }
+
+  /**
+   * Get all domains from applied rules
+   * Returns domains as a record of name -> keywords for easy merging
+   */
+  getFrameworkDomains(): Record<string, { description: string; keywords: string[] }> {
+    const domains: Record<string, { description: string; keywords: string[] }> = {};
+
+    for (const rule of this.rules) {
+      if (rule.domains) {
+        for (const domain of rule.domains) {
+          domains[domain.name] = {
+            description: domain.description,
+            keywords: domain.keywords,
+          };
+        }
+      }
+    }
+
+    return domains;
+  }
+
+  /**
+   * Get all loaded rules (for external access)
+   */
+  getLoadedRules(): DiscoveryRule[] {
+    return this.rules;
   }
 }

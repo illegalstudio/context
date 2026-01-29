@@ -88,4 +88,17 @@ export const synonymGroups: string[][] = [
   ['bozza', 'non pubblicato'],
   ['pubblicato', 'online', 'pubblico'],
   ['archiviato', 'eliminato'],
+
+  // === Moderazione ===
+  ['segnalare', 'segnalato', 'segnalazione', 'report', 'flag'],
+  ['sospendere', 'sospeso', 'sospensione', 'suspend', 'ban'],
+  ['bannare', 'bannato', 'ban', 'block'],
+  ['bloccare', 'bloccato', 'block'],
+  ['abuso', 'violazione', 'abuse'],
+
+  // === SMS / Verifica ===
+  ['sms', 'messaggio', 'text'],
+  ['verifica', 'verificare', 'validare', 'validazione', 'validation', 'verify'],
+  ['otp', 'codice', 'pin', 'code'],
+  ['cellulare', 'mobile', 'telefono', 'phone'],
 ];

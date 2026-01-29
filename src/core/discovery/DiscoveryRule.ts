@@ -17,6 +17,15 @@ export interface DiscoveryContext {
  * Discovery rules are modular plugins that add framework/tool-specific
  * heuristics for finding related files (e.g., Controller → View in Laravel)
  */
+/**
+ * Domain definition for framework-specific domains
+ */
+export interface FrameworkDomain {
+  name: string;
+  description: string;
+  keywords: string[];
+}
+
 export interface DiscoveryRule {
   /**
    * Unique identifier for the rule
@@ -51,6 +60,12 @@ export interface DiscoveryRule {
   ignorePatterns: string;
 
   /**
+   * Framework-specific domains (keywords for task analysis)
+   * These are loaded when the framework is detected
+   */
+  domains?: FrameworkDomain[];
+
+  /**
    * Optional weight multiplier for candidates found by this rule
    * Default is 1.0
    */
@@ -65,6 +80,7 @@ export function createDefaultSignals(): CandidateSignals {
     stacktraceHit: false,
     diffHit: false,
     symbolMatch: false,
+    exactSymbolMention: false,
     keywordMatch: false,
     graphRelated: false,
     testFile: false,

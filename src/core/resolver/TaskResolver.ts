@@ -1,7 +1,8 @@
 import type { ResolvedTask, TaskConfidence, PackOptions, StacktraceEntry, DiffEntry } from '../../types/index.js';
-import { KeywordExtractor } from './KeywordExtractor.js';
+import { KeywordExtractor, setDomainKeywords } from './KeywordExtractor.js';
 import { StacktraceParser } from './StacktraceParser.js';
 import { DiffAnalyzer } from './DiffAnalyzer.js';
+import { DomainManager } from './domains/index.js';
 
 export interface ResolveResult {
   task: ResolvedTask;
@@ -13,11 +14,31 @@ export class TaskResolver {
   private keywordExtractor: KeywordExtractor;
   private stacktraceParser: StacktraceParser;
   private diffAnalyzer: DiffAnalyzer;
+  private domainManager: DomainManager;
 
   constructor(rootDir: string) {
     this.keywordExtractor = new KeywordExtractor();
     this.stacktraceParser = new StacktraceParser();
     this.diffAnalyzer = new DiffAnalyzer(rootDir);
+    this.domainManager = new DomainManager(rootDir);
+  }
+
+  /**
+   * Initialize domain detection (call before resolve)
+   */
+  async init(): Promise<void> {
+    // Detect frameworks and load appropriate domains
+    await this.domainManager.detectFrameworks();
+
+    // Update the global domain keywords for use by KeywordExtractor
+    setDomainKeywords(this.domainManager.getAllDomainKeywords());
+  }
+
+  /**
+   * Get the DomainManager instance for external access (e.g., CLI commands)
+   */
+  getDomainManager(): DomainManager {
+    return this.domainManager;
   }
 
   async resolve(options: PackOptions): Promise<ResolveResult> {

@@ -151,10 +151,15 @@ export class CandidateDiscovery {
     candidates: Map<string, CandidateSignals>
   ): Promise<void> {
     // Search for symbols mentioned in the task
+    // These are explicit method/class names mentioned by the user - very strong signal
     for (const symbolName of task.symbols) {
       const symbols = this.db.findSymbolsByName(symbolName);
       for (const symbol of symbols) {
-        this.addCandidate(candidates, symbol.filePath, { symbolMatch: true });
+        // Mark as both symbolMatch AND exactSymbolMention for explicit task symbols
+        this.addCandidate(candidates, symbol.filePath, {
+          symbolMatch: true,
+          exactSymbolMention: true
+        });
       }
     }
   }
@@ -207,21 +212,21 @@ export class CandidateDiscovery {
 
     // Add all symbols (these include case variants)
     for (const symbol of task.symbols) {
-      if (symbol.length > 3) {
+      if (symbol.length >= 3) {
         searchTerms.add(symbol.toLowerCase());
       }
     }
 
     // Add ALL keywords (not just identifier-like ones)
     for (const keyword of task.keywords) {
-      if (keyword.length > 3) {
+      if (keyword.length >= 3) {
         searchTerms.add(keyword.toLowerCase());
       }
     }
 
     // Add domain names as search terms (e.g., "payments" domain -> search for payment-related files)
     for (const domain of task.domains) {
-      if (domain.length > 3) {
+      if (domain.length >= 3) {
         searchTerms.add(domain.toLowerCase());
       }
     }
@@ -451,6 +456,7 @@ export class CandidateDiscovery {
       stacktraceHit: false,
       diffHit: false,
       symbolMatch: false,
+      exactSymbolMention: false,
       keywordMatch: false,
       graphRelated: false,
       testFile: false,
