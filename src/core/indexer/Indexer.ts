@@ -10,6 +10,7 @@ import type { FileMetadata } from '../../types/index.js';
 export interface IndexerOptions extends ScanOptions {
   verbose?: boolean;
   onProgress?: (current: number, total: number, file: string) => void;
+  onPhase?: (phase: string) => void;
 }
 
 export interface IndexStats {
@@ -42,6 +43,7 @@ export class Indexer {
     const startTime = Date.now();
 
     // 1. Scan files
+    this.options.onPhase?.('Scanning files...');
     this.log('Scanning files...');
     const files = await this.fileScanner.scan();
     this.log(`Found ${files.length} files`);
@@ -50,6 +52,7 @@ export class Indexer {
     this.importGraphBuilder.setFileIndex(files.map(f => f.path));
 
     // 2. Index each file
+    this.options.onPhase?.('Indexing files...');
     let processed = 0;
     const total = files.length;
 
@@ -63,8 +66,9 @@ export class Indexer {
       processed++;
     }
 
-    // 3. Collect git signals
+    // 3. Collect git signals (fast batch operation)
     if (this.gitSignals.isAvailable()) {
+      this.options.onPhase?.('Collecting git signals...');
       this.log('Collecting git signals...');
       const signals = await this.gitSignals.collectSignals(files.map(f => f.path));
       for (const [filePath, signal] of signals) {

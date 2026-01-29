@@ -1,5 +1,4 @@
 import { execSync } from 'child_process';
-import path from 'path';
 import type { GitSignal } from '../../types/index.js';
 
 export class GitSignalsCollector {
@@ -27,125 +26,94 @@ export class GitSignalsCollector {
     return this.isGitRepo;
   }
 
+  // Fast batch collection using single git commands
   async collectSignals(files: string[]): Promise<Map<string, GitSignal>> {
     const signals = new Map<string, GitSignal>();
 
-    if (!this.isGitRepo) {
+    if (!this.isGitRepo || files.length === 0) {
       return signals;
     }
 
-    // Batch process for efficiency
-    const commitCounts = await this.getCommitCounts(files);
-    const lastModified = await this.getLastModifiedDates(files);
-    const churnScores = await this.getChurnScores(files);
-
+    // Initialize all files with default values
     for (const file of files) {
       signals.set(file, {
         path: file,
-        lastModified: lastModified.get(file),
-        commitCount: commitCounts.get(file) || 0,
-        churnScore: churnScores.get(file) || 0,
+        lastModified: undefined,
+        commitCount: 0,
+        churnScore: 0,
       });
+    }
+
+    // Get hotspots in a single command (most efficient)
+    const hotspots = await this.getHotspots(500);
+    const hotspotMap = new Map(hotspots.map(h => [h.file, h.score]));
+
+    // Update signals with hotspot scores
+    for (const file of files) {
+      const signal = signals.get(file);
+      if (signal && hotspotMap.has(file)) {
+        signal.churnScore = hotspotMap.get(file) || 0;
+        signal.commitCount = Math.round(signal.churnScore * 100); // Approximate
+      }
     }
 
     return signals;
   }
 
-  private async getCommitCounts(files: string[]): Promise<Map<string, number>> {
-    const counts = new Map<string, number>();
+  // Collect detailed signals for specific files only (used during pack)
+  async collectDetailedSignals(files: string[]): Promise<Map<string, GitSignal>> {
+    const signals = new Map<string, GitSignal>();
 
-    try {
-      // Use git shortlog to get commit counts per file
-      // Process in batches to avoid command line length limits
-      const batchSize = 100;
-
-      for (let i = 0; i < files.length; i += batchSize) {
-        const batch = files.slice(i, i + batchSize);
-
-        for (const file of batch) {
-          try {
-            const result = execSync(
-              `git rev-list --count HEAD -- "${file}"`,
-              { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8' }
-            );
-            const count = parseInt(result.trim(), 10);
-            if (!isNaN(count)) {
-              counts.set(file, count);
-            }
-          } catch {
-            counts.set(file, 0);
-          }
-        }
-      }
-    } catch {
-      // Git not available or error
+    if (!this.isGitRepo || files.length === 0) {
+      return signals;
     }
 
-    return counts;
-  }
-
-  private async getLastModifiedDates(files: string[]): Promise<Map<string, string>> {
-    const dates = new Map<string, string>();
-
-    try {
-      for (const file of files) {
+    // For small number of files, we can afford individual commands
+    for (const file of files) {
+      try {
+        // Get commit count
+        let commitCount = 0;
         try {
-          const result = execSync(
+          const countResult = execSync(
+            `git rev-list --count HEAD -- "${file}"`,
+            { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8', timeout: 5000 }
+          );
+          commitCount = parseInt(countResult.trim(), 10) || 0;
+        } catch {
+          // Ignore
+        }
+
+        // Get last modified
+        let lastModified: string | undefined;
+        try {
+          const dateResult = execSync(
             `git log -1 --format=%ci -- "${file}"`,
-            { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8' }
+            { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8', timeout: 5000 }
           );
-          const date = result.trim();
-          if (date) {
-            dates.set(file, date);
-          }
+          lastModified = dateResult.trim() || undefined;
         } catch {
-          // File might not be tracked
+          // Ignore
         }
+
+        // Calculate churn score based on commit count
+        const churnScore = Math.min(commitCount / 100, 1);
+
+        signals.set(file, {
+          path: file,
+          lastModified,
+          commitCount,
+          churnScore,
+        });
+      } catch {
+        signals.set(file, {
+          path: file,
+          commitCount: 0,
+          churnScore: 0,
+        });
       }
-    } catch {
-      // Git not available
     }
 
-    return dates;
-  }
-
-  private async getChurnScores(files: string[]): Promise<Map<string, number>> {
-    const scores = new Map<string, number>();
-
-    try {
-      // Calculate churn based on recent commits (last 3 months)
-      // Churn = (additions + deletions) in recent history
-      for (const file of files) {
-        try {
-          const result = execSync(
-            `git log --since="3 months ago" --pretty=tformat: --numstat -- "${file}"`,
-            { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8' }
-          );
-
-          let totalChurn = 0;
-          const lines = result.trim().split('\n');
-
-          for (const line of lines) {
-            const parts = line.split('\t');
-            if (parts.length >= 2) {
-              const additions = parseInt(parts[0], 10) || 0;
-              const deletions = parseInt(parts[1], 10) || 0;
-              totalChurn += additions + deletions;
-            }
-          }
-
-          // Normalize score (0-1 range, cap at 1000 changes)
-          const normalizedScore = Math.min(totalChurn / 1000, 1);
-          scores.set(file, normalizedScore);
-        } catch {
-          scores.set(file, 0);
-        }
-      }
-    } catch {
-      // Git not available
-    }
-
-    return scores;
+    return signals;
   }
 
   async getRecentlyModifiedFiles(since: string = '1 week ago', limit: number = 50): Promise<string[]> {
@@ -156,7 +124,7 @@ export class GitSignalsCollector {
     try {
       const result = execSync(
         `git log --since="${since}" --name-only --pretty=format: | sort | uniq -c | sort -rn | head -${limit}`,
-        { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8' }
+        { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8', timeout: 30000 }
       );
 
       return result.trim().split('\n')
@@ -167,19 +135,21 @@ export class GitSignalsCollector {
     }
   }
 
-  async getHotspots(limit: number = 20): Promise<Array<{ file: string; score: number }>> {
+  async getHotspots(limit: number = 100): Promise<Array<{ file: string; score: number }>> {
     if (!this.isGitRepo) {
       return [];
     }
 
     try {
-      // Get files with most commits in last 6 months
+      // Get files with most commits in last 6 months - single command
       const result = execSync(
         `git log --since="6 months ago" --name-only --pretty=format: | sort | uniq -c | sort -rn | head -${limit}`,
-        { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8' }
+        { cwd: this.rootDir, stdio: 'pipe', encoding: 'utf-8', timeout: 60000 }
       );
 
       const lines = result.trim().split('\n').filter(l => l.trim());
+      if (lines.length === 0) return [];
+
       const maxCount = parseInt(lines[0]?.trim().split(/\s+/)[0] || '1', 10);
 
       return lines.map(line => {
@@ -188,7 +158,7 @@ export class GitSignalsCollector {
         const file = parts.slice(1).join(' ');
         return {
           file,
-          score: count / maxCount, // Normalize to 0-1
+          score: count / maxCount,
         };
       }).filter(h => h.file.length > 0);
     } catch {
@@ -206,6 +176,7 @@ export class GitSignalsCollector {
         cwd: this.rootDir,
         stdio: 'pipe',
         encoding: 'utf-8',
+        timeout: 5000,
       });
       return result.trim();
     } catch {
@@ -223,6 +194,7 @@ export class GitSignalsCollector {
         cwd: this.rootDir,
         stdio: 'pipe',
         encoding: 'utf-8',
+        timeout: 5000,
       });
       return result.trim();
     } catch {

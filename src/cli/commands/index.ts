@@ -24,10 +24,15 @@ export async function indexCommand(options: IndexOptions = {}): Promise<void> {
   spinner.start();
 
   try {
+    let currentPhase = 'Scanning files...';
     const indexer = new Indexer(cwd, {
       verbose: options.verbose,
       onProgress: (current, total, file) => {
         spinner.progress(current, total, path.basename(file));
+      },
+      onPhase: (phase) => {
+        currentPhase = phase;
+        spinner.text(phase);
       },
     });
 
