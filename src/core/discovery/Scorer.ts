@@ -51,8 +51,8 @@ export class Scorer {
     const candidates: Candidate[] = [];
 
     for (const [filePath, signals] of candidateSignals) {
-      // Calculate base score from weighted signals
-      let score = this.calculateBaseScore(signals);
+      // Calculate base score from weighted signals (graphRelated scaled by domain relevance)
+      let score = this.calculateBaseScore(signals, filePath, task);
 
       // Apply bonuses (including domain relevance)
       score = this.applyBonuses(score, filePath, signals, candidateSignals, task);
@@ -117,20 +117,55 @@ export class Scorer {
     return result.slice(0, maxFiles);
   }
 
-  private calculateBaseScore(signals: CandidateSignals): number {
+  private calculateBaseScore(signals: CandidateSignals, filePath: string, task: ResolvedTask): number {
     let score = 0;
 
     if (signals.stacktraceHit) score += WEIGHTS.stacktraceHit;
     if (signals.diffHit) score += WEIGHTS.diffHit;
     if (signals.symbolMatch) score += WEIGHTS.symbolMatch;
     if (signals.keywordMatch) score += WEIGHTS.keywordMatch;
-    if (signals.graphRelated) score += WEIGHTS.graphRelated;
     if (signals.testFile) score += WEIGHTS.testFile;
     if (signals.gitHotspot) score += WEIGHTS.gitHotspot;
     if (signals.relatedFile) score += WEIGHTS.relatedFile;
     if (signals.exampleUsage) score += WEIGHTS.exampleUsage;
 
+    // graphRelated weight is scaled by domain relevance
+    // Files not matching any domain get reduced graphRelated value
+    if (signals.graphRelated) {
+      const domainWeight = this.getFileDomainWeight(filePath, task);
+      score += WEIGHTS.graphRelated * domainWeight;
+    }
+
     return score;
+  }
+
+  /**
+   * Get how strongly a file matches the task's domains (0.2 to 1.0)
+   * Returns the proportion of domain weight this file matches, with a minimum of 0.2
+   */
+  private getFileDomainWeight(filePath: string, task: ResolvedTask): number {
+    const domainWeights = task.domainWeights || {};
+    const totalWeight = Object.values(domainWeights).reduce((sum, w) => sum + w, 0);
+
+    if (totalWeight === 0) return 1; // No domains detected, full weight
+
+    const filePathLower = filePath.toLowerCase();
+    let matchedWeight = 0;
+
+    for (const domain of task.domains) {
+      const domainKeywords = DOMAIN_KEYWORDS[domain];
+      if (!domainKeywords) continue;
+
+      for (const keyword of domainKeywords) {
+        if (filePathLower.includes(keyword.toLowerCase())) {
+          matchedWeight += domainWeights[domain] || 0;
+          break;
+        }
+      }
+    }
+
+    // Return proportion with minimum of 0.2 (don't completely ignore graphRelated)
+    return Math.max(0.2, matchedWeight / totalWeight);
   }
 
   private applyBonuses(
