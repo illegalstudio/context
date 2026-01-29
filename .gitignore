@@ -4,3 +4,4 @@ dist/
 ctx/
 *.tgz
 .DS_Store
+docs/
