@@ -1,5 +1,6 @@
 import { ContextDatabase } from '../../storage/Database.js';
 import type { Candidate, CandidateSignals, ResolvedTask } from '../../types/index.js';
+import { DOMAIN_KEYWORDS } from '../resolver/KeywordExtractor.js';
 
 // Signal weights for scoring
 const WEIGHTS = {
@@ -24,6 +25,8 @@ const BONUSES = {
   multipleSignals: 1.15,
   // Recent modifications
   recentActivity: 1.1,
+  // File matches detected domain (e.g., PaymentController for "payments" domain)
+  domainRelevance: 1.25,
 };
 
 export interface ScorerOptions {
@@ -51,11 +54,11 @@ export class Scorer {
       // Calculate base score from weighted signals
       let score = this.calculateBaseScore(signals);
 
-      // Apply bonuses
-      score = this.applyBonuses(score, filePath, signals, candidateSignals);
+      // Apply bonuses (including domain relevance)
+      score = this.applyBonuses(score, filePath, signals, candidateSignals, task);
 
       // Generate reasons
-      const reasons = this.generateReasons(signals, filePath);
+      const reasons = this.generateReasons(signals, filePath, task);
 
       candidates.push({
         path: filePath,
@@ -134,11 +137,18 @@ export class Scorer {
     score: number,
     filePath: string,
     signals: CandidateSignals,
-    allCandidates: Map<string, CandidateSignals>
+    allCandidates: Map<string, CandidateSignals>,
+    task: ResolvedTask
   ): number {
     // Entry point bonus
     if (this.isEntryPoint(filePath)) {
       score *= BONUSES.entryPoint;
+    }
+
+    // Domain relevance bonus - scaled by how many keywords matched that domain
+    const domainBonus = this.calculateDomainBonus(filePath, task);
+    if (domainBonus > 1) {
+      score *= domainBonus;
     }
 
     // Multiple signals bonus
@@ -168,7 +178,68 @@ export class Scorer {
     return Math.min(score, 1.0); // Cap at 1.0
   }
 
-  private generateReasons(signals: CandidateSignals, filePath: string): string[] {
+  /**
+   * Calculate domain relevance bonus scaled by keyword match count.
+   * Files matching domains with more keyword hits get higher bonuses.
+   *
+   * Example: If task mentions 4 payment keywords and 1 auth keyword:
+   * - PaymentController gets bonus based on 4 matches
+   * - UserController gets bonus based on 1 match
+   */
+  private calculateDomainBonus(filePath: string, task: ResolvedTask): number {
+    const filePathLower = filePath.toLowerCase();
+    const domainWeights = task.domainWeights || {};
+
+    // Find the total weight across all domains
+    const totalWeight = Object.values(domainWeights).reduce((sum, w) => sum + w, 0);
+    if (totalWeight === 0) return 1;
+
+    // Find which domains this file matches and sum their weights
+    let matchedWeight = 0;
+
+    for (const domain of task.domains) {
+      const domainKeywords = DOMAIN_KEYWORDS[domain];
+      if (!domainKeywords) continue;
+
+      // Check if file path contains any domain keyword
+      for (const keyword of domainKeywords) {
+        if (filePathLower.includes(keyword.toLowerCase())) {
+          matchedWeight += domainWeights[domain] || 0;
+          break; // Only count each domain once per file
+        }
+      }
+    }
+
+    if (matchedWeight === 0) return 1;
+
+    // Scale bonus by the proportion of matched weight
+    // Max bonus (1.25) when file matches domain with all weight
+    // Proportionally less for domains with fewer keyword matches
+    const weightRatio = matchedWeight / totalWeight;
+    return 1 + (BONUSES.domainRelevance - 1) * weightRatio;
+  }
+
+  /**
+   * Check if a file path matches any of the detected domains
+   */
+  private isDomainRelevant(filePath: string, domains: string[]): boolean {
+    const filePathLower = filePath.toLowerCase();
+
+    for (const domain of domains) {
+      const domainKeywords = DOMAIN_KEYWORDS[domain];
+      if (!domainKeywords) continue;
+
+      for (const keyword of domainKeywords) {
+        if (filePathLower.includes(keyword.toLowerCase())) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private generateReasons(signals: CandidateSignals, filePath: string, task: ResolvedTask): string[] {
     const reasons: string[] = [];
 
     if (signals.stacktraceHit) {
@@ -200,6 +271,9 @@ export class Scorer {
     }
     if (this.isEntryPoint(filePath)) {
       reasons.push('entry point (controller/handler)');
+    }
+    if (this.isDomainRelevant(filePath, task.domains)) {
+      reasons.push(`domain relevant (${task.domains.join(', ')})`);
     }
 
     return reasons;

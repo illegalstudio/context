@@ -103,6 +103,7 @@ export class TaskResolver {
       filesHint: [...new Set(filesHint)],
       symbols: [...new Set(symbols)],
       domains: extracted.domains,
+      domainWeights: extracted.domainWeights,
       changeType: extracted.changeType,
       confidence,
     };

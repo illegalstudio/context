@@ -70,7 +70,8 @@ const STOPWORDS = new Set([
 ]);
 
 // Domain keywords that indicate specific areas
-const DOMAIN_KEYWORDS: Record<string, string[]> = {
+// Exported so Scorer can use them for domain relevance bonus
+export const DOMAIN_KEYWORDS: Record<string, string[]> = {
   auth: ['auth', 'authentication', 'login', 'logout', 'session', 'token', 'jwt', 'oauth', 'password', 'user', 'permission', 'role', 'access', 'credential', 'sanctum', 'passport'],
   payments: ['payment', 'stripe', 'checkout', 'charge', 'invoice', 'subscription', 'billing', 'price', 'cart', 'order', 'webhook', 'refund', 'paypal', 'transaction'],
   api: ['api', 'endpoint', 'route', 'rest', 'graphql', 'request', 'response', 'controller', 'middleware', 'cors', 'rate', 'limit'],
@@ -98,6 +99,7 @@ export interface ExtractedKeywords {
   keywords: string[];
   entities: ExtractedEntities;
   domains: string[];
+  domainWeights: Record<string, number>;  // How many keywords matched each domain
   changeType: 'bugfix' | 'feature' | 'refactor' | 'perf' | 'security' | 'unknown';
 }
 
@@ -128,8 +130,8 @@ export class KeywordExtractor {
     // Expand keywords with synonyms and translations
     const keywords = this.synonymExpander.expandAll(rawKeywords);
 
-    // Detect domains (use expanded keywords for better matching)
-    const domains = this.detectDomains(normalizedText, keywords);
+    // Detect domains with weights (how many keywords matched each)
+    const { domains, domainWeights } = this.detectDomainsWithWeights(normalizedText, keywords);
 
     // Detect change type
     const changeType = this.detectChangeType(normalizedText);
@@ -138,6 +140,7 @@ export class KeywordExtractor {
       keywords,
       entities,
       domains,
+      domainWeights,
       changeType,
     };
   }
@@ -261,21 +264,38 @@ export class KeywordExtractor {
       .slice(0, 20);
   }
 
-  private detectDomains(text: string, expandedKeywords: string[]): string[] {
-    const detectedDomains: string[] = [];
+  /**
+   * Detect domains and count how many keywords match each domain.
+   * This allows weighting domains by relevance (more keyword matches = more relevant).
+   */
+  private detectDomainsWithWeights(text: string, expandedKeywords: string[]): {
+    domains: string[];
+    domainWeights: Record<string, number>;
+  } {
+    const domainWeights: Record<string, number> = {};
     const keywordSet = new Set(expandedKeywords.map(k => k.toLowerCase()));
 
     for (const [domain, domainKeywords] of Object.entries(DOMAIN_KEYWORDS)) {
+      let matchCount = 0;
+
       for (const keyword of domainKeywords) {
         // Check both the original text and the expanded keywords
         if (text.includes(keyword) || keywordSet.has(keyword)) {
-          detectedDomains.push(domain);
-          break;
+          matchCount++;
         }
+      }
+
+      if (matchCount > 0) {
+        domainWeights[domain] = matchCount;
       }
     }
 
-    return [...new Set(detectedDomains)];
+    // Sort domains by weight (most matches first)
+    const domains = Object.keys(domainWeights).sort(
+      (a, b) => domainWeights[b] - domainWeights[a]
+    );
+
+    return { domains, domainWeights };
   }
 
   private detectChangeType(text: string): 'bugfix' | 'feature' | 'refactor' | 'perf' | 'security' | 'unknown' {

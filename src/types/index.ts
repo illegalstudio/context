@@ -37,6 +37,7 @@ export interface ResolvedTask {
   filesHint: string[];
   symbols: string[];
   domains: string[];
+  domainWeights: Record<string, number>;  // How many keywords matched each domain
   changeType: 'bugfix' | 'feature' | 'refactor' | 'perf' | 'security' | 'unknown';
   confidence: TaskConfidence;
 }
