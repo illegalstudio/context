@@ -72,7 +72,7 @@ const STOPWORDS = new Set([
 // Domain keywords that indicate specific areas
 // Exported so Scorer can use them for domain relevance bonus
 export const DOMAIN_KEYWORDS: Record<string, string[]> = {
-  auth: ['auth', 'authentication', 'login', 'logout', 'session', 'token', 'jwt', 'oauth', 'password', 'user', 'permission', 'role', 'access', 'credential', 'sanctum', 'passport'],
+  auth: ['auth', 'authentication', 'login', 'logout', 'session', 'token', 'jwt', 'oauth', 'password', 'permission', 'role', 'credential', 'sanctum', 'passport'],  // Note: 'user' and 'access' removed - too generic
   payments: ['payment', 'stripe', 'checkout', 'charge', 'invoice', 'subscription', 'billing', 'price', 'cart', 'order', 'webhook', 'refund', 'paypal', 'transaction'],
   api: ['api', 'endpoint', 'route', 'rest', 'graphql', 'request', 'response', 'controller', 'middleware', 'cors', 'rate', 'limit'],
   database: ['database', 'db', 'query', 'migration', 'model', 'schema', 'table', 'column', 'index', 'eloquent', 'sql', 'orm', 'relation', 'foreign'],
