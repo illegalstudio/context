@@ -93,6 +93,14 @@ export class TaskResolver {
     // Extract keywords and entities
     const extracted = this.keywordExtractor.extract(rawTask);
 
+    // Extract raw words from the original task (words >= 3 chars, lowercased)
+    // These are the EXACT words the user typed, very strong signal for path matching
+    const rawWords = (options.task || '')
+      .toLowerCase()
+      .split(/\s+/)
+      .map(w => w.replace(/[^\p{L}\p{N}]/gu, ''))  // Keep letters and numbers only
+      .filter(w => w.length >= 3);
+
     // Build file hints from various sources
     const filesHint: string[] = [
       ...extracted.entities.fileNames,
@@ -120,6 +128,7 @@ export class TaskResolver {
     // Build resolved task
     const task: ResolvedTask = {
       raw: rawTask.trim(),
+      rawWords: [...new Set(rawWords)],  // Deduplicated raw words from original task
       keywords: extracted.keywords,
       filesHint: [...new Set(filesHint)],
       symbols: [...new Set(symbols)],

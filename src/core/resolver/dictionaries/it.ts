@@ -90,15 +90,27 @@ export const synonymGroups: string[][] = [
   ['archiviato', 'eliminato'],
 
   // === Moderazione ===
-  ['segnalare', 'segnalato', 'segnalazione', 'report', 'flag'],
-  ['sospendere', 'sospeso', 'sospensione', 'suspend', 'ban'],
-  ['bannare', 'bannato', 'ban', 'block'],
-  ['bloccare', 'bloccato', 'block'],
-  ['abuso', 'violazione', 'abuse'],
+  ['segnalare', 'segnalato', 'segnalazione'],
+  ['sospendere', 'sospeso', 'sospensione'],
+  ['bannare', 'bannato'],
+  ['bloccare', 'bloccato'],
+  ['abuso', 'violazione'],
 
   // === SMS / Verifica ===
-  ['sms', 'messaggio', 'text'],
-  ['verifica', 'verificare', 'validare', 'validazione', 'validation', 'verify'],
-  ['otp', 'codice', 'pin', 'code'],
-  ['cellulare', 'mobile', 'telefono', 'phone'],
+  ['sms', 'messaggio'],
+  ['verifica', 'verificare', 'validare', 'validazione'],
+  ['otp', 'codice', 'pin'],
+  ['cellulare', 'telefono'],
+
+  // === Servizi ===
+  ['servizio', 'servizi', 'service'],
+
+  // === Personaggi ===
+  ['personaggio', 'personaggi', 'character', 'carattere'],
+
+  // === Restrizioni ===
+  ['restrizione', 'restrizioni', 'restriction', 'limitazione'],
+
+  // === Parole ===
+  ['parola', 'parole', 'word', 'termine'],
 ];

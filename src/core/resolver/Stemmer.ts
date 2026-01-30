@@ -2,7 +2,7 @@
  * Multi-Language Stemmer
  *
  * Uses Snowball stemming algorithm to reduce words to their root form.
- * Supports Italian and English for automatic plural/conjugation handling.
+ * Dynamically supports all languages defined in languages.ts.
  *
  * Examples:
  * - "utenti" → "utent"
@@ -12,21 +12,32 @@
  */
 
 import { newStemmer, type Stemmer } from 'snowball-stemmers';
+import { SUPPORTED_LANGUAGES } from './dictionaries/languages.js';
 
 export class MultiLangStemmer {
   private stemmers: Map<string, Stemmer> = new Map();
 
   constructor() {
-    this.stemmers.set('en', newStemmer('english'));
-    this.stemmers.set('it', newStemmer('italian'));
+    // Initialize stemmers for all supported languages
+    for (const lang of SUPPORTED_LANGUAGES) {
+      this.stemmers.set(lang.code, newStemmer(lang.stemmerName));
+    }
   }
 
   /**
-   * Stem a word using both Italian and English stemmers.
-   * Returns array of unique stems (usually 1-2 stems).
-   *
-   * @param word - Word to stem
-   * @returns Array of unique stems from all languages
+   * Stem with a specific language code
+   */
+  stemLang(word: string, langCode: string): string {
+    const stemmer = this.stemmers.get(langCode);
+    if (!stemmer) {
+      throw new Error(`Unsupported language: ${langCode}`);
+    }
+    return stemmer.stem(word.toLowerCase());
+  }
+
+  /**
+   * Stem with all available stemmers.
+   * Returns unique stems from all languages.
    */
   stem(word: string): string[] {
     const stems = new Set<string>();
@@ -43,29 +54,17 @@ export class MultiLangStemmer {
   }
 
   /**
-   * Stem a word with a specific language.
-   *
-   * @param word - Word to stem
-   * @param lang - Language code ('en' or 'it')
-   * @returns Stemmed word
+   * Check if a language is supported
    */
-  stemLang(word: string, lang: 'en' | 'it'): string {
-    const stemmer = this.stemmers.get(lang);
-    return stemmer?.stem(word.toLowerCase()) || word.toLowerCase();
+  hasLanguage(langCode: string): boolean {
+    return this.stemmers.has(langCode);
   }
 
   /**
-   * Get the Italian stem of a word.
+   * List of supported languages
    */
-  stemIt(word: string): string {
-    return this.stemLang(word, 'it');
-  }
-
-  /**
-   * Get the English stem of a word.
-   */
-  stemEn(word: string): string {
-    return this.stemLang(word, 'en');
+  getSupportedLanguages(): string[] {
+    return [...this.stemmers.keys()];
   }
 }
 

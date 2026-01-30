@@ -208,6 +208,10 @@ export class CandidateDiscovery {
    *
    * Uses stemming to match morphological variants:
    * - "utenti" → stem "utent" matches "UserResource" (stem "user" via translation)
+   *
+   * IMPORTANT: Keywords are grouped by their PRIMARY STEM, so "remove", "removed",
+   * "remov" all count as ONE match (they share the same stem root).
+   * This prevents inflating scores with stem duplicates from synonym expansion.
    */
   private async discoverFromFilenames(
     task: ResolvedTask,
@@ -215,52 +219,92 @@ export class CandidateDiscovery {
   ): Promise<void> {
     const allFiles = this.db.getAllFiles();
 
-    // Combine all meaningful terms and their stems
-    const searchTerms = new Set<string>();
+    // Build a map: primary stem → all searchable forms
+    // Keywords with the same stem are grouped together and counted once
+    // e.g., "remove", "removed", "remov" all share stem "remov" → counted as 1 match
+    const stemGroups = new Map<string, Set<string>>();
 
-    // Add all symbols (these include case variants) and their stems
+    /**
+     * Add a keyword to stem groups with intelligent merging.
+     * Words that share ANY stem are grouped together.
+     * E.g., "lista" and "list" both produce stem "list", so they're grouped.
+     */
+    const addKeyword = (keyword: string) => {
+      const lower = keyword.toLowerCase();
+      const allStems = stemmer.stem(lower);
+      const allForms = new Set([lower, ...allStems]);
+
+      // Find existing group that shares any stem with this keyword
+      let targetGroup: string | null = null;
+      for (const [groupKey, groupForms] of stemGroups) {
+        for (const form of allForms) {
+          if (groupForms.has(form) || groupKey === form) {
+            targetGroup = groupKey;
+            break;
+          }
+        }
+        if (targetGroup) break;
+      }
+
+      if (targetGroup) {
+        // Merge into existing group
+        const forms = stemGroups.get(targetGroup)!;
+        allForms.forEach(f => forms.add(f));
+      } else {
+        // Create new group using English stem as key (for consistency)
+        const englishStem = stemmer.stemLang(lower, 'en');
+        const primaryStem = englishStem && englishStem.length >= 2 ? englishStem : lower;
+        stemGroups.set(primaryStem, allForms);
+      }
+    };
+
+    // Add all symbols (explicit mentions)
     for (const symbol of task.symbols) {
       if (symbol.length >= 3) {
-        const lower = symbol.toLowerCase();
-        searchTerms.add(lower);
-        // Add stems
-        stemmer.stem(lower).forEach(s => searchTerms.add(s));
+        addKeyword(symbol);
       }
     }
 
-    // Add ALL keywords (not just identifier-like ones) and their stems
+    // Add all keywords
     for (const keyword of task.keywords) {
       if (keyword.length >= 3) {
-        const lower = keyword.toLowerCase();
-        searchTerms.add(lower);
-        // Add stems
-        stemmer.stem(lower).forEach(s => searchTerms.add(s));
+        addKeyword(keyword);
       }
     }
 
-    // Add domain names and their stems
+    // Add domain names
     for (const domain of task.domains) {
       if (domain.length >= 3) {
-        const lower = domain.toLowerCase();
-        searchTerms.add(lower);
-        // Add stems
-        stemmer.stem(lower).forEach(s => searchTerms.add(s));
+        addKeyword(domain);
       }
     }
 
-    if (searchTerms.size === 0) return;
+    if (stemGroups.size === 0) return;
 
-    // Search through all files and count how many terms match each file
+    // Search through all files and count matches
     for (const file of allFiles) {
       const filePathLower = file.path.toLowerCase();
 
       // Extract path segments and stem them for matching
       // e.g., "app/Filament/Resources/UserResource/Pages/ListUsers.php"
-      // → segments: ["app", "filament", "resources", "userresource", "pages", "listusers", "php"]
-      // → split camelCase: ["app", "filament", "resources", "user", "resource", "pages", "list", "users", "php"]
-      const segments = filePathLower.split(/[\/\\]/).flatMap(s =>
-        s.split(/(?=[A-Z])|[-_.]/).map(p => p.toLowerCase()).filter(p => p.length >= 2)
+      // → segments: ["app", "filament", "resources", "user", "resource", "pages", "list", "users", "php"]
+      //
+      // IMPORTANT: Split by camelCase BEFORE lowercasing, otherwise regex won't match
+      // Use lookbehind/lookahead to preserve acronyms: "SMSService" → ["SMS", "Service"]
+      const segments = file.path.split(/[\/\\]/).flatMap(s =>
+        s.split(/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|[-_.]/).map(p => p.toLowerCase()).filter(p => p.length >= 2)
       );
+      const segmentSet = new Set(segments);
+
+      // Count RAW word matches (very high value)
+      // These are exact words from the user's task input
+      // Use segment-based matching to avoid false positives (e.g., "nel" matching "panelprovider")
+      let rawMatchCount = 0;
+      for (const rawWord of task.rawWords) {
+        if (rawWord.length >= 3 && segmentSet.has(rawWord)) {
+          rawMatchCount++;
+        }
+      }
 
       // Create set of all segment forms (original + stemmed)
       const stemmedSegments = new Set<string>();
@@ -270,24 +314,56 @@ export class CandidateDiscovery {
         stemmer.stem(segment).forEach(s => stemmedSegments.add(s));
       }
 
-      // Count how many distinct search terms match this file path
-      let matchCount = 0;
-      for (const term of searchTerms) {
-        // Direct substring match in path
-        if (filePathLower.includes(term)) {
-          matchCount++;
-          continue;
+      // Count how many distinct STEM GROUPS match this file path (expanded keywords)
+      // Each stem group (e.g., "remov" containing remove/removed/remov) counts once
+      let expandedMatchCount = 0;
+      for (const [, forms] of stemGroups) {
+        let matched = false;
+        for (const form of forms) {
+          // Direct substring match in path
+          if (filePathLower.includes(form)) {
+            matched = true;
+            break;
+          }
+          // Stem-based segment match
+          if (stemmedSegments.has(form)) {
+            matched = true;
+            break;
+          }
         }
-        // Stem-based segment match
-        if (stemmedSegments.has(term)) {
-          matchCount++;
+        if (matched) {
+          expandedMatchCount++;
         }
       }
 
-      if (matchCount > 0) {
+      // Count how many keywords match in just the BASENAME (filename without extension)
+      // This is important for files like "ListUsers.php" matching "list" + "user"
+      // IMPORTANT: Split by camelCase BEFORE lowercasing, otherwise regex won't match
+      // Use lookbehind/lookahead to preserve acronyms: "SMSService" → ["SMS", "Service"]
+      const basenameRaw = file.path.split('/').pop()?.replace(/\.[^.]+$/, '') || '';
+      const basenameSegments = basenameRaw.split(/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|[-_]/).map(p => p.toLowerCase()).filter(p => p.length >= 2);
+      const basenameSegmentSet = new Set(basenameSegments);
+      // Also add stems of basename segments
+      for (const seg of basenameSegments) {
+        stemmer.stem(seg).forEach(s => basenameSegmentSet.add(s));
+      }
+
+      let basenameMatchCount = 0;
+      for (const [, forms] of stemGroups) {
+        for (const form of forms) {
+          if (basenameSegmentSet.has(form)) {
+            basenameMatchCount++;
+            break;
+          }
+        }
+      }
+
+      if (rawMatchCount > 0 || expandedMatchCount > 0) {
         this.addCandidate(candidates, file.path, {
-          symbolMatch: true,
-          filenameMatchCount: matchCount,
+          rawPathMatchCount: rawMatchCount,
+          filenameMatchCount: expandedMatchCount,
+          basenameMatchCount: basenameMatchCount,
+          symbolMatch: expandedMatchCount > 0,
         });
       }
     }
@@ -569,7 +645,9 @@ export class CandidateDiscovery {
       graphRelated: false,
       graphDepth: undefined,
       graphDecay: undefined,
+      rawPathMatchCount: undefined,
       filenameMatchCount: undefined,
+      basenameMatchCount: undefined,
       testFile: false,
       gitHotspot: false,
       relatedFile: false,
@@ -588,9 +666,19 @@ export class CandidateDiscovery {
       }
     }
 
+    // For rawPathMatchCount, keep the higher count
+    if (existing.rawPathMatchCount !== undefined && newSignals.rawPathMatchCount !== undefined) {
+      mergedSignals.rawPathMatchCount = Math.max(existing.rawPathMatchCount, newSignals.rawPathMatchCount);
+    }
+
     // For filenameMatchCount, keep the higher count
     if (existing.filenameMatchCount !== undefined && newSignals.filenameMatchCount !== undefined) {
       mergedSignals.filenameMatchCount = Math.max(existing.filenameMatchCount, newSignals.filenameMatchCount);
+    }
+
+    // For basenameMatchCount, keep the higher count
+    if (existing.basenameMatchCount !== undefined && newSignals.basenameMatchCount !== undefined) {
+      mergedSignals.basenameMatchCount = Math.max(existing.basenameMatchCount, newSignals.basenameMatchCount);
     }
 
     candidates.set(filePath, mergedSignals);

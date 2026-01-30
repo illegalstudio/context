@@ -285,8 +285,8 @@ export class KeywordExtractor {
     // Remove tokens that are parts of already-extracted entities
     const entityParts = new Set<string>();
     for (const cls of entities.classNames) {
-      // Split CamelCase into parts
-      const parts = cls.split(/(?=[A-Z])/).map(p => p.toLowerCase());
+      // Split CamelCase into parts, preserving acronyms: "SMSService" → ["SMS", "Service"]
+      const parts = cls.split(/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/).map(p => p.toLowerCase()).filter(p => p.length > 0);
       parts.forEach(p => entityParts.add(p));
     }
 
@@ -325,8 +325,8 @@ export class KeywordExtractor {
     // Remove tokens that are parts of already-extracted entities
     const entityParts = new Set<string>();
     for (const cls of entities.classNames) {
-      // Split CamelCase into parts
-      const parts = cls.split(/(?=[A-Z])/).map(p => p.toLowerCase());
+      // Split CamelCase into parts, preserving acronyms: "SMSService" → ["SMS", "Service"]
+      const parts = cls.split(/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/).map(p => p.toLowerCase()).filter(p => p.length > 0);
       parts.forEach(p => entityParts.add(p));
     }
 

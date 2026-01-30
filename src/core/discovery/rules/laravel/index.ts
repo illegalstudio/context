@@ -5,6 +5,17 @@ import { createDefaultSignals } from '../../DiscoveryRule.js';
 import type { CandidateSignals } from '../../../../types/index.js';
 
 /**
+ * Generic action words commonly found in Laravel migration filenames.
+ * Migrations matching ONLY these words should not get multi-keyword bonuses.
+ */
+const MIGRATION_GENERIC_WORDS = new Set([
+  'add', 'create', 'remove', 'drop', 'update', 'delete',
+  'modify', 'alter', 'change', 'make', 'set', 'rename',
+  'nullable', 'default', 'index', 'foreign', 'column', 'field', 'table',
+  'to', 'from', 'in', 'on', 'the', 'and',
+]);
+
+/**
  * Laravel Discovery Rule
  *
  * Framework-specific heuristics:
@@ -53,7 +64,8 @@ public/storage
     {
       name: 'filament',
       description: 'Filament admin panel',
-      keywords: ['filament', 'resource', 'widget', 'page', 'panel', 'admin', 'form', 'table', 'infolist'],
+      // Note: "table" removed - too generic, matches all migrations
+      keywords: ['filament', 'resource', 'widget', 'page', 'panel', 'admin', 'form', 'infolist'],
     },
     {
       name: 'livewire',
@@ -96,6 +108,10 @@ public/storage
   async discover(ctx: DiscoveryContext): Promise<Map<string, CandidateSignals>> {
     const found = new Map<string, CandidateSignals>();
 
+    // Penalize migrations that only match generic action words (add, create, etc.)
+    // This prevents migrations from dominating results when the task uses common verbs
+    penalizeMigrationsWithGenericMatches(ctx);
+
     await Promise.all([
       discoverViewsFromControllers(ctx, found),
       discoverControllersFromRoutes(ctx, found),
@@ -108,6 +124,45 @@ public/storage
     return found;
   },
 };
+
+/**
+ * Penalize migrations that only match generic action words.
+ * Modifies existing candidates in-place by zeroing filenameMatchCount and basenameMatchCount.
+ *
+ * This prevents migrations like "add_column_to_users_table" from getting high scores
+ * just because the task mentions "add" or "create".
+ */
+function penalizeMigrationsWithGenericMatches(ctx: DiscoveryContext): void {
+  for (const [filePath, signals] of ctx.candidates) {
+    // Only process Laravel migrations
+    if (!filePath.includes('database/migrations/')) continue;
+
+    // Skip if has raw path match (user explicitly mentioned something in the path)
+    if (signals.rawPathMatchCount && signals.rawPathMatchCount > 0) continue;
+
+    // Skip if no filename matches to penalize
+    if (!signals.filenameMatchCount || signals.filenameMatchCount === 0) continue;
+
+    // Check if all keyword matches in the path are generic words
+    const filePathLower = filePath.toLowerCase();
+    let hasNonGenericMatch = false;
+
+    for (const keyword of ctx.task.keywords) {
+      if (keyword.length >= 3 && filePathLower.includes(keyword.toLowerCase())) {
+        if (!MIGRATION_GENERIC_WORDS.has(keyword.toLowerCase())) {
+          hasNonGenericMatch = true;
+          break;
+        }
+      }
+    }
+
+    if (!hasNonGenericMatch) {
+      // All matches are generic - disable multi-keyword bonus
+      signals.filenameMatchCount = 0;
+      signals.basenameMatchCount = 0;
+    }
+  }
+}
 
 /**
  * Find Blade views related to controllers

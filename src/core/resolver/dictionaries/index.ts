@@ -1,35 +1,66 @@
 /**
- * Synonym Expander with Stemming Support
+ * Synonym Expander with Multi-Language Support
  *
  * Expands keywords with synonyms and translations using stemming.
+ * Uses English as pivot language - all other languages translate towards English.
+ *
  * Supports:
- * - English synonyms (en.ts)
+ * - English synonyms (en.ts) - pivot language
  * - Italian synonyms (it.ts)
- * - Bidirectional IT↔EN stem translations (en-it.ts)
+ * - Unidirectional X→EN stem translations (translations/*.ts)
  * - Automatic plural/conjugation handling via Snowball stemmer
+ *
+ * Adding a new language:
+ * 1. Add to languages.ts
+ * 2. Create synonyms file (e.g., es.ts)
+ * 3. Create translations file (e.g., translations/es.ts)
+ * 4. Register in constructor
  */
 
 import { synonymGroups as enSynonyms } from './en.js';
 import { synonymGroups as itSynonyms } from './it.js';
-import { stemTranslations } from './en-it.js';
+import { stemTranslations as itTranslations } from './translations/it.js';
 import { stemmer } from '../Stemmer.js';
+import { PIVOT_LANGUAGE } from './languages.js';
+
+interface LanguageDictionary {
+  code: string;
+  index: Map<string, Set<string>>;
+  toEnglishStems?: Map<string, Set<string>>; // X→EN (only for non-pivot)
+}
 
 export class SynonymExpander {
-  private enIndex: Map<string, Set<string>>;
-  private itIndex: Map<string, Set<string>>;
-  private stemIndex: Map<string, Set<string>>;
+  private dictionaries: Map<string, LanguageDictionary> = new Map();
+  private pivotCode: string = PIVOT_LANGUAGE;
 
   constructor() {
-    this.enIndex = this.buildIndex(enSynonyms);
-    this.itIndex = this.buildIndex(itSynonyms);
-    this.stemIndex = this.buildStemIndex(stemTranslations);
+    this.registerLanguage('en', enSynonyms);
+    this.registerLanguage('it', itSynonyms, itTranslations);
   }
 
   /**
-   * Expand a single term with all synonyms and translations.
-   * Uses stemming to match morphological variants (plurals, conjugations).
-   *
-   * Example: "utenti" → ["utenti", "utent", "user", ...]
+   * Register a language with its synonyms and translations to EN
+   */
+  private registerLanguage(
+    code: string,
+    synonymGroups: string[][],
+    toEnglishTranslations?: [string, string][]
+  ): void {
+    const index = this.buildIndex(synonymGroups);
+
+    const dict: LanguageDictionary = { code, index };
+
+    // If not pivot, build translation map towards EN
+    if (code !== this.pivotCode && toEnglishTranslations) {
+      dict.toEnglishStems = this.buildTranslationIndex(toEnglishTranslations);
+    }
+
+    this.dictionaries.set(code, dict);
+  }
+
+  /**
+   * Expand a term with synonyms from all languages.
+   * Uses English as pivot for cross-language expansion.
    */
   expand(term: string): string[] {
     const result = new Set<string>();
@@ -38,46 +69,75 @@ export class SynonymExpander {
     const termLower = term.toLowerCase();
     result.add(termLower);
 
-    // 1. English synonyms (exact match)
-    const enSyns = this.enIndex.get(termLower);
-    if (enSyns) {
-      enSyns.forEach(s => result.add(s));
-    }
-
-    // 2. Italian synonyms (exact match)
-    const itSyns = this.itIndex.get(termLower);
-    if (itSyns) {
-      itSyns.forEach(s => result.add(s));
-    }
-
-    // 3. Stem-based translations
-    // Get stems for the input term
+    // 1. Get stems for the term (all languages)
     const stems = stemmer.stem(termLower);
     for (const stem of stems) {
-      // Add the stem itself (useful for filename matching)
       result.add(stem);
+    }
 
-      // Look up translations for this stem
-      const translations = this.stemIndex.get(stem);
-      if (translations) {
-        translations.forEach(t => result.add(t));
+    // 2. Look up in all language dictionaries (exact + stem match)
+    for (const [, dict] of this.dictionaries) {
+      // Exact match
+      const exactSyns = dict.index.get(termLower);
+      if (exactSyns) {
+        exactSyns.forEach(s => result.add(s));
+      }
+
+      // Stem match
+      for (const stem of stems) {
+        const stemSyns = dict.index.get(stem);
+        if (stemSyns) {
+          stemSyns.forEach(s => result.add(s));
+        }
       }
     }
 
-    // 4. Also expand synonyms of translated terms
-    for (const translated of [...result]) {
-      const transSynsEn = this.enIndex.get(translated);
-      if (transSynsEn) {
-        transSynsEn.forEach(s => result.add(s));
-      }
+    // 3. Translate stems to English (pivot) and expand
+    const englishStems = this.translateToEnglish(stems);
+    const pivotDict = this.dictionaries.get(this.pivotCode);
 
-      const transSynsIt = this.itIndex.get(translated);
-      if (transSynsIt) {
-        transSynsIt.forEach(s => result.add(s));
+    if (pivotDict) {
+      for (const enStem of englishStems) {
+        result.add(enStem);
+
+        const enSyns = pivotDict.index.get(enStem);
+        if (enSyns) {
+          enSyns.forEach(s => result.add(s));
+        }
+      }
+    }
+
+    // 4. Expand synonyms of all collected terms
+    for (const collected of [...result]) {
+      for (const [, dict] of this.dictionaries) {
+        const syns = dict.index.get(collected);
+        if (syns) {
+          syns.forEach(s => result.add(s));
+        }
       }
     }
 
     return [...result];
+  }
+
+  /**
+   * Translate stems to English using all available translation maps
+   */
+  private translateToEnglish(stems: string[]): Set<string> {
+    const englishStems = new Set<string>(stems); // Include originals
+
+    for (const [code, dict] of this.dictionaries) {
+      if (code === this.pivotCode || !dict.toEnglishStems) continue;
+
+      for (const stem of stems) {
+        const enStems = dict.toEnglishStems.get(stem);
+        if (enStems) {
+          enStems.forEach(s => englishStems.add(s));
+        }
+      }
+    }
+
+    return englishStems;
   }
 
   /**
@@ -102,16 +162,27 @@ export class SynonymExpander {
   hasSynonyms(term: string): boolean {
     const termLower = term.toLowerCase();
 
-    // Check exact match
-    if (this.enIndex.has(termLower) || this.itIndex.has(termLower)) {
-      return true;
+    // Check exact match in all dictionaries
+    for (const [, dict] of this.dictionaries) {
+      if (dict.index.has(termLower)) {
+        return true;
+      }
     }
 
     // Check stem-based match
     const stems = stemmer.stem(termLower);
     for (const stem of stems) {
-      if (this.stemIndex.has(stem)) {
-        return true;
+      for (const [, dict] of this.dictionaries) {
+        if (dict.index.has(stem)) {
+          return true;
+        }
+      }
+
+      // Check translations
+      for (const [code, dict] of this.dictionaries) {
+        if (code !== this.pivotCode && dict.toEnglishStems?.has(stem)) {
+          return true;
+        }
       }
     }
 
@@ -119,9 +190,7 @@ export class SynonymExpander {
   }
 
   /**
-   * Build a synonym index from groups
-   *
-   * Each term in a group maps to the entire group (as a Set).
+   * Build synonym index with stem keys
    */
   private buildIndex(groups: string[][]): Map<string, Set<string>> {
     const index = new Map<string, Set<string>>();
@@ -131,13 +200,11 @@ export class SynonymExpander {
 
       for (const term of group) {
         const termLower = term.toLowerCase();
+        this.addToIndex(index, termLower, synonyms);
 
-        // Merge with existing synonyms if term appears in multiple groups
-        const existing = index.get(termLower);
-        if (existing) {
-          synonyms.forEach(s => existing.add(s));
-        } else {
-          index.set(termLower, new Set(synonyms));
+        const stems = stemmer.stem(termLower);
+        for (const stem of stems) {
+          this.addToIndex(index, stem, synonyms);
         }
       }
     }
@@ -146,37 +213,64 @@ export class SynonymExpander {
   }
 
   /**
-   * Build a bidirectional stem translation index.
-   * Maps stems to their translations in both directions.
+   * Build translation index (source stem → target stems)
    */
-  private buildStemIndex(pairs: [string, string][]): Map<string, Set<string>> {
+  private buildTranslationIndex(
+    pairs: [string, string][]
+  ): Map<string, Set<string>> {
     const index = new Map<string, Set<string>>();
 
-    for (const [itStem, enStem] of pairs) {
-      // IT stem → EN stem
-      if (!index.has(itStem)) {
-        index.set(itStem, new Set());
+    for (const [sourceStem, targetStem] of pairs) {
+      if (!index.has(sourceStem)) {
+        index.set(sourceStem, new Set());
       }
-      index.get(itStem)!.add(enStem);
-
-      // EN stem → IT stem (bidirectional)
-      if (!index.has(enStem)) {
-        index.set(enStem, new Set());
-      }
-      index.get(enStem)!.add(itStem);
+      index.get(sourceStem)!.add(targetStem);
     }
 
     return index;
   }
 
   /**
+   * Add synonyms to the index under a given key.
+   * Merges with existing synonyms if key already exists.
+   */
+  private addToIndex(
+    index: Map<string, Set<string>>,
+    key: string,
+    synonyms: Set<string>
+  ): void {
+    const existing = index.get(key);
+    if (existing) {
+      synonyms.forEach(s => existing.add(s));
+    } else {
+      index.set(key, new Set(synonyms));
+    }
+  }
+
+  /**
    * Get statistics about the dictionaries
    */
-  getStats(): { enTerms: number; itTerms: number; stemTranslations: number } {
+  getStats(): {
+    languages: string[];
+    totalTerms: number;
+    termsByLanguage: Record<string, number>;
+    translations: number;
+  } {
+    const termsByLanguage: Record<string, number> = {};
+    let translations = 0;
+
+    for (const [code, dict] of this.dictionaries) {
+      termsByLanguage[code] = dict.index.size;
+      if (dict.toEnglishStems) {
+        translations += dict.toEnglishStems.size;
+      }
+    }
+
     return {
-      enTerms: this.enIndex.size,
-      itTerms: this.itIndex.size,
-      stemTranslations: this.stemIndex.size,
+      languages: [...this.dictionaries.keys()],
+      totalTerms: Object.values(termsByLanguage).reduce((a, b) => a + b, 0),
+      termsByLanguage,
+      translations,
     };
   }
 }

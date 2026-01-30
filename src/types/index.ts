@@ -33,6 +33,7 @@ export interface GitSignal {
 
 export interface ResolvedTask {
   raw: string;
+  rawWords: string[];     // Original words from task (>= 3 chars, lowercased)
   keywords: string[];
   filesHint: string[];
   symbols: string[];
@@ -70,7 +71,9 @@ export interface CandidateSignals {
   graphRelated: boolean;
   graphDepth?: number;    // Depth at which file was found via graph traversal (1 = direct, 2+ = transitive)
   graphDecay?: number;    // Decay factor based on graph depth (1.0 at depth 1, decreasing with depth)
-  filenameMatchCount?: number;  // Number of task keywords matching in the file path (2+ = very relevant)
+  rawPathMatchCount?: number;      // Number of RAW task words (from original input) matching in file path
+  filenameMatchCount?: number;     // Number of task keywords matching in the file path (2+ = very relevant)
+  basenameMatchCount?: number;     // Number of keywords matching in just the filename (e.g., "ListUsers" = 2 for list+user)
   testFile: boolean;
   gitHotspot: boolean;
   relatedFile: boolean;    // Found by a discovery rule (view, component, etc.)

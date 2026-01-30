@@ -6,6 +6,7 @@ import { DOMAIN_KEYWORDS } from '../resolver/KeywordExtractor.js';
 const WEIGHTS = {
   stacktraceHit: 0.30,  // Appears in stacktrace (very strong)
   diffHit: 0.22,        // Modified in diff (strong)
+  rawPathMatch: 0.25,   // RAW task word in path (very strong - user explicitly typed this word)
   symbolMatch: 0.20,    // Contains matching symbol (increased - exact method/class mention is strong signal)
   keywordMatch: 0.08,   // Contains matching keywords
   graphRelated: 0.05,   // Related via import graph
@@ -137,7 +138,11 @@ export class Scorer {
       result.push(...relevantConfig.slice(0, configLimit));
     }
 
-    return result.slice(0, maxFiles);
+    // Cap scores to 1.0 for display (but ordering was done with raw scores)
+    return result.slice(0, maxFiles).map(c => ({
+      ...c,
+      score: Math.min(c.score, 1.0),
+    }));
   }
 
   private calculateBaseScore(signals: CandidateSignals, filePath: string, task: ResolvedTask): number {
@@ -145,6 +150,13 @@ export class Scorer {
 
     if (signals.stacktraceHit) score += WEIGHTS.stacktraceHit;
     if (signals.diffHit) score += WEIGHTS.diffHit;
+
+    // Raw path matches are VERY strong signals - these are exact words from the user's task
+    // Each raw word match adds 0.25 to score (capped at 3 matches = 0.75)
+    if (signals.rawPathMatchCount && signals.rawPathMatchCount > 0) {
+      score += WEIGHTS.rawPathMatch * Math.min(signals.rawPathMatchCount, 3);
+    }
+
     if (signals.symbolMatch) score += WEIGHTS.symbolMatch;
     if (signals.keywordMatch) score += WEIGHTS.keywordMatch;
     if (signals.testFile) score += WEIGHTS.testFile;
@@ -222,7 +234,15 @@ export class Scorer {
       score *= domainBonus;
     }
 
-    // Multi-keyword path bonus - files matching multiple task keywords in path
+    // Raw path match bonus - files matching multiple RAW task words get significant boost
+    // These are exact words the user typed, so 2+ matches is a very strong signal
+    if (signals.rawPathMatchCount && signals.rawPathMatchCount >= 2) {
+      // 2 raw matches = 1.4x, 3 raw matches = 1.96x
+      const rawBonus = Math.pow(1.4, signals.rawPathMatchCount - 1);
+      score *= rawBonus;
+    }
+
+    // Multi-keyword path bonus - files matching multiple task keywords in path (expanded keywords)
     // e.g., "app/Filament/Resources/UserResource/Pages/ListUsers.php" matching
     // "filament", "user", "list" gets a significant boost
     if (signals.filenameMatchCount && signals.filenameMatchCount >= 2) {
@@ -235,6 +255,17 @@ export class Scorer {
       if (signals.filenameMatchCount >= 4) {
         score *= 1.3; // Additional 30% boost for very targeted files
       }
+    }
+
+    // Basename match bonus - when the FILENAME itself matches multiple keywords
+    // e.g., "ListUsers" matching "list" + "user" is a very strong signal
+    // This prioritizes files whose names directly describe the task entities
+    // ONLY apply this bonus when file also has raw path matches (avoids boosting migrations)
+    if (signals.basenameMatchCount && signals.basenameMatchCount >= 2 &&
+        signals.rawPathMatchCount && signals.rawPathMatchCount >= 1) {
+      // 2 basename matches = 1.5x, 3 = 2.25x, 4 = 3.375x
+      const basenameBonus = Math.pow(1.5, signals.basenameMatchCount - 1);
+      score *= basenameBonus;
     }
 
     // Multiple signals bonus
@@ -261,7 +292,9 @@ export class Scorer {
       score *= BONUSES.recentActivity;
     }
 
-    return Math.min(score, 1.0); // Cap at 1.0
+    // Don't cap here - keep raw score for ranking
+    // Cap to 1.0 only for display purposes later
+    return score;
   }
 
   /**
@@ -342,8 +375,14 @@ export class Scorer {
     if (signals.keywordMatch) {
       reasons.push('contains matching keywords');
     }
+    if (signals.rawPathMatchCount && signals.rawPathMatchCount >= 1) {
+      reasons.push(`path contains ${signals.rawPathMatchCount} exact task word(s)`);
+    }
     if (signals.filenameMatchCount && signals.filenameMatchCount >= 2) {
-      reasons.push(`path matches ${signals.filenameMatchCount} task keywords`);
+      reasons.push(`path matches ${signals.filenameMatchCount} expanded keywords`);
+    }
+    if (signals.basenameMatchCount && signals.basenameMatchCount >= 2) {
+      reasons.push(`filename matches ${signals.basenameMatchCount} keywords`);
     }
     if (signals.graphRelated) {
       const depth = signals.graphDepth ?? 1;
