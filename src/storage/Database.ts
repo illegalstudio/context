@@ -250,6 +250,18 @@ export class ContextDatabase {
   }
 
   searchContent(query: string, limit: number = 50): Array<{ path: string; rank: number }> {
+    // Sanitize query for FTS5 - remove special characters that cause syntax errors
+    // FTS5 special chars: " * ( ) : - ^ ~ AND OR NOT NEAR
+    const sanitizedQuery = query
+      .replace(/['"():\-^~*]/g, ' ')  // Remove FTS5 special chars
+      .replace(/\b(AND|OR|NOT|NEAR)\b/gi, ' ')  // Remove FTS5 operators
+      .replace(/\s+/g, ' ')  // Collapse whitespace
+      .trim();
+
+    if (!sanitizedQuery || sanitizedQuery.length < 2) {
+      return [];
+    }
+
     // Use BM25 ranking with field boosting:
     // - bm25() returns negative scores (closer to 0 = better match)
     // - Add 0.5 boost when query appears in the file path (filename match is strong signal)
@@ -262,7 +274,7 @@ export class ContextDatabase {
       ORDER BY rank
       LIMIT ?
     `);
-    return (stmt.all(query, query, limit) as any[]).map(row => ({
+    return (stmt.all(sanitizedQuery, sanitizedQuery, limit) as any[]).map(row => ({
       path: row.path,
       rank: row.rank,
     }));

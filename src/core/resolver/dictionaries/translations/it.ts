@@ -161,6 +161,7 @@ export const stemTranslations: [string, string][] = [
   ['director', 'director'], // directory → directory
   ['immagin', 'imag'], // immagine → image
   ['fot', 'photo'], // foto → photo
+  ['copert', 'cover'], // copertina → cover (foto di copertina = cover photo)
   ['video', 'video'],
   ['audio', 'audio'],
   ['galler', 'galleri'], // galleria → gallery (en stem is "galleri")

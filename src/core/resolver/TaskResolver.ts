@@ -111,13 +111,16 @@ export class TaskResolver {
     // Extract keywords and entities
     const extracted = this.keywordExtractor.extract(rawTask);
 
-    // Extract raw words from the original task (words >= 3 chars, lowercased)
+    // Short technical terms that should be kept even though < 3 chars
+    const ALLOWED_SHORT_WORDS = new Set(['ip', 'id', 'ui', 'db', 'api', 'cdn', 'sms', 'otp', 'ai', 'ml', 'io']);
+
+    // Extract raw words from the original task (words >= 3 chars OR allowed short terms)
     // These are the EXACT words the user typed, very strong signal for path matching
     const rawWords = (options.task || '')
       .toLowerCase()
       .split(/\s+/)
       .map(w => w.replace(/[^\p{L}\p{N}]/gu, ''))  // Keep letters and numbers only
-      .filter(w => w.length >= 3);
+      .filter(w => w.length >= 3 || ALLOWED_SHORT_WORDS.has(w));
 
     // Build file hints from various sources
     const filesHint: string[] = [
