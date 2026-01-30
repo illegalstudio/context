@@ -6,6 +6,7 @@ import { DiscoveryLoader } from './DiscoveryLoader.js';
 import type { DiscoveryContext as RuleDiscoveryContext } from './DiscoveryRule.js';
 import { CtxIgnore } from '../indexer/CtxIgnore.js';
 import { ReferenceExtractor } from './ReferenceExtractor.js';
+import { stemmer } from '../resolver/dictionaries/index.js';
 
 export interface DiscoveryContext {
   task: ResolvedTask;
@@ -204,6 +205,9 @@ export class CandidateDiscovery {
    * Files matching multiple keywords get a higher filenameMatchCount, which boosts their score.
    * For example, "app/Filament/Resources/UserResource/Pages/ListUsers.php" matching
    * "filament", "user", "list" would get filenameMatchCount=3.
+   *
+   * Uses stemming to match morphological variants:
+   * - "utenti" → stem "utent" matches "UserResource" (stem "user" via translation)
    */
   private async discoverFromFilenames(
     task: ResolvedTask,
@@ -211,27 +215,36 @@ export class CandidateDiscovery {
   ): Promise<void> {
     const allFiles = this.db.getAllFiles();
 
-    // Combine all meaningful terms to search in filenames
+    // Combine all meaningful terms and their stems
     const searchTerms = new Set<string>();
 
-    // Add all symbols (these include case variants)
+    // Add all symbols (these include case variants) and their stems
     for (const symbol of task.symbols) {
       if (symbol.length >= 3) {
-        searchTerms.add(symbol.toLowerCase());
+        const lower = symbol.toLowerCase();
+        searchTerms.add(lower);
+        // Add stems
+        stemmer.stem(lower).forEach(s => searchTerms.add(s));
       }
     }
 
-    // Add ALL keywords (not just identifier-like ones)
+    // Add ALL keywords (not just identifier-like ones) and their stems
     for (const keyword of task.keywords) {
       if (keyword.length >= 3) {
-        searchTerms.add(keyword.toLowerCase());
+        const lower = keyword.toLowerCase();
+        searchTerms.add(lower);
+        // Add stems
+        stemmer.stem(lower).forEach(s => searchTerms.add(s));
       }
     }
 
-    // Add domain names as search terms (e.g., "payments" domain -> search for payment-related files)
+    // Add domain names and their stems
     for (const domain of task.domains) {
       if (domain.length >= 3) {
-        searchTerms.add(domain.toLowerCase());
+        const lower = domain.toLowerCase();
+        searchTerms.add(lower);
+        // Add stems
+        stemmer.stem(lower).forEach(s => searchTerms.add(s));
       }
     }
 
@@ -241,10 +254,32 @@ export class CandidateDiscovery {
     for (const file of allFiles) {
       const filePathLower = file.path.toLowerCase();
 
-      // Count how many distinct terms match this file path
+      // Extract path segments and stem them for matching
+      // e.g., "app/Filament/Resources/UserResource/Pages/ListUsers.php"
+      // → segments: ["app", "filament", "resources", "userresource", "pages", "listusers", "php"]
+      // → split camelCase: ["app", "filament", "resources", "user", "resource", "pages", "list", "users", "php"]
+      const segments = filePathLower.split(/[\/\\]/).flatMap(s =>
+        s.split(/(?=[A-Z])|[-_.]/).map(p => p.toLowerCase()).filter(p => p.length >= 2)
+      );
+
+      // Create set of all segment forms (original + stemmed)
+      const stemmedSegments = new Set<string>();
+      for (const segment of segments) {
+        stemmedSegments.add(segment);
+        // Add stems of each segment
+        stemmer.stem(segment).forEach(s => stemmedSegments.add(s));
+      }
+
+      // Count how many distinct search terms match this file path
       let matchCount = 0;
       for (const term of searchTerms) {
+        // Direct substring match in path
         if (filePathLower.includes(term)) {
+          matchCount++;
+          continue;
+        }
+        // Stem-based segment match
+        if (stemmedSegments.has(term)) {
           matchCount++;
         }
       }

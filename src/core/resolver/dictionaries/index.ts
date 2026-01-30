@@ -1,68 +1,80 @@
 /**
- * Synonym Expander
+ * Synonym Expander with Stemming Support
  *
- * Expands keywords with synonyms and translations.
+ * Expands keywords with synonyms and translations using stemming.
  * Supports:
  * - English synonyms (en.ts)
  * - Italian synonyms (it.ts)
- * - Bidirectional IT↔EN translations (en-it.ts)
+ * - Bidirectional IT↔EN stem translations (en-it.ts)
+ * - Automatic plural/conjugation handling via Snowball stemmer
  */
 
 import { synonymGroups as enSynonyms } from './en.js';
 import { synonymGroups as itSynonyms } from './it.js';
-import { translations } from './en-it.js';
+import { stemTranslations } from './en-it.js';
+import { stemmer } from '../Stemmer.js';
 
 export class SynonymExpander {
   private enIndex: Map<string, Set<string>>;
   private itIndex: Map<string, Set<string>>;
-  private translationIndex: Map<string, Set<string>>;
+  private stemIndex: Map<string, Set<string>>;
 
   constructor() {
     this.enIndex = this.buildIndex(enSynonyms);
     this.itIndex = this.buildIndex(itSynonyms);
-    this.translationIndex = this.buildTranslationIndex(translations);
+    this.stemIndex = this.buildStemIndex(stemTranslations);
   }
 
   /**
-   * Expand a single term with all synonyms and translations
+   * Expand a single term with all synonyms and translations.
+   * Uses stemming to match morphological variants (plurals, conjugations).
    *
-   * Example: "pagamento" → ["pagamento", "payment", "charge", "transaction", "billing", "versamento", "transazione"]
+   * Example: "utenti" → ["utenti", "utent", "user", ...]
    */
   expand(term: string): string[] {
     const result = new Set<string>();
     result.add(term);
 
     const termLower = term.toLowerCase();
+    result.add(termLower);
 
-    // 1. English synonyms
+    // 1. English synonyms (exact match)
     const enSyns = this.enIndex.get(termLower);
     if (enSyns) {
       enSyns.forEach(s => result.add(s));
     }
 
-    // 2. Italian synonyms
+    // 2. Italian synonyms (exact match)
     const itSyns = this.itIndex.get(termLower);
     if (itSyns) {
       itSyns.forEach(s => result.add(s));
     }
 
-    // 3. Translations (bidirectional)
-    const trans = this.translationIndex.get(termLower);
-    if (trans) {
-      trans.forEach(t => {
-        result.add(t);
+    // 3. Stem-based translations
+    // Get stems for the input term
+    const stems = stemmer.stem(termLower);
+    for (const stem of stems) {
+      // Add the stem itself (useful for filename matching)
+      result.add(stem);
 
-        // Also expand synonyms of the translated term
-        const transSynsEn = this.enIndex.get(t);
-        if (transSynsEn) {
-          transSynsEn.forEach(s => result.add(s));
-        }
+      // Look up translations for this stem
+      const translations = this.stemIndex.get(stem);
+      if (translations) {
+        translations.forEach(t => result.add(t));
+      }
+    }
 
-        const transSynsIt = this.itIndex.get(t);
-        if (transSynsIt) {
-          transSynsIt.forEach(s => result.add(s));
-        }
-      });
+    // 4. Also expand synonyms of translated terms
+    for (const translated of [...result]) {
+      const transSynsEn = this.enIndex.get(translated);
+      if (transSynsEn) {
+        transSynsEn.forEach(s => result.add(s));
+      }
+
+      const transSynsIt = this.itIndex.get(translated);
+      if (transSynsIt) {
+        transSynsIt.forEach(s => result.add(s));
+      }
     }
 
     return [...result];
@@ -89,11 +101,21 @@ export class SynonymExpander {
    */
   hasSynonyms(term: string): boolean {
     const termLower = term.toLowerCase();
-    return (
-      this.enIndex.has(termLower) ||
-      this.itIndex.has(termLower) ||
-      this.translationIndex.has(termLower)
-    );
+
+    // Check exact match
+    if (this.enIndex.has(termLower) || this.itIndex.has(termLower)) {
+      return true;
+    }
+
+    // Check stem-based match
+    const stems = stemmer.stem(termLower);
+    for (const stem of stems) {
+      if (this.stemIndex.has(stem)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -124,28 +146,24 @@ export class SynonymExpander {
   }
 
   /**
-   * Build a bidirectional translation index
-   *
-   * Each term maps to its translations in both directions.
+   * Build a bidirectional stem translation index.
+   * Maps stems to their translations in both directions.
    */
-  private buildTranslationIndex(pairs: [string, string][]): Map<string, Set<string>> {
+  private buildStemIndex(pairs: [string, string][]): Map<string, Set<string>> {
     const index = new Map<string, Set<string>>();
 
-    for (const [a, b] of pairs) {
-      const aLower = a.toLowerCase();
-      const bLower = b.toLowerCase();
-
-      // A → B
-      if (!index.has(aLower)) {
-        index.set(aLower, new Set());
+    for (const [itStem, enStem] of pairs) {
+      // IT stem → EN stem
+      if (!index.has(itStem)) {
+        index.set(itStem, new Set());
       }
-      index.get(aLower)!.add(bLower);
+      index.get(itStem)!.add(enStem);
 
-      // B → A (bidirectional)
-      if (!index.has(bLower)) {
-        index.set(bLower, new Set());
+      // EN stem → IT stem (bidirectional)
+      if (!index.has(enStem)) {
+        index.set(enStem, new Set());
       }
-      index.get(bLower)!.add(aLower);
+      index.get(enStem)!.add(itStem);
     }
 
     return index;
@@ -154,14 +172,17 @@ export class SynonymExpander {
   /**
    * Get statistics about the dictionaries
    */
-  getStats(): { enTerms: number; itTerms: number; translations: number } {
+  getStats(): { enTerms: number; itTerms: number; stemTranslations: number } {
     return {
       enTerms: this.enIndex.size,
       itTerms: this.itIndex.size,
-      translations: this.translationIndex.size,
+      stemTranslations: this.stemIndex.size,
     };
   }
 }
 
 // Export a singleton instance for convenience
 export const synonymExpander = new SynonymExpander();
+
+// Re-export stemmer for use in other modules
+export { stemmer } from '../Stemmer.js';
