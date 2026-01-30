@@ -6,7 +6,4 @@ ctx/
 .DS_Store
 docs/
 
-# Test files
-test-scenarios.sh
-TEST_REPORT.md
 .claude/
