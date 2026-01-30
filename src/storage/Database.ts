@@ -74,6 +74,13 @@ export class ContextDatabase {
     this.db.exec(SCHEMA);
   }
 
+  /**
+   * Get the raw SQLite database instance for custom queries
+   */
+  getDb(): Database.Database {
+    return this.db;
+  }
+
   // File operations
   upsertFile(file: FileMetadata): void {
     const stmt = this.db.prepare(`
@@ -142,6 +149,29 @@ export class ContextDatabase {
     const stmt = this.db.prepare('SELECT * FROM symbols WHERE name LIKE ?');
     return (stmt.all(`%${name}%`) as any[]).map(row => ({
       id: row.id,
+      filePath: row.file_path,
+      name: row.name,
+      kind: row.kind,
+      startLine: row.start_line,
+      endLine: row.end_line,
+      signature: row.signature,
+    }));
+  }
+
+  /**
+   * Get all symbols from the database (for autocomplete)
+   * Only returns class, function, and method symbols (not variables/constants)
+   */
+  getAllSymbols(): Symbol[] {
+    const stmt = this.db.prepare(`
+      SELECT DISTINCT name, file_path, kind, start_line, end_line, signature
+      FROM symbols
+      WHERE kind IN ('class', 'function', 'method', 'trait', 'interface')
+      ORDER BY name
+      LIMIT 5000
+    `);
+    return (stmt.all() as any[]).map(row => ({
+      id: 0,
       filePath: row.file_path,
       name: row.name,
       kind: row.kind,

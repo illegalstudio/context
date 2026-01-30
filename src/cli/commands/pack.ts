@@ -6,6 +6,7 @@ import { ExcerptExtractor } from '../../core/extractor/index.js';
 import { PackComposer } from '../../core/composer/index.js';
 import { logger } from '../utils/logger.js';
 import { createSpinner } from '../utils/spinner.js';
+import { InteractivePrompt } from '../utils/interactive-prompt.js';
 import type { PackOptions } from '../../types/index.js';
 
 export async function packCommand(options: PackOptions): Promise<void> {
@@ -17,18 +18,59 @@ export async function packCommand(options: PackOptions): Promise<void> {
     process.exit(1);
   }
 
-  // Validate we have some input
+  // If no input provided, enter interactive mode
   if (!options.task && !options.error && !options.diff && !options.file) {
-    logger.error('No input provided. Use --task, --error, --diff, or --file.');
-    logger.blank();
-    logger.dim('Examples:');
-    logger.list([
-      'context pack --task "Fix checkout webhook idempotency"',
-      'context pack --error storage/logs/laravel.log --since 1h',
-      'context pack --diff origin/main',
-      'context pack --file app/Services/StripeService.php --symbol handleWebhook',
-    ]);
-    process.exit(1);
+    // Check if running in interactive terminal
+    if (process.stdin.isTTY) {
+      // Load index first for autocomplete
+      let tempIndexer: Indexer | null = null;
+      try {
+        tempIndexer = new Indexer(cwd);
+        const db = tempIndexer.getDatabase();
+
+        // Create interactive prompt with autocomplete
+        const prompt = new InteractivePrompt(db);
+        const taskInput = await prompt.promptTask();
+
+        if (!taskInput) {
+          logger.warning('No task provided. Exiting.');
+          tempIndexer.close();
+          process.exit(0);
+        }
+
+        // Parse @ references from the task
+        const { task: cleanTask, files, symbols } = prompt.parseReferences(taskInput);
+
+        // Set options from interactive input
+        options.task = cleanTask;
+        if (files.length > 0 && !options.file) {
+          options.file = files[0]; // Use first file as primary
+        }
+        if (symbols.length > 0 && !options.symbol) {
+          options.symbol = symbols[0]; // Use first symbol as primary
+        }
+
+        prompt.close();
+        tempIndexer.close();
+      } catch (err) {
+        tempIndexer?.close();
+        throw err;
+      }
+    } else {
+      // Non-interactive mode - show help
+      logger.error('No input provided. Use --task, --error, --diff, or --file.');
+      logger.blank();
+      logger.dim('Examples:');
+      logger.list([
+        'context pack --task "Fix checkout webhook idempotency"',
+        'context pack --error storage/logs/laravel.log --since 1h',
+        'context pack --diff origin/main',
+        'context pack --file app/Services/StripeService.php --symbol handleWebhook',
+      ]);
+      logger.blank();
+      logger.dim('Or run without arguments in a terminal for interactive mode with autocomplete.');
+      process.exit(1);
+    }
   }
 
   logger.header('Creating Context Pack');
