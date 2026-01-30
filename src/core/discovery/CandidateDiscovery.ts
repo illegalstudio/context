@@ -248,20 +248,83 @@ export class CandidateDiscovery {
     }
   }
 
-  private async expandGraph(candidates: Map<string, CandidateSignals>): Promise<void> {
-    const initialCandidates = [...candidates.keys()];
+  /**
+   * Multi-hop BFS graph traversal to find transitive dependencies.
+   *
+   * Starting from high-priority candidates (stacktrace, diff, symbol matches),
+   * traverse the import graph up to maxDepth hops. Files found at greater depths
+   * get a decay factor applied to their score.
+   *
+   * @param candidates - Current candidate map
+   * @param maxDepth - Maximum traversal depth (default: 2)
+   * @param maxNodes - Maximum number of nodes to visit (default: 100)
+   */
+  private async expandGraph(
+    candidates: Map<string, CandidateSignals>,
+    maxDepth: number = 2,
+    maxNodes: number = 100
+  ): Promise<void> {
+    // Start BFS from high-priority candidates only
+    const startFiles = [...candidates.keys()].filter(f => {
+      const signals = candidates.get(f)!;
+      return signals.stacktraceHit || signals.diffHit || signals.symbolMatch || signals.exactSymbolMention;
+    });
 
-    for (const filePath of initialCandidates) {
+    if (startFiles.length === 0) {
+      // Fallback: use all current candidates as starting points
+      startFiles.push(...candidates.keys());
+    }
+
+    const visited = new Set<string>(startFiles);
+    const queue: Array<{ file: string; depth: number }> = startFiles.map(f => ({
+      file: f,
+      depth: 0,
+    }));
+
+    while (queue.length > 0 && visited.size < maxNodes) {
+      const { file, depth } = queue.shift()!;
+
+      // Don't expand beyond maxDepth
+      if (depth >= maxDepth) continue;
+
       // Get files that this file imports
-      const imports = this.db.getImportsFrom(filePath);
+      const imports = this.db.getImportsFrom(file);
       for (const imp of imports) {
-        this.addCandidate(candidates, imp.targetPath, { graphRelated: true });
+        if (!visited.has(imp.targetPath)) {
+          visited.add(imp.targetPath);
+
+          // Calculate decay factor based on depth (1.0 at depth 1, decreasing)
+          const graphDepth = depth + 1;
+          const graphDecay = 1 / graphDepth;
+
+          this.addCandidate(candidates, imp.targetPath, {
+            graphRelated: true,
+            graphDepth,
+            graphDecay,
+          });
+
+          queue.push({ file: imp.targetPath, depth: depth + 1 });
+        }
       }
 
       // Get files that import this file
-      const importers = this.db.getImportersOf(filePath);
+      const importers = this.db.getImportersOf(file);
       for (const imp of importers) {
-        this.addCandidate(candidates, imp.sourcePath, { graphRelated: true });
+        if (!visited.has(imp.sourcePath)) {
+          visited.add(imp.sourcePath);
+
+          // Calculate decay factor based on depth
+          const graphDepth = depth + 1;
+          const graphDecay = 1 / graphDepth;
+
+          this.addCandidate(candidates, imp.sourcePath, {
+            graphRelated: true,
+            graphDepth,
+            graphDecay,
+          });
+
+          queue.push({ file: imp.sourcePath, depth: depth + 1 });
+        }
       }
     }
   }
@@ -459,16 +522,27 @@ export class CandidateDiscovery {
       exactSymbolMention: false,
       keywordMatch: false,
       graphRelated: false,
+      graphDepth: undefined,
+      graphDecay: undefined,
       testFile: false,
       gitHotspot: false,
       relatedFile: false,
       exampleUsage: false,
     };
 
-    candidates.set(filePath, {
-      ...existing,
-      ...newSignals,
-    });
+    // For graphDepth and graphDecay, keep the smallest depth (closest path)
+    // if this file was already found via graph traversal
+    let mergedSignals = { ...existing, ...newSignals };
+
+    if (existing.graphDepth !== undefined && newSignals.graphDepth !== undefined) {
+      // Keep the shorter path (smaller depth = closer = more relevant)
+      if (existing.graphDepth <= newSignals.graphDepth) {
+        mergedSignals.graphDepth = existing.graphDepth;
+        mergedSignals.graphDecay = existing.graphDecay;
+      }
+    }
+
+    candidates.set(filePath, mergedSignals);
   }
 
   private normalizePath(filePath: string): string {

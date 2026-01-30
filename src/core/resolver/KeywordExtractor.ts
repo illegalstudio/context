@@ -1,6 +1,8 @@
 // Keyword extraction using rule-based approach (no AI needed)
 
 import { SynonymExpander } from './dictionaries/index.js';
+import { TFIDFCalculator } from './TFIDFCalculator.js';
+import { RAKEExtractor } from './RAKEExtractor.js';
 
 // Case conversion utilities
 function snakeToCamel(str: string): string {
@@ -97,6 +99,7 @@ const CHANGE_TYPE_KEYWORDS: Record<string, string[]> = {
 
 export interface ExtractedKeywords {
   keywords: string[];
+  keyphrases: string[];  // Multi-word keyphrases extracted via RAKE
   entities: ExtractedEntities;
   domains: string[];
   domainWeights: Record<string, number>;  // How many keywords matched each domain
@@ -113,9 +116,13 @@ export interface ExtractedEntities {
 
 export class KeywordExtractor {
   private synonymExpander: SynonymExpander;
+  private tfidfCalculator: TFIDFCalculator;
+  private rakeExtractor: RAKEExtractor;
 
   constructor() {
     this.synonymExpander = new SynonymExpander();
+    this.tfidfCalculator = new TFIDFCalculator();
+    this.rakeExtractor = new RAKEExtractor({ stopwords: STOPWORDS });
   }
 
   extract(text: string): ExtractedKeywords {
@@ -124,25 +131,59 @@ export class KeywordExtractor {
     // Extract entities first (they're more reliable)
     const entities = this.extractEntities(text);
 
-    // Extract keywords (after removing entities to avoid duplication)
-    const rawKeywords = this.extractKeywords(text, entities);
+    // Extract keywords using TF-IDF scoring (after removing entities to avoid duplication)
+    const rawKeywords = this.extractKeywordsWithTFIDF(text, entities);
+
+    // Extract multi-word keyphrases using RAKE
+    const keyphrases = this.rakeExtractor.extractPhraseStrings(text, 10);
 
     // Expand keywords with synonyms and translations
     const keywords = this.synonymExpander.expandAll(rawKeywords);
 
+    // Also expand keyphrases (each word in the phrase gets synonyms)
+    const expandedKeyphrases = this.expandKeyphrases(keyphrases);
+
     // Detect domains with weights (how many keywords matched each)
-    const { domains, domainWeights } = this.detectDomainsWithWeights(normalizedText, keywords);
+    const { domains, domainWeights } = this.detectDomainsWithWeights(
+      normalizedText,
+      [...keywords, ...expandedKeyphrases]
+    );
 
     // Detect change type
     const changeType = this.detectChangeType(normalizedText);
 
     return {
-      keywords,
+      keywords: [...new Set([...keywords, ...expandedKeyphrases])],
+      keyphrases,
       entities,
       domains,
       domainWeights,
       changeType,
     };
+  }
+
+  /**
+   * Expand keyphrases by adding synonym variants of each word.
+   * E.g., "payment webhook" → ["payment webhook", "pagamento webhook"]
+   */
+  private expandKeyphrases(keyphrases: string[]): string[] {
+    const expanded: string[] = [];
+
+    for (const phrase of keyphrases) {
+      expanded.push(phrase);
+
+      // Also add the phrase as individual words for matching
+      const words = phrase.split(' ');
+      for (const word of words) {
+        if (word.length >= 3 && !STOPWORDS.has(word)) {
+          // Get synonyms for this word
+          const synonyms = this.synonymExpander.expandAll([word]);
+          expanded.push(...synonyms);
+        }
+      }
+    }
+
+    return [...new Set(expanded)];
   }
 
   private extractEntities(text: string): ExtractedEntities {
@@ -226,6 +267,50 @@ export class KeywordExtractor {
     };
   }
 
+  /**
+   * Extract keywords using TF-IDF scoring to prioritize rare/specific terms.
+   * This replaces simple frequency-based keyword selection.
+   */
+  private extractKeywordsWithTFIDF(text: string, entities: ExtractedEntities): string[] {
+    // Tokenize
+    const tokens = text
+      .toLowerCase()
+      .replace(/[^\w\s\-_]/g, ' ')
+      .split(/\s+/)
+      .filter(token => token.length > 2);
+
+    // Remove stopwords
+    const filtered = tokens.filter(token => !STOPWORDS.has(token));
+
+    // Remove tokens that are parts of already-extracted entities
+    const entityParts = new Set<string>();
+    for (const cls of entities.classNames) {
+      // Split CamelCase into parts
+      const parts = cls.split(/(?=[A-Z])/).map(p => p.toLowerCase());
+      parts.forEach(p => entityParts.add(p));
+    }
+
+    const keywords = filtered.filter(token => {
+      // Keep if not a single entity part (keep compound terms)
+      if (entityParts.has(token)) return false;
+      return true;
+    });
+
+    // Use TF-IDF to score keywords (uses heuristics since we don't have a corpus)
+    // This prioritizes rare/specific terms over common ones
+    const tfidfResults = this.tfidfCalculator.calculateWithoutCorpus(keywords);
+
+    // Return top 20 keywords by TF-IDF score
+    return tfidfResults
+      .slice(0, 20)
+      .map(r => r.term);
+  }
+
+  /**
+   * Legacy method kept for backward compatibility.
+   * Uses simple frequency-based extraction.
+   * @deprecated Use extractKeywordsWithTFIDF instead
+   */
   private extractKeywords(text: string, entities: ExtractedEntities): string[] {
     // Tokenize
     const tokens = text

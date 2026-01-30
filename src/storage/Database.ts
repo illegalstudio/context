@@ -220,14 +220,19 @@ export class ContextDatabase {
   }
 
   searchContent(query: string, limit: number = 50): Array<{ path: string; rank: number }> {
+    // Use BM25 ranking with field boosting:
+    // - bm25() returns negative scores (closer to 0 = better match)
+    // - Add 0.5 boost when query appears in the file path (filename match is strong signal)
+    // - This makes files with matching names rank higher than content-only matches
     const stmt = this.db.prepare(`
-      SELECT path, rank
+      SELECT path,
+             (bm25(files_fts) + CASE WHEN path LIKE '%' || ? || '%' THEN 0.5 ELSE 0.0 END) as rank
       FROM files_fts
       WHERE files_fts MATCH ?
       ORDER BY rank
       LIMIT ?
     `);
-    return (stmt.all(query, limit) as any[]).map(row => ({
+    return (stmt.all(query, query, limit) as any[]).map(row => ({
       path: row.path,
       rank: row.rank,
     }));

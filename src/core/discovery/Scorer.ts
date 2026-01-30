@@ -149,11 +149,14 @@ export class Scorer {
     if (signals.relatedFile) score += WEIGHTS.relatedFile;
     if (signals.exampleUsage) score += WEIGHTS.exampleUsage;
 
-    // graphRelated weight is scaled by domain relevance
-    // Files not matching any domain get reduced graphRelated value
+    // graphRelated weight is scaled by:
+    // 1. Domain relevance (files not matching any domain get reduced value)
+    // 2. Graph depth decay (files found at greater distances get reduced value)
     if (signals.graphRelated) {
       const domainWeight = this.getFileDomainWeight(filePath, task);
-      score += WEIGHTS.graphRelated * domainWeight;
+      // Use graphDecay if available (from multi-hop BFS), otherwise use 1.0
+      const graphDecay = signals.graphDecay ?? 1.0;
+      score += WEIGHTS.graphRelated * domainWeight * graphDecay;
     }
 
     return score;
@@ -322,7 +325,12 @@ export class Scorer {
       reasons.push('contains matching keywords');
     }
     if (signals.graphRelated) {
-      reasons.push('related via imports');
+      const depth = signals.graphDepth ?? 1;
+      if (depth === 1) {
+        reasons.push('related via imports (direct)');
+      } else {
+        reasons.push(`related via imports (${depth} hops)`);
+      }
     }
     if (signals.testFile) {
       reasons.push('test file for candidate');

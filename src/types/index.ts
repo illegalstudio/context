@@ -68,6 +68,8 @@ export interface CandidateSignals {
   exactSymbolMention: boolean;  // File contains a symbol explicitly mentioned in the task (method/class name)
   keywordMatch: boolean;
   graphRelated: boolean;
+  graphDepth?: number;    // Depth at which file was found via graph traversal (1 = direct, 2+ = transitive)
+  graphDecay?: number;    // Decay factor based on graph depth (1.0 at depth 1, decreasing with depth)
   testFile: boolean;
   gitHotspot: boolean;
   relatedFile: boolean;    // Found by a discovery rule (view, component, etc.)
