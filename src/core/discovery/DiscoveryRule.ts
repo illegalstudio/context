@@ -79,6 +79,8 @@ export function createDefaultSignals(): CandidateSignals {
   return {
     stacktraceHit: false,
     diffHit: false,
+    fileHintHit: false,
+    fileHintExact: false,
     symbolMatch: false,
     exactSymbolMention: false,
     keywordMatch: false,

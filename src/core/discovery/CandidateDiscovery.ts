@@ -184,15 +184,22 @@ export class CandidateDiscovery {
     candidates: Map<string, CandidateSignals>
   ): Promise<void> {
     for (const fileHint of task.filesHint) {
-      // Try exact match first
+      // Try exact match first (full path)
       const file = this.db.getFile(fileHint);
       if (file) {
-        this.addCandidate(candidates, fileHint, { keywordMatch: true });
+        // Exact full path match - highest priority
+        this.addCandidate(candidates, fileHint, { fileHintHit: true, fileHintExact: true });
       } else {
-        // Try partial match
-        const matchingFiles = this.findMatchingFiles(fileHint);
-        for (const matchedPath of matchingFiles) {
-          this.addCandidate(candidates, matchedPath, { keywordMatch: true });
+        // Try partial match - distinguish exact filename vs partial path match
+        const matchingFiles = this.findMatchingFilesWithExactness(fileHint);
+        for (const { path: matchedPath, isExactBasename } of matchingFiles) {
+          if (isExactBasename) {
+            // Exact basename match (e.g., "User.php" matches ".../User.php")
+            this.addCandidate(candidates, matchedPath, { fileHintHit: true, fileHintExact: true });
+          } else {
+            // Partial match (e.g., "User.php" matches ".../ChatUser.php")
+            this.addCandidate(candidates, matchedPath, { fileHintHit: true });
+          }
         }
       }
     }
@@ -639,6 +646,8 @@ export class CandidateDiscovery {
     const existing = candidates.get(filePath) || {
       stacktraceHit: false,
       diffHit: false,
+      fileHintHit: false,
+      fileHintExact: false,
       symbolMatch: false,
       exactSymbolMention: false,
       keywordMatch: false,
@@ -691,19 +700,35 @@ export class CandidateDiscovery {
   }
 
   private findMatchingFiles(filePattern: string): string[] {
+    return this.findMatchingFilesWithExactness(filePattern).map(m => m.path);
+  }
+
+  /**
+   * Find files matching a pattern, distinguishing exact basename match from partial match.
+   * Exact: "User.php" matches "app/Models/User.php" (basename is exactly "User.php")
+   * Partial: "User.php" matches "app/Models/ChatUser.php" (contains "User.php" but basename differs)
+   */
+  private findMatchingFilesWithExactness(filePattern: string): Array<{ path: string; isExactBasename: boolean }> {
     const allFiles = this.db.getAllFiles();
     const normalizedPattern = this.normalizePath(filePattern).toLowerCase();
+    const patternBasename = path.basename(normalizedPattern);
 
-    // Try to match by filename
-    const fileName = path.basename(normalizedPattern);
+    const results: Array<{ path: string; isExactBasename: boolean }> = [];
 
-    return allFiles
-      .filter(f => {
-        const normalizedPath = f.path.toLowerCase();
-        // Match full path or just filename
-        return normalizedPath.includes(normalizedPattern) ||
-               path.basename(normalizedPath) === fileName;
-      })
-      .map(f => f.path);
+    for (const f of allFiles) {
+      const normalizedPath = f.path.toLowerCase();
+      const fileBasename = path.basename(normalizedPath);
+
+      // Check for exact basename match first (highest priority)
+      if (fileBasename === patternBasename) {
+        results.push({ path: f.path, isExactBasename: true });
+      }
+      // Then check for path contains pattern (partial match)
+      else if (normalizedPath.includes(normalizedPattern)) {
+        results.push({ path: f.path, isExactBasename: false });
+      }
+    }
+
+    return results;
   }
 }

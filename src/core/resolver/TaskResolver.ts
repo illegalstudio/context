@@ -4,6 +4,24 @@ import { StacktraceParser } from './StacktraceParser.js';
 import { DiffAnalyzer } from './DiffAnalyzer.js';
 import { DomainManager } from './domains/index.js';
 
+// Stopwords for symbols - common method names and file extensions that are too generic
+const SYMBOL_STOPWORDS = new Set([
+  // Migration methods (Laravel, Rails, etc.) - too common
+  'up', 'down', 'run', 'seed',
+  // Common CRUD methods - too generic
+  'index', 'show', 'store', 'create', 'update', 'destroy', 'delete', 'edit',
+  'get', 'set', 'add', 'remove', 'find', 'all', 'first', 'last',
+  // Lifecycle hooks
+  'boot', 'init', 'setup', 'teardown', 'handle', 'invoke',
+  // File extensions (should never be symbols)
+  'php', 'ts', 'tsx', 'js', 'jsx', 'py', 'rb', 'go', 'rs', 'java', 'vue', 'svelte',
+  // Common test methods
+  'test', 'it', 'describe', 'expect', 'should', 'assert',
+  // Other too-generic
+  'new', 'old', 'data', 'item', 'items', 'value', 'values', 'key', 'keys',
+  'name', 'type', 'id', 'ids', 'uuid', 'slug',
+]);
+
 export interface ResolveResult {
   task: ResolvedTask;
   stacktraceEntries: StacktraceEntry[];
@@ -112,15 +130,18 @@ export class TaskResolver {
       filesHint.push(options.file);
     }
 
-    // Build symbol hints
-    const symbols: string[] = [
+    // Build symbol hints, filtering out generic stopwords
+    const rawSymbols: string[] = [
       ...extracted.entities.classNames,
       ...extracted.entities.methodNames,
     ];
 
     if (options.symbol) {
-      symbols.push(options.symbol);
+      rawSymbols.push(options.symbol);
     }
+
+    // Filter out stopwords from symbols
+    const symbols = rawSymbols.filter(s => !SYMBOL_STOPWORDS.has(s.toLowerCase()));
 
     // Calculate confidence
     const confidence = this.calculateConfidence(extracted, stacktraceEntries, diffEntries, options);

@@ -65,6 +65,8 @@ export interface Candidate {
 export interface CandidateSignals {
   stacktraceHit: boolean;
   diffHit: boolean;
+  fileHintHit: boolean;         // File explicitly mentioned in the task (e.g., "User.php")
+  fileHintExact: boolean;       // Exact filename match (User.php matches User.php, not ChatUser.php)
   symbolMatch: boolean;
   exactSymbolMention: boolean;  // File contains a symbol explicitly mentioned in the task (method/class name)
   keywordMatch: boolean;

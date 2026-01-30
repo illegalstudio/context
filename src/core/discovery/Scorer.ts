@@ -4,6 +4,8 @@ import { DOMAIN_KEYWORDS } from '../resolver/KeywordExtractor.js';
 
 // Signal weights for scoring
 const WEIGHTS = {
+  fileHintExact: 0.60,  // Exact file mention (e.g., "User.php" matches User.php exactly) - HIGHEST
+  fileHintHit: 0.40,    // File mentioned in task (partial match, e.g., "User.php" matches ChatUser.php)
   stacktraceHit: 0.30,  // Appears in stacktrace (very strong)
   diffHit: 0.22,        // Modified in diff (strong)
   rawPathMatch: 0.25,   // RAW task word in path (very strong - user explicitly typed this word)
@@ -86,9 +88,9 @@ export class Scorer {
     const configFiles: Candidate[] = [];
 
     for (const candidate of candidates) {
-      // Files with exactSymbolMention are ALWAYS included (reserved slots)
-      // These are files where the user explicitly mentioned a method/class name
-      if (candidate.signals.exactSymbolMention && !this.isTestFile(candidate.path)) {
+      // Files with exact file hint or exactSymbolMention are ALWAYS included (reserved slots)
+      // These are files where the user explicitly mentioned a filename or method/class name
+      if ((candidate.signals.fileHintExact || candidate.signals.exactSymbolMention) && !this.isTestFile(candidate.path)) {
         reservedFiles.push(candidate);
       } else if (this.isTestFile(candidate.path)) {
         testFiles.push(candidate);
@@ -147,6 +149,15 @@ export class Scorer {
 
   private calculateBaseScore(signals: CandidateSignals, filePath: string, task: ResolvedTask): number {
     let score = 0;
+
+    // File hint is the strongest signal - user explicitly mentioned this file
+    // Exact match (e.g., "User.php" matches User.php) gets highest score
+    // Partial match (e.g., "User.php" matches ChatUser.php) gets lower but still high score
+    if (signals.fileHintExact) {
+      score += WEIGHTS.fileHintExact;
+    } else if (signals.fileHintHit) {
+      score += WEIGHTS.fileHintHit;
+    }
 
     if (signals.stacktraceHit) score += WEIGHTS.stacktraceHit;
     if (signals.diffHit) score += WEIGHTS.diffHit;
@@ -360,6 +371,13 @@ export class Scorer {
 
   private generateReasons(signals: CandidateSignals, filePath: string, task: ResolvedTask): string[] {
     const reasons: string[] = [];
+
+    // File hint is the strongest signal
+    if (signals.fileHintExact) {
+      reasons.push('exact file match (explicitly mentioned)');
+    } else if (signals.fileHintHit) {
+      reasons.push('file mentioned in task (partial match)');
+    }
 
     if (signals.stacktraceHit) {
       reasons.push('appears in stacktrace');
