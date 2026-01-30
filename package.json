@@ -2,16 +2,41 @@
   "name": "context-packer",
   "version": "0.1.0",
   "description": "CLI context packer for agentic coding - transforms tasks into deterministic, explainable context packages",
+  "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "context": "./dist/cli/index.js"
+    "context-packer": "./dist/cli/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/illegalstudio/context-packer.git"
+  },
+  "homepage": "https://github.com/illegalstudio/context-packer#readme",
+  "bugs": {
+    "url": "https://github.com/illegalstudio/context-packer/issues"
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
     "start": "node dist/cli/index.js",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "npm run build && vitest run --config vitest.e2e.config.ts",
+    "test:all": "npm run test && npm run test:e2e"
   },
   "keywords": [
     "cli",
@@ -23,9 +48,8 @@
     "cursor",
     "codex"
   ],
-  "author": "",
+  "author": "Illegal Studio",
   "license": "MIT",
-  "type": "module",
   "engines": {
     "node": ">=18.0.0"
   },
@@ -44,6 +68,9 @@
     "@types/archiver": "^6.0.3",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.10.5",
-    "typescript": "^5.7.2"
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.18"
   }
 }
