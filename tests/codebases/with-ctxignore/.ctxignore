@@ -1,0 +1,19 @@
+# Custom ctxignore patterns for testing
+
+# Ignore vendor directory
+vendor/
+
+# Ignore generated files
+*.generated.ts
+*.generated.js
+
+# Ignore cache
+cache/
+.cache/
+
+# Ignore specific patterns
+**/temp/**
+**/tmp/**
+
+# Keep specific file even if in ignored folder
+!vendor/important.ts

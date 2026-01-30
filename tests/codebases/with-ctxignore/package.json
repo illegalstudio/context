@@ -1,0 +1,6 @@
+{
+  "name": "with-ctxignore",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Test project with custom .ctxignore"
+}

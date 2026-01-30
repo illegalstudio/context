@@ -1,0 +1,7 @@
+{
+  "name": "@mixed/backend",
+  "version": "1.0.0",
+  "dependencies": {
+    "@mixed/shared": "1.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "typescript-nestjs",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "nest build",
+    "start": "nest start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0"
+  }
+}

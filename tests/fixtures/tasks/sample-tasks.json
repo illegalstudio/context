@@ -1,0 +1,48 @@
+{
+  "bugfix": [
+    {
+      "text": "Fix bug in UserController where login fails for users with special characters in password",
+      "expectedDomains": ["auth"],
+      "expectedChangeType": "bugfix",
+      "expectedFiles": ["UserController"]
+    },
+    {
+      "text": "Payment webhook returns 500 error when Stripe sends duplicate events",
+      "expectedDomains": ["payments"],
+      "expectedChangeType": "bugfix",
+      "expectedFiles": ["Payment", "webhook", "Stripe"]
+    }
+  ],
+  "feature": [
+    {
+      "text": "Add new export functionality for user reports in CSV format",
+      "expectedDomains": ["users"],
+      "expectedChangeType": "feature",
+      "expectedFiles": ["User", "export"]
+    },
+    {
+      "text": "Implement OAuth2 authentication for third-party integrations",
+      "expectedDomains": ["auth"],
+      "expectedChangeType": "feature",
+      "expectedFiles": ["Auth", "OAuth"]
+    }
+  ],
+  "refactor": [
+    {
+      "text": "Refactor authentication module to use dependency injection pattern",
+      "expectedDomains": ["auth"],
+      "expectedChangeType": "refactor",
+      "expectedFiles": ["Auth"]
+    }
+  ],
+  "vague": [
+    {
+      "text": "Something is broken",
+      "expectedConfidenceBelow": 0.3
+    },
+    {
+      "text": "Fix the bug",
+      "expectedConfidenceBelow": 0.3
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+# Context Packer - Ignore Patterns
+# Auto-generated based on detected project type
+# Modify this file to control which files are excluded
+# Syntax: same as .gitignore
+
+# === Node.js ===
+node_modules/
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+coverage/
+.nyc_output/
+.cache/
+.parcel-cache/
+.turbo/
+
+# === Universal ===
+.git/
+.context/
+
+# Logs
+*.log
+logs/
+
+# Minified/compiled assets
+*.min.js
+*.min.css
+*.map
+*.bundle.js
+*.bundle.css
+
+# Build outputs
+dist/
+build/
+out/
+
+# Cache
+.cache/
+.tmp/
+tmp/
+temp/
+
+# IDE/Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+composer.lock
+Gemfile.lock
+Cargo.lock
+poetry.lock
+
+# Security - never index
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+credentials.json
+secrets.json
+secrets.yaml

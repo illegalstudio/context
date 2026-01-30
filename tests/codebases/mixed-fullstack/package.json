@@ -1,0 +1,6 @@
+{
+  "name": "mixed-fullstack",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["backend", "frontend", "shared"]
+}

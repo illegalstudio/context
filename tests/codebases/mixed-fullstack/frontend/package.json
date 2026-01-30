@@ -1,0 +1,8 @@
+{
+  "name": "@mixed/frontend",
+  "version": "1.0.0",
+  "dependencies": {
+    "@mixed/shared": "1.0.0",
+    "react": "^18.2.0"
+  }
+}

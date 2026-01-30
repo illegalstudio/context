@@ -1,0 +1,9 @@
+TypeError: Cannot read property 'name' of undefined
+    at UserService.create (/app/src/services/UserService.ts:45:12)
+    at UserController.store (/app/src/controllers/UserController.ts:23:8)
+    at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+    at next (/app/node_modules/express/lib/router/route.js:137:13)
+    at Route.dispatch (/app/node_modules/express/lib/router/route.js:112:3)
+    at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+    at /app/node_modules/express/lib/router/index.js:281:22
+    at Function.process_params (/app/node_modules/express/lib/router/index.js:335:12)

@@ -1,0 +1,8 @@
+[2024-01-15 10:30:45] local.ERROR: Call to undefined method App\Models\User::invalid() {"exception":"[object] (BadMethodCallException(code: 0): Call to undefined method App\\Models\\User::invalid() at /var/www/html/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:71)
+[stacktrace]
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(36): Illuminate\\Database\\Eloquent\\Model::throwBadMethodCallException()
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2353): Illuminate\\Database\\Eloquent\\Model::forwardCallTo()
+#2 /var/www/html/app/Http/Controllers/UserController.php(45): Illuminate\\Database\\Eloquent\\Model->__call()
+#3 /var/www/html/app/Services/UserService.php(23): App\\Http\\Controllers\\UserController->show()
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App\\Http\\Controllers\\Controller->callAction()
+"}

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "app/routes/users.py", line 45, in create_user
+    user = User(name=data['name'])
+  File "app/models/user.py", line 12, in __init__
+    self.validate()
+  File "app/models/user.py", line 25, in validate
+    raise ValueError("Invalid user data")
+ValueError: Invalid user data
