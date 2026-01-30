@@ -232,8 +232,9 @@ export class KeywordExtractor {
       }
     }
 
-    // File paths and names (e.g., app/Services/StripeService.php)
-    const filePattern = /(?:^|\s)((?:[\w-]+\/)*[\w-]+\.(?:php|ts|tsx|js|jsx|py|rb|go|rs|java|vue|svelte))\b/gi;
+    // File paths and names (e.g., app/Services/StripeService.php, @PaymentController.php)
+    // Also matches files prefixed with @ (common in interactive mode)
+    const filePattern = /(?:^|\s|@)((?:[\w-]+\/)*[\w-]+\.(?:php|ts|tsx|js|jsx|py|rb|go|rs|java|vue|svelte))\b/gi;
     while ((match = filePattern.exec(text)) !== null) {
       fileNames.push(match[1]);
     }

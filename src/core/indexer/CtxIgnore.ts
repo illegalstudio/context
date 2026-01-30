@@ -14,8 +14,28 @@ export class CtxIgnore {
   private ig: Ignore;
   private loaded: boolean = false;
 
+  // Builtin patterns always applied (cannot be overridden)
+  private static readonly BUILTIN_PATTERNS = `
+# Context packer output
+ctx/
+.context/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+`;
+
   constructor(rootDir: string) {
     this.ig = ignore();
+
+    // Always add builtin patterns first
+    this.ig.add(CtxIgnore.BUILTIN_PATTERNS);
 
     const ctxignorePath = path.join(rootDir, '.ctxignore');
     if (fs.existsSync(ctxignorePath)) {
@@ -35,13 +55,10 @@ export class CtxIgnore {
    * @returns true if the file should be ignored
    */
   isIgnored(filePath: string): boolean {
-    if (!this.loaded) {
-      return false;
-    }
-
     // Normalize path separators
     const normalizedPath = filePath.replace(/\\/g, '/');
 
+    // Always check against builtin + custom patterns
     return this.ig.ignores(normalizedPath);
   }
 
@@ -51,10 +68,7 @@ export class CtxIgnore {
    * @returns Array of paths that are not ignored
    */
   filter(filePaths: string[]): string[] {
-    if (!this.loaded) {
-      return filePaths;
-    }
-
+    // Always filter - builtin patterns are always applied
     return filePaths.filter(fp => !this.isIgnored(fp));
   }
 

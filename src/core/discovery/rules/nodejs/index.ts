@@ -54,7 +54,8 @@ coverage/
     {
       name: 'nestjs',
       description: 'NestJS framework',
-      keywords: ['nestjs', 'controller', 'service', 'module', 'guard', 'pipe', 'interceptor', 'decorator', 'injectable'],
+      // Use NestJS-specific decorators to avoid matching generic terms like "controller"/"service" in Laravel/other frameworks
+      keywords: ['nestjs', '@nestjs', '@Controller', '@Injectable', '@Module', '@Guard', '@Pipe', '@Interceptor', '@Get', '@Post', '@Put', '@Delete', '@Patch'],
     },
     {
       name: 'react',

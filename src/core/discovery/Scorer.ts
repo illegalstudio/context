@@ -4,7 +4,7 @@ import { DOMAIN_KEYWORDS } from '../resolver/KeywordExtractor.js';
 
 // Signal weights for scoring
 const WEIGHTS = {
-  fileHintExact: 0.60,  // Exact file mention (e.g., "User.php" matches User.php exactly) - HIGHEST
+  fileHintExact: 2.0,   // Exact file mention - MUCH HIGHER to guarantee first position when explicitly mentioned
   fileHintHit: 0.40,    // File mentioned in task (partial match, e.g., "User.php" matches ChatUser.php)
   stacktraceHit: 0.30,  // Appears in stacktrace (very strong)
   diffHit: 0.22,        // Modified in diff (strong)
@@ -140,10 +140,14 @@ export class Scorer {
       result.push(...relevantConfig.slice(0, configLimit));
     }
 
-    // Cap scores to 1.0 for display (but ordering was done with raw scores)
-    return result.slice(0, maxFiles).map(c => ({
+    // Normalize scores relative to the highest score for display
+    // This shows how files compare to the top match (top = 1.0 = 100%)
+    const finalResult = result.slice(0, maxFiles);
+    const maxScore = finalResult.length > 0 ? Math.max(...finalResult.map(c => c.score)) : 1;
+
+    return finalResult.map(c => ({
       ...c,
-      score: Math.min(c.score, 1.0),
+      score: maxScore > 0 ? c.score / maxScore : 0,
     }));
   }
 
@@ -224,9 +228,19 @@ export class Scorer {
     allCandidates: Map<string, CandidateSignals>,
     task: ResolvedTask
   ): number {
-    // Entry point bonus
+    // Entry point bonus - only apply full bonus if file has strong signals
+    // This prevents irrelevant controllers from getting boosted just because they're controllers
     if (this.isEntryPoint(filePath)) {
-      score *= BONUSES.entryPoint;
+      const hasStrongSignal = signals.fileHintHit ||
+                              signals.stacktraceHit ||
+                              signals.diffHit ||
+                              (signals.rawPathMatchCount && signals.rawPathMatchCount >= 1) ||
+                              signals.exactSymbolMention;
+      if (hasStrongSignal) {
+        score *= BONUSES.entryPoint;  // 1.3x for relevant entry points
+      } else {
+        score *= 1.1;  // Reduced bonus for entry points without strong task relevance
+      }
     }
 
     // Model file bonus
