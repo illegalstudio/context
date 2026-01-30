@@ -31,6 +31,9 @@ const BONUSES = {
   recentActivity: 1.1,
   // File matches detected domain (e.g., PaymentController for "payments" domain)
   domainRelevance: 1.25,
+  // File path matches multiple task keywords (e.g., "filament" + "user" + "list")
+  // This is cumulative: 1.2^(matchCount-1), so 2 matches = 1.2x, 3 matches = 1.44x, 4 matches = 1.73x
+  multiKeywordPath: 1.2,
 };
 
 export interface ScorerOptions {
@@ -219,6 +222,21 @@ export class Scorer {
       score *= domainBonus;
     }
 
+    // Multi-keyword path bonus - files matching multiple task keywords in path
+    // e.g., "app/Filament/Resources/UserResource/Pages/ListUsers.php" matching
+    // "filament", "user", "list" gets a significant boost
+    if (signals.filenameMatchCount && signals.filenameMatchCount >= 2) {
+      // Cumulative bonus: 1.2^(matchCount-1)
+      // 2 matches = 1.2x, 3 matches = 1.44x, 4 matches = 1.73x, 5 matches = 2.07x
+      const multiMatchBonus = Math.pow(BONUSES.multiKeywordPath, signals.filenameMatchCount - 1);
+      score *= multiMatchBonus;
+
+      // Extra boost for 4+ keyword path matches - these files are highly targeted
+      if (signals.filenameMatchCount >= 4) {
+        score *= 1.3; // Additional 30% boost for very targeted files
+      }
+    }
+
     // Multiple signals bonus
     const signalCount = Object.values(signals).filter(v => v === true).length;
     if (signalCount >= 3) {
@@ -323,6 +341,9 @@ export class Scorer {
     }
     if (signals.keywordMatch) {
       reasons.push('contains matching keywords');
+    }
+    if (signals.filenameMatchCount && signals.filenameMatchCount >= 2) {
+      reasons.push(`path matches ${signals.filenameMatchCount} task keywords`);
     }
     if (signals.graphRelated) {
       const depth = signals.graphDepth ?? 1;

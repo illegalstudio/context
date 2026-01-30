@@ -200,6 +200,10 @@ export class CandidateDiscovery {
   /**
    * Search for files whose path contains any of the extracted symbols, keywords, or domain terms
    * This catches Model files, Resource files, Service files, etc. based on naming
+   *
+   * Files matching multiple keywords get a higher filenameMatchCount, which boosts their score.
+   * For example, "app/Filament/Resources/UserResource/Pages/ListUsers.php" matching
+   * "filament", "user", "list" would get filenameMatchCount=3.
    */
   private async discoverFromFilenames(
     task: ResolvedTask,
@@ -233,17 +237,23 @@ export class CandidateDiscovery {
 
     if (searchTerms.size === 0) return;
 
-    // Search through all files
+    // Search through all files and count how many terms match each file
     for (const file of allFiles) {
       const filePathLower = file.path.toLowerCase();
-      const fileNameLower = path.basename(file.path).toLowerCase();
 
+      // Count how many distinct terms match this file path
+      let matchCount = 0;
       for (const term of searchTerms) {
-        // Check if the filename or path contains the term
-        if (fileNameLower.includes(term) || filePathLower.includes(term)) {
-          this.addCandidate(candidates, file.path, { symbolMatch: true });
-          break; // Only add once per file
+        if (filePathLower.includes(term)) {
+          matchCount++;
         }
+      }
+
+      if (matchCount > 0) {
+        this.addCandidate(candidates, file.path, {
+          symbolMatch: true,
+          filenameMatchCount: matchCount,
+        });
       }
     }
   }
@@ -524,6 +534,7 @@ export class CandidateDiscovery {
       graphRelated: false,
       graphDepth: undefined,
       graphDecay: undefined,
+      filenameMatchCount: undefined,
       testFile: false,
       gitHotspot: false,
       relatedFile: false,
@@ -540,6 +551,11 @@ export class CandidateDiscovery {
         mergedSignals.graphDepth = existing.graphDepth;
         mergedSignals.graphDecay = existing.graphDecay;
       }
+    }
+
+    // For filenameMatchCount, keep the higher count
+    if (existing.filenameMatchCount !== undefined && newSignals.filenameMatchCount !== undefined) {
+      mergedSignals.filenameMatchCount = Math.max(existing.filenameMatchCount, newSignals.filenameMatchCount);
     }
 
     candidates.set(filePath, mergedSignals);

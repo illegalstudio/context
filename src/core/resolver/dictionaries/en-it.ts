@@ -69,7 +69,11 @@ export const translations: [string, string][] = [
 
   // === Entità / Entities ===
   ['utente', 'user'],
+  ['utenti', 'users'],           // plural
+  ['utenti', 'user'],            // plural -> singular too (for matching UserResource etc.)
   ['cliente', 'customer'],
+  ['clienti', 'customers'],      // plural
+  ['clienti', 'customer'],       // plural -> singular too
   ['account', 'account'],
   ['membro', 'member'],
   ['amministratore', 'admin'],
@@ -185,6 +189,8 @@ export const translations: [string, string][] = [
   ['archiviato', 'archived'],
 
   // === UI / Interface ===
+  ['pannello', 'panel'],
+  ['dashboard', 'dashboard'],
   ['pulsante', 'button'],
   ['bottone', 'button'],
   ['modulo', 'form'],

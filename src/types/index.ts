@@ -70,6 +70,7 @@ export interface CandidateSignals {
   graphRelated: boolean;
   graphDepth?: number;    // Depth at which file was found via graph traversal (1 = direct, 2+ = transitive)
   graphDecay?: number;    // Decay factor based on graph depth (1.0 at depth 1, decreasing with depth)
+  filenameMatchCount?: number;  // Number of task keywords matching in the file path (2+ = very relevant)
   testFile: boolean;
   gitHotspot: boolean;
   relatedFile: boolean;    // Found by a discovery rule (view, component, etc.)
