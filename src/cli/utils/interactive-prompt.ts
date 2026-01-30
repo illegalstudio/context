@@ -211,6 +211,35 @@ export class InteractivePrompt {
   }
 
   /**
+   * Delete the word before the cursor
+   */
+  private deleteWordBackward(): void {
+    if (this.cursorPos === 0) return;
+
+    // Find the start of the word to delete
+    let pos = this.cursorPos - 1;
+
+    // Skip trailing spaces
+    while (pos > 0 && this.input[pos] === ' ') {
+      pos--;
+    }
+
+    // Skip non-space characters (the word)
+    while (pos > 0 && this.input[pos - 1] !== ' ') {
+      pos--;
+    }
+
+    // Delete from pos to cursorPos
+    this.input = this.input.slice(0, pos) + this.input.slice(this.cursorPos);
+    this.cursorPos = pos;
+
+    this.clearSuggestions();
+    this.renderInput();
+    this.updateSuggestions();
+    this.renderSuggestions();
+  }
+
+  /**
    * Apply the selected suggestion
    */
   private applySuggestion(): void {
@@ -314,8 +343,20 @@ export class InteractivePrompt {
           return;
         }
 
+        // Ctrl+W - delete word backward
+        if (code === 23) {
+          this.deleteWordBackward();
+          return;
+        }
+
         // Escape sequences (arrows, etc.)
         if (code === 27) {
+          // Alt+Backspace (ESC + DEL = \x1b\x7f)
+          if (key[1] === 127) {
+            this.deleteWordBackward();
+            return;
+          }
+
           // Arrow keys: \x1b[A (up), \x1b[B (down), \x1b[C (right), \x1b[D (left)
           if (key[1] === 91) {
             if (key[2] === 65) {
