@@ -1,6 +1,6 @@
 /**
- * Interactive prompt with @ autocomplete for files and symbols
- * Uses dynamic SQL queries instead of caching for efficiency
+ * Interactive prompt with live @ autocomplete for files and symbols
+ * Shows suggestions in real-time as user types (like Claude Code)
  */
 
 import * as readline from 'readline';
@@ -14,9 +14,29 @@ interface CompletionItem {
   fullPath?: string;
 }
 
+// ANSI escape codes
+const ANSI = {
+  clearLine: '\x1b[2K',
+  clearDown: '\x1b[J',
+  cursorUp: (n: number) => `\x1b[${n}A`,
+  cursorDown: (n: number) => `\x1b[${n}B`,
+  cursorToColumn: (n: number) => `\x1b[${n}G`,
+  saveCursor: '\x1b[s',
+  restoreCursor: '\x1b[u',
+  dim: '\x1b[2m',
+  reset: '\x1b[0m',
+  cyan: '\x1b[36m',
+  yellow: '\x1b[33m',
+};
+
 export class InteractivePrompt {
   private db: ContextDatabase;
-  private rl: readline.Interface | null = null;
+  private input: string = '';
+  private cursorPos: number = 0;
+  private suggestions: CompletionItem[] = [];
+  private selectedIndex: number = 0;
+  private showingSuggestions: boolean = false;
+  private suggestionsDisplayed: number = 0;
 
   constructor(db: ContextDatabase) {
     this.db = db;
@@ -25,79 +45,54 @@ export class InteractivePrompt {
   /**
    * Search files by partial name (dynamic query)
    */
-  private searchFiles(query: string, limit: number = 15): CompletionItem[] {
-    if (!query || query.length < 1) {
-      // Show recent/common files when no query
+  private searchFiles(query: string, limit: number = 10): CompletionItem[] {
+    const queryLower = query.toLowerCase();
+
+    try {
       const stmt = this.db.getDb().prepare(`
         SELECT path FROM files
-        WHERE path NOT LIKE '%/vendor/%'
+        WHERE LOWER(path) LIKE '%' || ? || '%'
+          AND path NOT LIKE '%/vendor/%'
           AND path NOT LIKE '%/node_modules/%'
-        ORDER BY mtime DESC
+        ORDER BY
+          CASE WHEN LOWER(path) LIKE '%/' || ? || '%' THEN 0 ELSE 1 END,
+          LENGTH(path)
         LIMIT ?
       `);
-      const rows = stmt.all(limit) as { path: string }[];
+
+      const rows = stmt.all(queryLower, queryLower, limit) as { path: string }[];
+
       return rows.map(row => ({
         value: row.path.split('/').pop() || row.path,
         type: 'file' as const,
-        display: this.formatFileDisplay(row.path),
+        display: this.formatPath(row.path),
         fullPath: row.path,
       }));
+    } catch {
+      return [];
     }
-
-    const queryLower = query.toLowerCase();
-
-    // Search by basename first (exact start), then contains
-    const stmt = this.db.getDb().prepare(`
-      SELECT path,
-        CASE
-          WHEN LOWER(SUBSTR(path, -LENGTH(path) + INSTR(path || '/', '/') - 1)) LIKE ? || '%' THEN 1
-          WHEN LOWER(path) LIKE '%' || ? || '%' THEN 2
-          ELSE 3
-        END as match_rank
-      FROM files
-      WHERE LOWER(path) LIKE '%' || ? || '%'
-        AND path NOT LIKE '%/vendor/%'
-        AND path NOT LIKE '%/node_modules/%'
-      ORDER BY match_rank, LENGTH(path)
-      LIMIT ?
-    `);
-
-    const rows = stmt.all(queryLower, queryLower, queryLower, limit) as { path: string }[];
-
-    return rows.map(row => ({
-      value: row.path.split('/').pop() || row.path,
-      type: 'file' as const,
-      display: this.formatFileDisplay(row.path),
-      fullPath: row.path,
-    }));
   }
 
   /**
    * Search symbols by partial name (dynamic query)
    */
-  private searchSymbols(query: string, limit: number = 10): CompletionItem[] {
-    if (!query || query.length < 2) {
-      return []; // Require at least 2 chars for symbol search
-    }
+  private searchSymbols(query: string, limit: number = 8): CompletionItem[] {
+    if (query.length < 2) return [];
 
     const queryLower = query.toLowerCase();
 
     try {
       const stmt = this.db.getDb().prepare(`
-        SELECT DISTINCT name, file_path,
-          CASE
-            WHEN LOWER(name) LIKE ? || '%' THEN 1
-            WHEN LOWER(name) LIKE '%' || ? || '%' THEN 2
-            ELSE 3
-          END as match_rank
-        FROM symbols
+        SELECT DISTINCT name, file_path FROM symbols
         WHERE LOWER(name) LIKE '%' || ? || '%'
           AND kind IN ('class', 'function', 'method', 'trait', 'interface')
-        ORDER BY match_rank, LENGTH(name)
+        ORDER BY
+          CASE WHEN LOWER(name) LIKE ? || '%' THEN 0 ELSE 1 END,
+          LENGTH(name)
         LIMIT ?
       `);
 
-      const rows = stmt.all(queryLower, queryLower, queryLower, limit) as { name: string; file_path: string }[];
+      const rows = stmt.all(queryLower, queryLower, limit) as { name: string; file_path: string }[];
 
       return rows.map(row => ({
         value: row.name,
@@ -106,172 +101,274 @@ export class InteractivePrompt {
         fullPath: row.file_path,
       }));
     } catch {
-      // Symbol table might not exist
       return [];
     }
   }
 
   /**
-   * Format file path for display
+   * Format path for display (show last parts)
    */
-  private formatFileDisplay(filePath: string): string {
+  private formatPath(filePath: string): string {
     const parts = filePath.split('/');
-    const basename = parts.pop() || '';
-
-    if (parts.length <= 2) {
-      return filePath;
-    }
-
-    // Show last 2 directories + filename
-    return `.../${parts.slice(-2).join('/')}/${basename}`;
+    if (parts.length <= 3) return filePath;
+    return parts.slice(-3).join('/');
   }
 
   /**
-   * Get completions for the current input
+   * Get the current @ query from input
    */
-  private getCompletions(line: string): CompletionItem[] {
-    // Find the last @ in the line
-    const lastAtIndex = line.lastIndexOf('@');
-    if (lastAtIndex === -1) return [];
+  private getAtQuery(): string | null {
+    // Find the last @ before cursor
+    const beforeCursor = this.input.slice(0, this.cursorPos);
+    const lastAtIndex = beforeCursor.lastIndexOf('@');
 
-    const afterAt = line.slice(lastAtIndex + 1);
+    if (lastAtIndex === -1) return null;
 
-    // Search both files and symbols
-    const fileResults = this.searchFiles(afterAt, 12);
-    const symbolResults = this.searchSymbols(afterAt, 8);
+    // Check if there's a space between @ and cursor
+    const afterAt = beforeCursor.slice(lastAtIndex + 1);
+    if (afterAt.includes(' ')) return null;
 
-    // Merge and sort: prefer exact prefix matches
-    const all = [...fileResults, ...symbolResults];
-
-    all.sort((a, b) => {
-      const query = afterAt.toLowerCase();
-      const aStarts = a.value.toLowerCase().startsWith(query);
-      const bStarts = b.value.toLowerCase().startsWith(query);
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-      // Files before symbols for same match quality
-      if (a.type !== b.type) return a.type === 'file' ? -1 : 1;
-      return a.value.length - b.value.length;
-    });
-
-    return all.slice(0, 15);
+    return afterAt;
   }
 
   /**
-   * Completer function for readline
+   * Update suggestions based on current input
    */
-  private completer(line: string): [string[], string] {
-    const lastAtIndex = line.lastIndexOf('@');
+  private updateSuggestions(): void {
+    const query = this.getAtQuery();
 
-    if (lastAtIndex === -1) {
-      return [[], line];
-    }
-
-    const afterAt = line.slice(lastAtIndex + 1);
-    const completions = this.getCompletions(line);
-
-    if (completions.length === 0) {
-      return [[], line];
-    }
-
-    // Return values that can complete the current input
-    const hits = completions.map(c => c.value);
-    return [hits, afterAt];
-  }
-
-  /**
-   * Display completion suggestions to the user
-   */
-  private displayCompletions(completions: CompletionItem[]): void {
-    if (completions.length === 0) {
-      logger.dim('  No matches found');
+    if (query === null) {
+      this.suggestions = [];
+      this.showingSuggestions = false;
       return;
     }
 
-    console.log(); // New line
-    for (const item of completions.slice(0, 12)) {
-      const typeIcon = item.type === 'file' ? '📄' : '⚡';
-      logger.dim(`  ${typeIcon} ${item.display}`);
-    }
-    if (completions.length > 12) {
-      logger.dim(`  ... and ${completions.length - 12} more`);
+    // Search both files and symbols
+    const files = this.searchFiles(query, 8);
+    const symbols = this.searchSymbols(query, 6);
+
+    this.suggestions = [...files, ...symbols].slice(0, 10);
+    this.showingSuggestions = this.suggestions.length > 0;
+    this.selectedIndex = 0;
+  }
+
+  /**
+   * Clear the suggestions display
+   */
+  private clearSuggestions(): void {
+    if (this.suggestionsDisplayed > 0) {
+      // Move to start of suggestions and clear
+      process.stdout.write(ANSI.saveCursor);
+      process.stdout.write('\n'); // Move past current line
+      for (let i = 0; i < this.suggestionsDisplayed; i++) {
+        process.stdout.write(ANSI.clearLine + '\n');
+      }
+      // Move back up
+      process.stdout.write(ANSI.cursorUp(this.suggestionsDisplayed + 1));
+      process.stdout.write(ANSI.restoreCursor);
+      this.suggestionsDisplayed = 0;
     }
   }
 
   /**
-   * Prompt for task input with autocomplete
+   * Render the suggestions below the input
+   */
+  private renderSuggestions(): void {
+    this.clearSuggestions();
+
+    if (!this.showingSuggestions || this.suggestions.length === 0) {
+      return;
+    }
+
+    // Save cursor, move down, render suggestions
+    process.stdout.write(ANSI.saveCursor);
+    process.stdout.write('\n');
+
+    for (let i = 0; i < this.suggestions.length; i++) {
+      const item = this.suggestions[i];
+      const prefix = i === this.selectedIndex ? `${ANSI.cyan}+ ` : `${ANSI.dim}+ `;
+      const icon = item.type === 'file' ? '' : '';
+      process.stdout.write(`${ANSI.clearLine}${prefix}${item.display}${ANSI.reset}\n`);
+    }
+
+    this.suggestionsDisplayed = this.suggestions.length;
+
+    // Restore cursor position
+    process.stdout.write(ANSI.cursorUp(this.suggestionsDisplayed + 1));
+    process.stdout.write(ANSI.restoreCursor);
+  }
+
+  /**
+   * Render the input line
+   */
+  private renderInput(): void {
+    process.stdout.write(`\r${ANSI.clearLine}> ${this.input}`);
+    // Position cursor correctly
+    const cursorOffset = this.input.length - this.cursorPos;
+    if (cursorOffset > 0) {
+      process.stdout.write(`\x1b[${cursorOffset}D`);
+    }
+  }
+
+  /**
+   * Apply the selected suggestion
+   */
+  private applySuggestion(): void {
+    if (!this.showingSuggestions || this.suggestions.length === 0) return;
+
+    const selected = this.suggestions[this.selectedIndex];
+    const query = this.getAtQuery();
+
+    if (query === null) return;
+
+    // Find where the @ query starts
+    const beforeCursor = this.input.slice(0, this.cursorPos);
+    const lastAtIndex = beforeCursor.lastIndexOf('@');
+
+    // Replace @query with @value
+    const before = this.input.slice(0, lastAtIndex + 1);
+    const after = this.input.slice(this.cursorPos);
+    this.input = before + selected.value + after;
+    this.cursorPos = lastAtIndex + 1 + selected.value.length;
+
+    this.showingSuggestions = false;
+    this.suggestions = [];
+  }
+
+  /**
+   * Prompt for task input with live autocomplete
    */
   async promptTask(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      // Enable keypress events
-      if (process.stdin.isTTY) {
-        readline.emitKeypressEvents(process.stdin);
-        process.stdin.setRawMode(true);
-      }
-
-      this.rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-        completer: (line: string) => this.completer(line),
-        terminal: true,
-      });
-
+    return new Promise((resolve) => {
+      // Show instructions
       logger.blank();
       logger.bold('Enter your task:');
-      logger.dim('  Use @ to reference files/symbols (e.g., @User.php @handlePayment)');
-      logger.dim('  Press Tab for suggestions, Enter to submit');
+      logger.dim('  Use @ to reference files/symbols (autocomplete appears as you type)');
+      logger.dim('  Arrow keys to select, Tab/Enter to complete, Enter to submit');
       logger.blank();
 
-      let currentLine = '';
+      process.stdout.write('> ');
 
-      // Handle keypress for @ detection and Tab completions
-      const keypressHandler = (_char: string | undefined, key: readline.Key | undefined) => {
-        if (!key) return;
+      // Enable raw mode
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(true);
+      }
+      process.stdin.resume();
 
-        // Tab key - show completions
-        if (key.name === 'tab') {
-          // Get current line from readline
-          const line = (this.rl as any).line || '';
-          const completions = this.getCompletions(line);
-          this.displayCompletions(completions);
-          // Redraw the prompt
-          (this.rl as any)._refreshLine();
+      const handleKey = (key: Buffer) => {
+        const char = key.toString();
+        const code = key[0];
+
+        // Ctrl+C - exit
+        if (code === 3) {
+          this.clearSuggestions();
+          process.stdout.write('\n');
+          if (process.stdin.isTTY) process.stdin.setRawMode(false);
+          process.stdin.removeListener('data', handleKey);
+          resolve('');
+          return;
+        }
+
+        // Enter
+        if (code === 13) {
+          if (this.showingSuggestions && this.suggestions.length > 0) {
+            // Apply suggestion
+            this.applySuggestion();
+            this.clearSuggestions();
+            this.renderInput();
+            this.updateSuggestions();
+            this.renderSuggestions();
+          } else {
+            // Submit
+            this.clearSuggestions();
+            process.stdout.write('\n');
+            if (process.stdin.isTTY) process.stdin.setRawMode(false);
+            process.stdin.removeListener('data', handleKey);
+            resolve(this.input.trim());
+          }
+          return;
+        }
+
+        // Tab - apply suggestion
+        if (code === 9) {
+          if (this.showingSuggestions && this.suggestions.length > 0) {
+            this.applySuggestion();
+            this.clearSuggestions();
+            this.renderInput();
+            this.updateSuggestions();
+            this.renderSuggestions();
+          }
+          return;
+        }
+
+        // Backspace
+        if (code === 127) {
+          if (this.cursorPos > 0) {
+            this.input = this.input.slice(0, this.cursorPos - 1) + this.input.slice(this.cursorPos);
+            this.cursorPos--;
+            this.clearSuggestions();
+            this.renderInput();
+            this.updateSuggestions();
+            this.renderSuggestions();
+          }
+          return;
+        }
+
+        // Escape sequences (arrows, etc.)
+        if (code === 27) {
+          // Arrow keys: \x1b[A (up), \x1b[B (down), \x1b[C (right), \x1b[D (left)
+          if (key[1] === 91) {
+            if (key[2] === 65) {
+              // Up arrow
+              if (this.showingSuggestions && this.selectedIndex > 0) {
+                this.selectedIndex--;
+                this.renderSuggestions();
+              }
+              return;
+            }
+            if (key[2] === 66) {
+              // Down arrow
+              if (this.showingSuggestions && this.selectedIndex < this.suggestions.length - 1) {
+                this.selectedIndex++;
+                this.renderSuggestions();
+              }
+              return;
+            }
+            if (key[2] === 67) {
+              // Right arrow
+              if (this.cursorPos < this.input.length) {
+                this.cursorPos++;
+                this.renderInput();
+              }
+              return;
+            }
+            if (key[2] === 68) {
+              // Left arrow
+              if (this.cursorPos > 0) {
+                this.cursorPos--;
+                this.renderInput();
+              }
+              return;
+            }
+          }
+          // Escape - close suggestions
+          this.showingSuggestions = false;
+          this.clearSuggestions();
+          return;
+        }
+
+        // Regular character
+        if (code >= 32 && code < 127) {
+          this.input = this.input.slice(0, this.cursorPos) + char + this.input.slice(this.cursorPos);
+          this.cursorPos++;
+          this.clearSuggestions();
+          this.renderInput();
+          this.updateSuggestions();
+          this.renderSuggestions();
         }
       };
 
-      process.stdin.on('keypress', keypressHandler);
-
-      this.rl.on('line', (line: string) => {
-        currentLine = line;
-        process.stdin.removeListener('keypress', keypressHandler);
-        if (process.stdin.isTTY) {
-          process.stdin.setRawMode(false);
-        }
-
-        if (line.trim()) {
-          this.rl?.close();
-          resolve(line.trim());
-        } else {
-          logger.warning('Task cannot be empty.');
-          this.rl?.prompt();
-        }
-      });
-
-      this.rl.on('close', () => {
-        process.stdin.removeListener('keypress', keypressHandler);
-        if (process.stdin.isTTY) {
-          process.stdin.setRawMode(false);
-        }
-        resolve(currentLine.trim());
-      });
-
-      this.rl.on('error', (err) => {
-        process.stdin.removeListener('keypress', keypressHandler);
-        reject(err);
-      });
-
-      this.rl.setPrompt('> ');
-      this.rl.prompt();
+      process.stdin.on('data', handleKey);
     });
   }
 
@@ -286,27 +383,22 @@ export class InteractivePrompt {
     const files: string[] = [];
     const symbols: string[] = [];
 
-    // Find all @references
     const refPattern = /@([\w\-.]+(?:\.[\w]+)?)/g;
     let match;
 
     while ((match = refPattern.exec(task)) !== null) {
       const ref = match[1];
 
-      // Check if it looks like a file (has extension)
       if (/\.\w+$/.test(ref)) {
-        // Search for the file
         const fileResults = this.searchFiles(ref, 1);
         if (fileResults.length > 0 && fileResults[0].fullPath) {
           files.push(fileResults[0].fullPath);
         }
       } else {
-        // Search for symbol
         const symbolResults = this.searchSymbols(ref, 1);
         if (symbolResults.length > 0) {
           symbols.push(symbolResults[0].value);
         } else {
-          // Maybe it's a file without extension, try file search
           const fileResults = this.searchFiles(ref, 1);
           if (fileResults.length > 0 && fileResults[0].fullPath) {
             files.push(fileResults[0].fullPath);
@@ -318,11 +410,8 @@ export class InteractivePrompt {
     return { task, files, symbols };
   }
 
-  /**
-   * Close the prompt
-   */
   close(): void {
-    this.rl?.close();
+    // Nothing to close
   }
 }
 
