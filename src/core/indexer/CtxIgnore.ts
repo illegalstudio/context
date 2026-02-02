@@ -17,7 +17,6 @@ export class CtxIgnore {
   // Builtin patterns always applied (cannot be overridden)
   private static readonly BUILTIN_PATTERNS = `
 # Context packer output
-ctx/
 .context/
 
 # IDE
