@@ -95,15 +95,8 @@ export async function openCommand(options: OpenOptions = {}): Promise<void> {
     // Find most recent pack
     packDir = getMostRecentPack(packsDir);
     if (!packDir) {
-      // Check for legacy ctx/ directory
-      const legacyDir = path.join(cwd, 'ctx');
-      if (fs.existsSync(legacyDir)) {
-        packDir = legacyDir;
-        logger.dim('Note: Using legacy ctx/ directory. Run `context pack` to create a new pack in .context/packs/');
-      } else {
-        logger.error('No context pack found. Run `context pack` first.');
-        process.exit(1);
-      }
+      logger.error('No context pack found. Run `context pack` first.');
+      process.exit(1);
     }
   }
 
