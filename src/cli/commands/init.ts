@@ -61,7 +61,7 @@ export async function initCommand(options: InitOptions = {}): Promise<void> {
   if (fs.existsSync(gitignorePath)) {
     const gitignore = fs.readFileSync(gitignorePath, 'utf-8');
     if (!gitignore.includes('.context')) {
-      fs.appendFileSync(gitignorePath, '\n# Context Packer\n.context/\nctx/\n');
+      fs.appendFileSync(gitignorePath, '\n# Context Packer\n.context/\n');
       logger.success('Updated .gitignore');
     }
   }
