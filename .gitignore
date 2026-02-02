@@ -5,6 +5,5 @@ ctx/
 *.tgz
 .DS_Store
 coverage/
-docs/
 
 .claude/

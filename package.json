@@ -1,12 +1,12 @@
 {
-  "name": "@illegalstudio/context-packer",
-  "version": "0.1.1",
+  "name": "@illegalstudio/context",
+  "version": "0.1.0",
   "description": "CLI context packer for agentic coding - transforms tasks into deterministic, explainable context packages",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "context-packer": "dist/cli/index.js"
+    "context": "dist/cli/index.js"
   },
   "exports": {
     ".": {
@@ -19,11 +19,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/illegalstudio/context-packer.git"
+    "url": "git+https://github.com/illegalstudio/context.git"
   },
-  "homepage": "https://github.com/illegalstudio/context-packer#readme",
+  "homepage": "https://github.com/illegalstudio/context#readme",
   "bugs": {
-    "url": "https://github.com/illegalstudio/context-packer/issues"
+    "url": "https://github.com/illegalstudio/context/issues"
   },
   "scripts": {
     "build": "tsc",
