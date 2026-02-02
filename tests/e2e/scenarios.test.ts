@@ -243,9 +243,34 @@ function runCtxPack(codebasePath: string, task: string, options: string = ''): s
   return runCli(codebasePath, `pack --task "${task}" ${options}`);
 }
 
-// Helper to parse JSON output from ctx/ctx.json
+// Helper to find the most recent pack directory
+function findMostRecentPack(codebasePath: string): string | null {
+  const packsDir = path.join(codebasePath, '.context', 'packs');
+  if (!fs.existsSync(packsDir)) {
+    return null;
+  }
+
+  const entries = fs.readdirSync(packsDir, { withFileTypes: true });
+  const packDirs = entries
+    .filter(e => e.isDirectory())
+    .map(e => e.name)
+    .sort((a, b) => b.localeCompare(a)); // Most recent first (slugs are date-prefixed)
+
+  if (packDirs.length === 0) {
+    return null;
+  }
+
+  return path.join(packsDir, packDirs[0]);
+}
+
+// Helper to parse JSON output from .context/packs/<slug>/ctx.json
 function parseOutput(codebasePath: string): any {
-  const jsonPath = path.join(codebasePath, 'ctx', 'ctx.json');
+  const packDir = findMostRecentPack(codebasePath);
+  if (!packDir) {
+    return null;
+  }
+
+  const jsonPath = path.join(packDir, 'ctx.json');
   if (fs.existsSync(jsonPath)) {
     const content = fs.readFileSync(jsonPath, 'utf-8');
     return JSON.parse(content);
@@ -255,11 +280,17 @@ function parseOutput(codebasePath: string): any {
 
 // Helper to cleanup output files
 function cleanup(codebasePath: string): void {
-  const contextDir = path.join(codebasePath, 'ctx');
+  // Clean up .context directory (packs and database)
+  const contextDir = path.join(codebasePath, '.context');
   if (fs.existsSync(contextDir)) {
     fs.rmSync(contextDir, { recursive: true, force: true });
   }
-  // Also clean up .ctxpacker directory (database)
+  // Also clean up legacy ctx/ directory
+  const legacyCtxDir = path.join(codebasePath, 'ctx');
+  if (fs.existsSync(legacyCtxDir)) {
+    fs.rmSync(legacyCtxDir, { recursive: true, force: true });
+  }
+  // Also clean up legacy .ctxpacker directory (database)
   const dbDir = path.join(codebasePath, '.ctxpacker');
   if (fs.existsSync(dbDir)) {
     fs.rmSync(dbDir, { recursive: true, force: true });
@@ -287,11 +318,11 @@ describe('E2E Scenario Tests', () => {
         cleanup(codebasePath);
       });
 
-      // Cleanup ctx output before each scenario
+      // Cleanup packs output before each scenario
       beforeEach(() => {
-        const contextDir = path.join(codebasePath, 'ctx');
-        if (fs.existsSync(contextDir)) {
-          fs.rmSync(contextDir, { recursive: true, force: true });
+        const packsDir = path.join(codebasePath, '.context', 'packs');
+        if (fs.existsSync(packsDir)) {
+          fs.rmSync(packsDir, { recursive: true, force: true });
         }
       });
 
@@ -370,16 +401,19 @@ describe('E2E Output Format Tests', () => {
   });
 
   beforeEach(() => {
-    const contextDir = path.join(codebasePath, 'ctx');
-    if (fs.existsSync(contextDir)) {
-      fs.rmSync(contextDir, { recursive: true, force: true });
+    const packsDir = path.join(codebasePath, '.context', 'packs');
+    if (fs.existsSync(packsDir)) {
+      fs.rmSync(packsDir, { recursive: true, force: true });
     }
   });
 
   it('should generate valid JSON manifest', () => {
     runCtxPack(codebasePath, 'Bug in UserController');
 
-    const jsonPath = path.join(codebasePath, 'ctx', 'ctx.json');
+    const packDir = findMostRecentPack(codebasePath);
+    expect(packDir).not.toBeNull();
+
+    const jsonPath = path.join(packDir!, 'ctx.json');
     expect(fs.existsSync(jsonPath)).toBe(true);
 
     const content = fs.readFileSync(jsonPath, 'utf-8');
@@ -388,6 +422,7 @@ describe('E2E Output Format Tests', () => {
     // Validate JSON structure
     expect(parsed.version).toBeDefined();
     expect(parsed.timestamp).toBeDefined();
+    expect(parsed.slug).toBeDefined();
     expect(parsed.task).toBeDefined();
     expect(parsed.task.raw).toContain('UserController');
     expect(parsed.files).toBeDefined();
@@ -396,7 +431,10 @@ describe('E2E Output Format Tests', () => {
   it('should generate PACK.md with context', () => {
     runCtxPack(codebasePath, 'Bug in UserController');
 
-    const packPath = path.join(codebasePath, 'ctx', 'PACK.md');
+    const packDir = findMostRecentPack(codebasePath);
+    expect(packDir).not.toBeNull();
+
+    const packPath = path.join(packDir!, 'PACK.md');
     expect(fs.existsSync(packPath)).toBe(true);
 
     const content = fs.readFileSync(packPath, 'utf-8');
@@ -409,7 +447,10 @@ describe('E2E Output Format Tests', () => {
   it('should generate FILES.md with file list', () => {
     runCtxPack(codebasePath, 'Bug in UserController');
 
-    const filesPath = path.join(codebasePath, 'ctx', 'FILES.md');
+    const packDir = findMostRecentPack(codebasePath);
+    expect(packDir).not.toBeNull();
+
+    const filesPath = path.join(packDir!, 'FILES.md');
     expect(fs.existsSync(filesPath)).toBe(true);
 
     const content = fs.readFileSync(filesPath, 'utf-8');
@@ -419,7 +460,10 @@ describe('E2E Output Format Tests', () => {
   it('should generate TASK.md with task analysis', () => {
     runCtxPack(codebasePath, 'Bug in UserController');
 
-    const taskPath = path.join(codebasePath, 'ctx', 'TASK.md');
+    const packDir = findMostRecentPack(codebasePath);
+    expect(packDir).not.toBeNull();
+
+    const taskPath = path.join(packDir!, 'TASK.md');
     expect(fs.existsSync(taskPath)).toBe(true);
 
     const content = fs.readFileSync(taskPath, 'utf-8');
@@ -429,7 +473,10 @@ describe('E2E Output Format Tests', () => {
   it('should create excerpts directory', () => {
     runCtxPack(codebasePath, 'Bug in UserController');
 
-    const excerptsPath = path.join(codebasePath, 'ctx', 'excerpts');
+    const packDir = findMostRecentPack(codebasePath);
+    expect(packDir).not.toBeNull();
+
+    const excerptsPath = path.join(packDir!, 'excerpts');
     expect(fs.existsSync(excerptsPath)).toBe(true);
     expect(fs.statSync(excerptsPath).isDirectory()).toBe(true);
   });
@@ -437,9 +484,27 @@ describe('E2E Output Format Tests', () => {
   it('should create portable archive', () => {
     runCtxPack(codebasePath, 'Bug in UserController');
 
-    const archivePath = path.join(codebasePath, 'ctx', 'ctx.tgz');
+    const packDir = findMostRecentPack(codebasePath);
+    expect(packDir).not.toBeNull();
+
+    const archivePath = path.join(packDir!, 'ctx.tgz');
     expect(fs.existsSync(archivePath)).toBe(true);
     expect(fs.statSync(archivePath).size).toBeGreaterThan(0);
+  });
+
+  it('should create pack in .context/packs/ with slug', () => {
+    runCtxPack(codebasePath, 'Bug in UserController');
+
+    const packsDir = path.join(codebasePath, '.context', 'packs');
+    expect(fs.existsSync(packsDir)).toBe(true);
+
+    const entries = fs.readdirSync(packsDir, { withFileTypes: true });
+    const packDirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+
+    expect(packDirs.length).toBe(1);
+    // Slug format: YYYYMMDD-HHMMSS-task-slug
+    expect(packDirs[0]).toMatch(/^\d{8}-\d{6}-.+$/);
+    expect(packDirs[0]).toContain('bug-in-usercontroller');
   });
 });
 
@@ -447,7 +512,7 @@ describe('E2E Edge Cases', () => {
   it('should handle empty/vague task gracefully', () => {
     const codebasePath = path.join(CODEBASES_DIR, 'laravel-app');
     // Index if not already indexed
-    if (!fs.existsSync(path.join(codebasePath, '.ctxpacker'))) {
+    if (!fs.existsSync(path.join(codebasePath, '.context'))) {
       indexCodebase(codebasePath);
     }
 
@@ -464,7 +529,7 @@ describe('E2E Edge Cases', () => {
   it('should handle non-existent file mention gracefully', () => {
     const codebasePath = path.join(CODEBASES_DIR, 'laravel-app');
     // Index if not already indexed
-    if (!fs.existsSync(path.join(codebasePath, '.ctxpacker'))) {
+    if (!fs.existsSync(path.join(codebasePath, '.context'))) {
       indexCodebase(codebasePath);
     }
 

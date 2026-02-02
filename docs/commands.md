@@ -139,13 +139,56 @@ See [Getting Started - Interactive Mode](getting-started.md#interactive-mode-rep
 
 ---
 
-## context open
+## context list
 
-Open the context pack directory in your file manager or editor.
+List all context packs.
 
 ```bash
-context open [options]
+context list [options]
+context ls [options]
 ```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `-n, --limit <number>` | Number of packs to show |
+
+**Example:**
+
+```bash
+context list
+context ls
+context list --limit 10
+```
+
+**Output:**
+
+```
+Context Packs
+
+DATE        TIME      TASK                                     FILES
+----------  --------  ----------------------------------------  -----
+2026-02-02  14:30:22  fix-payment-webhook-handler                  12
+2026-02-02  10:15:00  add-user-validation                           8
+2026-02-01  16:45:30  refactor-auth-service                        15
+```
+
+---
+
+## context open
+
+Open a context pack in your file manager or editor.
+
+```bash
+context open [pack] [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+|----------|-------------|
+| `pack` | Pack slug or prefix (optional, opens most recent if not specified) |
 
 **Options:**
 
@@ -156,8 +199,20 @@ context open [options]
 **Example:**
 
 ```bash
+# Open most recent pack
 context open
+
+# Open specific pack by full slug
+context open 20260202-143022-fix-payment-webhook
+
+# Open specific pack by prefix
+context open 20260202-143022
+
+# Open specific file from most recent pack
 context open --file PACK.md
+
+# Open specific file from specific pack
+context open 20260202-143022-fix-payment-webhook --file PACK.md
 ```
 
 ---

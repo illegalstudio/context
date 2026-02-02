@@ -131,13 +131,20 @@ You can safely delete `.context/` and re-run `context index` to rebuild.
 
 ## Output Directory
 
-Context packs are created in the `ctx/` directory by default. Each pack overwrites the previous one.
-
-Add `ctx/` to your `.gitignore` if you don't want to commit context packs:
+Context packs are created in `.context/packs/` with unique timestamped slugs:
 
 ```
-# Context packs
-ctx/
+.context/packs/20260202-143022-fix-payment-webhook/
+.context/packs/20260202-150100-add-user-validation/
+```
+
+Each pack is preserved - they don't overwrite each other. Use `context list` to see all packs and `context open <pack>` to open a specific one.
+
+Add `.context/packs/` to your `.gitignore` if you don't want to commit context packs:
+
+```
+# Context packs (keep the index)
+.context/packs/
 ```
 
 ## Environment Variables

@@ -7,6 +7,7 @@ import type { ResolvedTask, Candidate, Excerpt, PackManifest, DiffEntry } from '
 export interface ComposeOptions {
   outputDir?: string;
   includeArchive?: boolean;
+  slug?: string;
 }
 
 export interface ComposeInput {
@@ -25,8 +26,33 @@ export class PackComposer {
     this.db = db;
   }
 
+  /**
+   * Generate a slug for the pack based on timestamp and task description.
+   * Format: YYYYMMDD-HHMMSS-task-slug
+   */
+  generateSlug(task: string): string {
+    const now = new Date();
+    const timestamp = now.toISOString()
+      .replace(/[-:T]/g, '')
+      .slice(0, 14); // YYYYMMDDHHMMSS
+
+    const formatted = `${timestamp.slice(0, 8)}-${timestamp.slice(8, 14)}`;
+
+    const taskSlug = task
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 40)
+      .replace(/-$/, '');
+
+    return `${formatted}-${taskSlug}`;
+  }
+
   async compose(input: ComposeInput, options: ComposeOptions = {}): Promise<string> {
-    const outputDir = options.outputDir || path.join(this.rootDir, 'ctx');
+    // Generate slug if not provided
+    const slug = options.slug || this.generateSlug(input.task.raw || 'pack');
+    const outputDir = options.outputDir || path.join(this.rootDir, '.context', 'packs', slug);
 
     // Create output directory
     await fs.promises.mkdir(outputDir, { recursive: true });
@@ -44,7 +70,7 @@ export class PackComposer {
       this.writeDiffMd(outputDir, input.diffEntries),
       this.writeTestsMd(outputDir, input.candidates),
       this.writeExcerpts(excerptsDir, input.excerpts),
-      this.writeManifest(outputDir, input),
+      this.writeManifest(outputDir, input, slug),
     ]);
 
     // Create archive if requested
@@ -335,10 +361,11 @@ ${task.confidence.overall < 0.5 ? `
     }
   }
 
-  private async writeManifest(outputDir: string, input: ComposeInput): Promise<void> {
+  private async writeManifest(outputDir: string, input: ComposeInput, slug?: string): Promise<void> {
     const manifest: PackManifest = {
       version: '0.1.0',
       timestamp: new Date().toISOString(),
+      slug,
       task: input.task,
       files: input.candidates.map(c => ({
         path: c.path,

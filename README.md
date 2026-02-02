@@ -46,17 +46,20 @@ context pack
 
 ## Output
 
-Running `context pack` creates a `ctx/` directory containing:
+Running `context pack` creates a timestamped pack in `.context/packs/<slug>/`:
 
-| File | Description |
-|------|-------------|
-| `PACK.md` | Ready-to-use prompt for AI agents |
-| `TASK.md` | Task analysis and assumptions |
-| `FILES.md` | Selected files with relevance reasons |
-| `GRAPH.md` | Dependency graph visualization |
-| `excerpts/` | Focused code excerpts |
-| `ctx.json` | Machine-readable manifest |
-| `ctx.tgz` | Portable archive |
+```
+.context/packs/20260202-143022-fix-payment-webhook/
+  PACK.md       # Ready-to-use prompt for AI agents
+  TASK.md       # Task analysis and assumptions
+  FILES.md      # Selected files with relevance reasons
+  GRAPH.md      # Dependency graph visualization
+  excerpts/     # Focused code excerpts
+  ctx.json      # Machine-readable manifest
+  ctx.tgz       # Portable archive
+```
+
+Each pack is preserved with a unique slug based on timestamp and task description.
 
 ## Features
 
@@ -74,7 +77,9 @@ context init              # Initialize in current directory
 context index             # Index the codebase
 context pack              # Create a context pack (interactive)
 context pack --task "..." # Create pack for specific task
-context open              # Open the ctx/ directory
+context list              # List all packs
+context open              # Open the most recent pack
+context open <pack>       # Open a specific pack
 context domains list      # List active domains
 context domains add       # Add custom domain
 ```

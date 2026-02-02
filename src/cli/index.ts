@@ -5,6 +5,7 @@ import { initCommand } from './commands/init.js';
 import { indexCommand } from './commands/index.js';
 import { packCommand } from './commands/pack.js';
 import { openCommand } from './commands/open.js';
+import { listCommand } from './commands/list.js';
 import {
   domainsListCommand,
   domainsAddCommand,
@@ -67,13 +68,23 @@ program
     await packCommand(options);
   });
 
+// list command
+program
+  .command('list')
+  .alias('ls')
+  .description('List all context packs')
+  .option('-n, --limit <number>', 'Number of packs to show', parseInt)
+  .action(async (options) => {
+    await listCommand(options);
+  });
+
 // open command
 program
-  .command('open')
-  .description('Open the context pack directory')
+  .command('open [pack]')
+  .description('Open a context pack (latest if not specified)')
   .option('-f, --file <name>', 'Open specific file (e.g., PACK.md)')
-  .action(async (options) => {
-    await openCommand(options);
+  .action(async (pack, options) => {
+    await openCommand({ ...options, pack });
   });
 
 // domains command with subcommands

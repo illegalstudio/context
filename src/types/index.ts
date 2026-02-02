@@ -94,6 +94,7 @@ export interface Excerpt {
 export interface PackManifest {
   version: string;
   timestamp: string;
+  slug?: string;
   task: ResolvedTask;
   files: Array<{
     path: string;

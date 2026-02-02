@@ -72,10 +72,10 @@ context pack
 
 ### 4. Review the Output
 
-Context creates a `ctx/` directory with your context pack:
+Context creates a timestamped pack in `.context/packs/`:
 
 ```
-ctx/
+.context/packs/20260202-143022-fix-user-authentication-login-flow/
   PACK.md       # Ready-to-use prompt
   TASK.md       # Task analysis
   FILES.md      # Selected files with reasons
@@ -89,6 +89,12 @@ Open the main output:
 
 ```bash
 context open --file PACK.md
+```
+
+List all your packs:
+
+```bash
+context list
 ```
 
 ### 5. Use with AI Assistants
@@ -246,7 +252,7 @@ Top files:
   72% app/Http/Requests/CreateUserRequest.php
   ...
 
-Context pack created at: ctx/
+Context pack created at: .context/packs/20260202-143022-fix-validation-in-usercontroller-createuser/
 ```
 
 ### Tips for Interactive Mode

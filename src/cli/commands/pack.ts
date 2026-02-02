@@ -201,7 +201,9 @@ export async function packCommand(options: PackOptions): Promise<void> {
       'ctx.tgz     - Portable archive',
     ]);
     logger.blank();
-    logger.dim('Use `context open` to open the pack directory.');
+    logger.dim('Commands:');
+    logger.dim('  context open        - Open the most recent pack');
+    logger.dim('  context list        - List all packs');
   } catch (error) {
     spinner.fail('Pack creation failed');
     logger.error(error instanceof Error ? error.message : String(error));
