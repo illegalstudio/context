@@ -115,7 +115,8 @@ The `@` character triggers autocomplete for files and symbols from your indexed 
 | `@filename` | Match files by name | `@UserController` |
 | `@path/to/` | Match files by path | `@app/Models/User.php` |
 | `@symbolName` | Match symbols (classes, methods) | `@handlePayment` |
-| `@UC` | Match acronyms (uppercase) | `@UserController` |
+| `@ucon` | Match acronyms (case-insensitive, 3+ chars) | `@UserController` |
+| `@ucont` | Match acronyms with prefixes | `@UserController` |
 
 **Keyboard controls:**
 

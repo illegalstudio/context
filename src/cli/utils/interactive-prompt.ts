@@ -47,8 +47,7 @@ export class InteractivePrompt {
    */
   private searchFiles(query: string, limit: number = 10): CompletionItem[] {
     const queryLower = query.toLowerCase();
-    const queryUpper = query.toUpperCase();
-    const wantsAcronym = query.length >= 2 && queryUpper === query;
+    const wantsAcronym = query.length >= 3;
 
     try {
       const stmt = this.db.getDb().prepare(`
@@ -75,7 +74,7 @@ export class InteractivePrompt {
         return results;
       }
 
-      const acronymRows = this.searchFileAcronyms(queryUpper, limit);
+      const acronymRows = this.searchFileAcronyms(queryLower, limit);
       return this.mergeSuggestions(results, acronymRows, limit);
     } catch {
       return [];
@@ -89,8 +88,7 @@ export class InteractivePrompt {
     if (query.length < 2) return [];
 
     const queryLower = query.toLowerCase();
-    const queryUpper = query.toUpperCase();
-    const wantsAcronym = query.length >= 2 && queryUpper === query;
+    const wantsAcronym = query.length >= 3;
 
     try {
       const stmt = this.db.getDb().prepare(`
@@ -116,7 +114,7 @@ export class InteractivePrompt {
         return results;
       }
 
-      const acronymRows = this.searchSymbolAcronyms(queryUpper, limit);
+      const acronymRows = this.searchSymbolAcronyms(queryLower, limit);
       return this.mergeSuggestions(results, acronymRows, limit);
     } catch {
       return [];
@@ -126,8 +124,9 @@ export class InteractivePrompt {
   /**
    * Search file suggestions by acronym (e.g., UC -> UserController)
    */
-  private searchFileAcronyms(queryUpper: string, limit: number): CompletionItem[] {
-    const firstLetter = queryUpper[0]?.toLowerCase();
+  private searchFileAcronyms(queryLower: string, limit: number): CompletionItem[] {
+    const normalizedQuery = queryLower.replace(/[^a-z0-9]/g, '');
+    const firstLetter = normalizedQuery[0];
     if (!firstLetter) return [];
 
     try {
@@ -145,8 +144,8 @@ export class InteractivePrompt {
 
       for (const row of rows) {
         const fileName = row.path.split('/').pop() || row.path;
-        const acronym = this.getAcronym(fileName);
-        if (acronym.startsWith(queryUpper)) {
+        const segments = this.getSegments(fileName);
+        if (this.matchesSegmentedPrefix(normalizedQuery, segments)) {
           matches.push({
             value: fileName,
             type: 'file' as const,
@@ -166,8 +165,9 @@ export class InteractivePrompt {
   /**
    * Search symbol suggestions by acronym (e.g., UC -> UserController)
    */
-  private searchSymbolAcronyms(queryUpper: string, limit: number): CompletionItem[] {
-    const firstLetter = queryUpper[0]?.toLowerCase();
+  private searchSymbolAcronyms(queryLower: string, limit: number): CompletionItem[] {
+    const normalizedQuery = queryLower.replace(/[^a-z0-9]/g, '');
+    const firstLetter = normalizedQuery[0];
     if (!firstLetter) return [];
 
     try {
@@ -183,8 +183,8 @@ export class InteractivePrompt {
       const matches: CompletionItem[] = [];
 
       for (const row of rows) {
-        const acronym = this.getAcronym(row.name);
-        if (acronym.startsWith(queryUpper)) {
+        const segments = this.getSegments(row.name);
+        if (this.matchesSegmentedPrefix(normalizedQuery, segments)) {
           matches.push({
             value: row.name,
             type: 'symbol' as const,
@@ -204,23 +204,63 @@ export class InteractivePrompt {
   /**
    * Build acronym from a name or filename (camelCase, PascalCase, snake, kebab)
    */
-  private getAcronym(text: string): string {
+  private getSegments(text: string): string[] {
     const base = text.replace(/\.[^.]+$/, '');
-    const parts = base.split(/[^a-zA-Z0-9]+/).filter(Boolean);
-    let acronym = '';
+    const pieces = base.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+    const segments: string[] = [];
 
-    for (const part of parts) {
-      if (part.length === 0) continue;
-      acronym += part[0];
-      for (let i = 1; i < part.length; i++) {
-        const ch = part[i];
-        if (ch >= 'A' && ch <= 'Z') {
-          acronym += ch;
-        }
+    for (const piece of pieces) {
+      const matches = piece.match(/[A-Z]?[a-z]+|[A-Z]+(?![a-z])|\d+/g);
+      if (matches) {
+        segments.push(...matches);
       }
     }
 
-    return acronym.toUpperCase();
+    return segments;
+  }
+
+  /**
+   * Match query as concatenated prefixes of successive segments.
+   * Example: "UCont" or "UsContr" -> ["User", "Controller"]
+   */
+  private matchesSegmentedPrefix(queryLower: string, segments: string[]): boolean {
+    const normalizedQuery = queryLower.replace(/[^a-z0-9]/g, '');
+    if (normalizedQuery.length === 0) return false;
+    const normalizedSegments = segments
+      .map(seg => seg.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())
+      .filter(Boolean);
+    if (normalizedSegments.length === 0) return false;
+
+    const memo = new Map<string, boolean>();
+
+    const dfs = (qIndex: number, sIndex: number): boolean => {
+      if (qIndex >= normalizedQuery.length) return true;
+      if (sIndex >= normalizedSegments.length) return false;
+      const key = `${qIndex}:${sIndex}`;
+      const cached = memo.get(key);
+      if (cached !== undefined) return cached;
+
+      const segment = normalizedSegments[sIndex];
+      const remaining = normalizedQuery.length - qIndex;
+      const maxLen = Math.min(segment.length, remaining);
+
+      for (let len = 1; len <= maxLen; len++) {
+        const qPart = normalizedQuery.slice(qIndex, qIndex + len);
+        if (segment.startsWith(qPart)) {
+          if (dfs(qIndex + len, sIndex + 1)) {
+            memo.set(key, true);
+            return true;
+          }
+        } else {
+          break;
+        }
+      }
+
+      memo.set(key, false);
+      return false;
+    };
+
+    return dfs(0, 0);
   }
 
   /**
