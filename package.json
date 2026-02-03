@@ -1,6 +1,6 @@
 {
   "name": "@illegalstudio/context",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "CLI context packer for agentic coding - transforms tasks into deterministic, explainable context packages",
   "type": "module",
   "main": "dist/index.js",
