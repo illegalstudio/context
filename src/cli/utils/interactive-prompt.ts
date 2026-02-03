@@ -47,6 +47,8 @@ export class InteractivePrompt {
    */
   private searchFiles(query: string, limit: number = 10): CompletionItem[] {
     const queryLower = query.toLowerCase();
+    const queryUpper = query.toUpperCase();
+    const wantsAcronym = query.length >= 2 && queryUpper === query;
 
     try {
       const stmt = this.db.getDb().prepare(`
@@ -62,12 +64,19 @@ export class InteractivePrompt {
 
       const rows = stmt.all(queryLower, queryLower, limit) as { path: string }[];
 
-      return rows.map(row => ({
+      const results = rows.map(row => ({
         value: row.path.split('/').pop() || row.path,
         type: 'file' as const,
         display: this.formatPath(row.path),
         fullPath: row.path,
       }));
+
+      if (!wantsAcronym || results.length >= limit) {
+        return results;
+      }
+
+      const acronymRows = this.searchFileAcronyms(queryUpper, limit);
+      return this.mergeSuggestions(results, acronymRows, limit);
     } catch {
       return [];
     }
@@ -80,6 +89,8 @@ export class InteractivePrompt {
     if (query.length < 2) return [];
 
     const queryLower = query.toLowerCase();
+    const queryUpper = query.toUpperCase();
+    const wantsAcronym = query.length >= 2 && queryUpper === query;
 
     try {
       const stmt = this.db.getDb().prepare(`
@@ -94,15 +105,153 @@ export class InteractivePrompt {
 
       const rows = stmt.all(queryLower, queryLower, limit) as { name: string; file_path: string }[];
 
-      return rows.map(row => ({
+      const results = rows.map(row => ({
         value: row.name,
         type: 'symbol' as const,
         display: `${row.name} (${row.file_path.split('/').pop()})`,
         fullPath: row.file_path,
       }));
+
+      if (!wantsAcronym || results.length >= limit) {
+        return results;
+      }
+
+      const acronymRows = this.searchSymbolAcronyms(queryUpper, limit);
+      return this.mergeSuggestions(results, acronymRows, limit);
     } catch {
       return [];
     }
+  }
+
+  /**
+   * Search file suggestions by acronym (e.g., UC -> UserController)
+   */
+  private searchFileAcronyms(queryUpper: string, limit: number): CompletionItem[] {
+    const firstLetter = queryUpper[0]?.toLowerCase();
+    if (!firstLetter) return [];
+
+    try {
+      const stmt = this.db.getDb().prepare(`
+        SELECT path FROM files
+        WHERE LOWER(path) LIKE '%/' || ? || '%'
+          AND path NOT LIKE '%/vendor/%'
+          AND path NOT LIKE '%/node_modules/%'
+        ORDER BY LENGTH(path)
+        LIMIT 200
+      `);
+
+      const rows = stmt.all(firstLetter) as { path: string }[];
+      const matches: CompletionItem[] = [];
+
+      for (const row of rows) {
+        const fileName = row.path.split('/').pop() || row.path;
+        const acronym = this.getAcronym(fileName);
+        if (acronym.startsWith(queryUpper)) {
+          matches.push({
+            value: fileName,
+            type: 'file' as const,
+            display: this.formatPath(row.path),
+            fullPath: row.path,
+          });
+        }
+        if (matches.length >= limit) break;
+      }
+
+      return matches;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Search symbol suggestions by acronym (e.g., UC -> UserController)
+   */
+  private searchSymbolAcronyms(queryUpper: string, limit: number): CompletionItem[] {
+    const firstLetter = queryUpper[0]?.toLowerCase();
+    if (!firstLetter) return [];
+
+    try {
+      const stmt = this.db.getDb().prepare(`
+        SELECT DISTINCT name, file_path FROM symbols
+        WHERE LOWER(name) LIKE ? || '%'
+          AND kind IN ('class', 'function', 'method', 'trait', 'interface')
+        ORDER BY LENGTH(name)
+        LIMIT 200
+      `);
+
+      const rows = stmt.all(firstLetter) as { name: string; file_path: string }[];
+      const matches: CompletionItem[] = [];
+
+      for (const row of rows) {
+        const acronym = this.getAcronym(row.name);
+        if (acronym.startsWith(queryUpper)) {
+          matches.push({
+            value: row.name,
+            type: 'symbol' as const,
+            display: `${row.name} (${row.file_path.split('/').pop()})`,
+            fullPath: row.file_path,
+          });
+        }
+        if (matches.length >= limit) break;
+      }
+
+      return matches;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Build acronym from a name or filename (camelCase, PascalCase, snake, kebab)
+   */
+  private getAcronym(text: string): string {
+    const base = text.replace(/\.[^.]+$/, '');
+    const parts = base.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+    let acronym = '';
+
+    for (const part of parts) {
+      if (part.length === 0) continue;
+      acronym += part[0];
+      for (let i = 1; i < part.length; i++) {
+        const ch = part[i];
+        if (ch >= 'A' && ch <= 'Z') {
+          acronym += ch;
+        }
+      }
+    }
+
+    return acronym.toUpperCase();
+  }
+
+  /**
+   * Merge suggestions without duplicates, preserving order
+   */
+  private mergeSuggestions(
+    primary: CompletionItem[],
+    secondary: CompletionItem[],
+    limit: number
+  ): CompletionItem[] {
+    const seen = new Set<string>();
+    const merged: CompletionItem[] = [];
+
+    for (const item of primary) {
+      const key = `${item.type}:${item.value}:${item.fullPath ?? ''}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        merged.push(item);
+      }
+    }
+
+    for (const item of secondary) {
+      const key = `${item.type}:${item.value}:${item.fullPath ?? ''}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        merged.push(item);
+      }
+      if (merged.length >= limit) break;
+    }
+
+    return merged.slice(0, limit);
   }
 
   /**
