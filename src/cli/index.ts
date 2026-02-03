@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+import { createRequire } from 'module';
 import { initCommand } from './commands/init.js';
 import { indexCommand } from './commands/index.js';
 import { packCommand } from './commands/pack.js';
@@ -13,12 +14,15 @@ import {
   domainsEnableCommand,
 } from './commands/domains.js';
 
+const require = createRequire(import.meta.url);
+const { version } = require('../../package.json');
+
 const program = new Command();
 
 program
   .name('context')
   .description('CLI context packer for agentic coding')
-  .version('0.1.0');
+  .version(version);
 
 // init command
 program
