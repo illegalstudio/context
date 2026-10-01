@@ -1,8 +1,33 @@
-# Context
+<p align="center">
+  <img src="assets/logo-transparent.png" alt="Context logo" width="130">
+</p>
 
-CLI tool for agentic coding that transforms tasks into deterministic, explainable context packages.
+<h1 align="center">Context</h1>
 
-Context analyzes your codebase and creates focused context packs that help AI coding assistants (Claude, Cursor, Codex) understand exactly which files are relevant to your task.
+<p align="center">
+  <em>The right context for every coding task.</em>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@illegalstudio/context"><img src="https://img.shields.io/npm/v/%40illegalstudio%2Fcontext?style=flat-square&amp;logo=npm&amp;logoColor=white&amp;color=02B7A1" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@illegalstudio/context"><img src="https://img.shields.io/npm/dm/%40illegalstudio%2Fcontext?style=flat-square&amp;logo=npm&amp;logoColor=white&amp;color=02B7A1" alt="Monthly npm downloads"></a>
+  <a href="https://github.com/illegalstudio/context/stargazers"><img src="https://img.shields.io/github/stars/illegalstudio/context?style=flat-square&amp;logo=github&amp;logoColor=white&amp;label=stars&amp;color=02B7A1" alt="GitHub stars"></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-02B7A1?style=flat-square&amp;color=02B7A1" alt="License: MIT"></a>
+</p>
+
+<p align="center">
+  <strong>Deterministic packs &middot; Explainable file selection &middot; Multi-language support</strong>
+</p>
+
+<p align="center">
+  Context is a CLI tool for agentic coding that transforms tasks into deterministic, explainable context packages. It analyzes your codebase and creates focused context packs that help AI coding assistants (Claude, Cursor, Codex) understand exactly which files are relevant to your task.
+</p>
+
+<p align="center">
+  <a href="https://opensource.nahi.me"><strong>opensource.nahi.me</strong></a>
+</p>
+
+---
 
 ## Installation
 
