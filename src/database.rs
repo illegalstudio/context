@@ -10,6 +10,7 @@ use std::{
 
 pub struct Database {
     pub connection: Connection,
+    project: Option<crate::project::ProjectMap>,
 }
 
 pub struct IndexedFile {
@@ -35,7 +36,7 @@ impl Database {
         connection.pragma_update(None, "journal_mode", "WAL")?;
         connection.pragma_update(None, "foreign_keys", "ON")?;
         let version: i64 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
-        if version != 4 {
+        if version != 5 {
             // The index is disposable. Source files, settings and packs are preserved.
             connection.execute_batch("BEGIN IMMEDIATE;
                 DROP TABLE IF EXISTS skipped_files; DROP TABLE IF EXISTS files_fts; DROP TABLE IF EXISTS import_requests;
@@ -55,9 +56,16 @@ impl Database {
                 CREATE INDEX imports_target ON imports(target_path);
                 CREATE INDEX import_requests_source ON import_requests(source_path);
                 CREATE INDEX refs_name ON refs(name);
-                PRAGMA user_version=4; COMMIT;")?;
+                PRAGMA user_version=5; COMMIT;")?;
         }
-        Ok(Self { connection })
+        Ok(Self {
+            connection,
+            project: None,
+        })
+    }
+
+    pub fn set_project_map(&mut self, project: crate::project::ProjectMap) {
+        self.project = Some(project);
     }
 
     pub fn files(&self) -> Result<BTreeMap<String, FileMetadata>> {
@@ -199,6 +207,7 @@ impl Database {
         git_key: Option<&str>,
         aliases: &[(String, String)],
     ) -> Result<(usize, usize)> {
+        let project_key = serde_json::to_string(&self.project)?;
         let transaction = self.connection.transaction()?;
         let mut updated = 0;
         let mut removed_count = 0;
@@ -290,7 +299,16 @@ impl Database {
                 content_insert.execute(params![f.path, file.content])?;
             }
         }
-        if updated > 0 || removed_count > 0 || self_aliases_changed(&transaction, aliases)? {
+        let previous_project: Option<String> = transaction
+            .query_row("SELECT value FROM state WHERE key='project_map'", [], |r| {
+                r.get(0)
+            })
+            .optional()?;
+        if updated > 0
+            || removed_count > 0
+            || self_aliases_changed(&transaction, aliases)?
+            || previous_project.as_ref() != Some(&project_key)
+        {
             transaction.execute("DELETE FROM imports", [])?;
             let files = {
                 let mut statement = transaction.prepare("SELECT path FROM files")?;
@@ -313,10 +331,20 @@ impl Database {
                     })?
                     .collect::<rusqlite::Result<Vec<_>>>()?
             };
+            if let Some(project) = self.project.as_mut() {
+                project.prepare_files(&files);
+            }
             let mut statement =
                 transaction.prepare_cached("INSERT OR IGNORE INTO imports VALUES(?,?)")?;
             for (source, request) in requests {
-                for target in crate::parser::resolve_import(&source, &request, &files, aliases) {
+                let targets = self
+                    .project
+                    .as_ref()
+                    .and_then(|p| p.resolve(&source, &request, &files))
+                    .unwrap_or_else(|| {
+                        crate::parser::resolve_import(&source, &request, &files, aliases)
+                    });
+                for target in targets {
                     statement.execute(params![source, target])?;
                 }
             }
@@ -340,6 +368,10 @@ impl Database {
         transaction.execute(
             "INSERT OR REPLACE INTO state VALUES('aliases',?)",
             [serde_json::to_string(aliases)?],
+        )?;
+        transaction.execute(
+            "INSERT OR REPLACE INTO state VALUES('project_map',?)",
+            [&project_key],
         )?;
         transaction.commit().context("Cannot commit index update")?;
         Ok((updated, removed_count))

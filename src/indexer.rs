@@ -60,6 +60,7 @@ pub fn index(
             true
         });
     let mut current = BTreeMap::new();
+    let mut project_paths = BTreeSet::new();
     for entry in walker.build() {
         let entry = entry.context("Cannot scan repository")?;
         if !entry.file_type().is_some_and(|t| t.is_file()) {
@@ -67,6 +68,12 @@ pub fn index(
         }
         let path = parser::normalize(entry.path().strip_prefix(root)?);
         let metadata = entry.metadata()?;
+        if matches!(
+            path.rsplit('/').next(),
+            Some("tsconfig.json" | "package.json" | "composer.json" | "Cargo.toml")
+        ) {
+            project_paths.insert(path.clone());
+        }
         if metadata.len() == 0 || metadata.len() > config.max_file_size {
             continue;
         }
@@ -173,6 +180,10 @@ pub fn index(
         None
     };
     let aliases = aliases(root)?;
+    database.set_project_map(crate::project::ProjectMap::load(
+        root,
+        project_paths.iter(),
+    )?);
     let (updated, removed) = database.update(
         changes,
         &removed,
@@ -237,7 +248,7 @@ pub fn aliases(root: &Path) -> Result<Vec<(String, String)>> {
     Ok(aliases)
 }
 
-fn strip_json_comments(text: &str) -> String {
+pub(crate) fn strip_json_comments(text: &str) -> String {
     let mut output = String::new();
     let mut chars = text.chars().peekable();
     let mut quoted = false;

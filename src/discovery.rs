@@ -16,6 +16,7 @@ struct Score {
     value: f64,
     reserved: bool,
     reasons: BTreeSet<String>,
+    contributions: BTreeMap<String, f64>,
 }
 
 fn add(
@@ -28,6 +29,7 @@ fn add(
     let score = scores.entry(path.into()).or_default();
     if score.reasons.insert(reason.into()) {
         score.value += amount;
+        score.contributions.insert(reason.into(), amount);
     }
     score.reserved |= reserved;
 }
@@ -438,18 +440,27 @@ pub fn discover(
         }
         let total_weight: f64 = task.domain_weights.values().sum();
         if total_weight > 0.0 {
+            let previous = score.value;
             score.value *= 1.0 + 0.35 * matched_weight / total_weight;
+            score
+                .contributions
+                .insert("domain boost".into(), score.value - previous);
         }
         if let Some(signal) = git.get(&path)
             && signal.churn_score > 0.5
         {
+            let previous = score.value;
             score.value *= 1.05;
+            score
+                .contributions
+                .insert("git activity boost".into(), score.value - previous);
             score.reasons.insert("high git activity (hotspot)".into());
         }
         candidates.push(Candidate {
             path,
             score: score.value,
             reasons: score.reasons.into_iter().collect(),
+            contributions: score.contributions,
             reserved: score.reserved,
         });
     }
@@ -494,6 +505,9 @@ pub fn discover(
     for candidate in &mut candidates {
         if highest > 0.0 {
             candidate.score /= highest;
+            for value in candidate.contributions.values_mut() {
+                *value /= highest;
+            }
         }
     }
     Ok(candidates)

@@ -63,6 +63,8 @@ pub struct Candidate {
     pub path: String,
     pub score: f64,
     pub reasons: Vec<String>,
+    #[serde(default)]
+    pub contributions: BTreeMap<String, f64>,
     #[serde(skip)]
     pub reserved: bool,
 }
@@ -94,7 +96,8 @@ pub struct DiffEntry {
     pub changed_lines: Vec<usize>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
 pub struct PackOptions {
     pub task: Option<String>,
     pub error: Option<String>,

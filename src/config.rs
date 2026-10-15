@@ -14,6 +14,7 @@ pub struct Config {
     pub max_lines_per_file: usize,
     pub budget_tokens: usize,
     pub graph_depth: usize,
+    pub tokenizer: String,
 }
 
 impl Default for Config {
@@ -26,6 +27,7 @@ impl Default for Config {
             max_lines_per_file: 300,
             budget_tokens: 32_000,
             graph_depth: 2,
+            tokenizer: "approx".into(),
         }
     }
 }
@@ -80,6 +82,7 @@ pub fn load(root: &Path) -> Result<Config> {
     {
         bail!("Configuration limits must be positive and graphDepth must be at most 8");
     }
+    crate::tokens::Tokenizer::validate(&config.tokenizer)?;
     Ok(config)
 }
 

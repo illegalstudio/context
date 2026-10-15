@@ -1,9 +1,15 @@
 pub mod config;
 pub mod database;
 pub mod discovery;
+pub mod evaluation;
 pub mod git;
 pub mod indexer;
+pub mod mcp;
 pub mod model;
 pub mod pack;
 pub mod parser;
+pub mod project;
+pub mod query;
 pub mod resolver;
+pub mod snippets;
+pub mod tokens;

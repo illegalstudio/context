@@ -64,6 +64,8 @@ jobs:
         run: python3 scripts/release.py --check-tag "$RELEASE_TAG"
       - name: Check formatting, lint and tests
         run: make check
+      - name: Evaluate selection on pinned historical tasks
+        run: cargo run --locked -- evaluate tests/fixtures/evaluation-history.json --max-files 15 --min-recall 1
       - name: Build binary
         run: make build
       - name: Sign macOS release binary

@@ -52,6 +52,54 @@ enum Commands {
     },
     /// Select relevant files and create a context pack.
     Pack(PackArgs),
+    /// Search source files, symbols and focused code excerpts.
+    Search {
+        query: String,
+        #[arg(short='n',long,default_value="10",value_parser=positive)]
+        limit: usize,
+        #[arg(long)]
+        json: bool,
+        #[arg(long)]
+        verify: bool,
+        #[arg(long)]
+        tokenizer: Option<String>,
+    },
+    /// Explain a file's selection, ranking signals and dependencies for a task.
+    Explain {
+        path: String,
+        #[arg(short, long)]
+        task: String,
+        #[arg(long,value_parser=positive)]
+        max_files: Option<usize>,
+        #[arg(long, value_delimiter = ',')]
+        exclude: Vec<String>,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Evaluate retrieval and excerpt quality on a labeled dataset without modifying its projects.
+    Evaluate {
+        dataset: PathBuf,
+        #[arg(long)]
+        projects: Option<PathBuf>,
+        #[arg(long,default_value="eval",value_parser=["train","eval","all"])]
+        split: String,
+        #[arg(long)]
+        tokenizer: Option<String>,
+        #[arg(long,value_parser=positive)]
+        max_files: Option<usize>,
+        #[arg(long,value_parser=positive)]
+        budget_tokens: Option<usize>,
+        #[arg(long)]
+        baseline: Option<PathBuf>,
+        #[arg(long)]
+        output: Option<PathBuf>,
+        #[arg(long)]
+        min_recall: Option<f64>,
+        #[arg(long)]
+        json: bool,
+    },
+    /// Serve Context tools and pack resources over MCP stdio.
+    Mcp,
     /// List saved context packs.
     #[command(alias = "ls")]
     List {
@@ -96,9 +144,15 @@ struct PackArgs {
     /// Maximum selected files, including explicit hints.
     #[arg(long,env="CONTEXT_MAX_FILES",value_parser=positive)]
     max_files: Option<usize>,
-    /// Approximate token budget for the complete prompt.
+    /// Token budget for the complete prompt, measured with the selected tokenizer.
     #[arg(long,value_parser=positive)]
     budget_tokens: Option<usize>,
+    /// approx, cl100k_base or o200k_base. No downloads are required.
+    #[arg(long)]
+    tokenizer: Option<String>,
+    /// Emit a delta relative to a saved pack slug, unique prefix or latest.
+    #[arg(long)]
+    update: Option<String>,
     /// Permitted optional categories: tests,config,docs.
     #[arg(long, value_delimiter = ',')]
     include: Vec<String>,
@@ -194,28 +248,72 @@ fn execute(cli: Cli) -> Result<()> {
                 }
             }
             config::initialize(&root, false)?;
-            let config = config::load(&root)?;
+            let mut config = config::load(&root)?;
+            let parent = args
+                .update
+                .as_deref()
+                .map(|slug| pack::load(&root, slug))
+                .transpose()?;
+            config.tokenizer = args
+                .tokenizer
+                .or_else(|| parent.as_ref().map(|(_, m)| m.tokenizer.clone()))
+                .unwrap_or(config.tokenizer);
+            context::tokens::Tokenizer::validate(&config.tokenizer)?;
             let mut database = Database::open(&root)?;
-            let stats = indexer::index(&root, &mut database, &config, args.verify)?;
+            let stats = indexer::index(
+                &root,
+                &mut database,
+                &config,
+                args.verify || parent.is_some(),
+            )?;
             if cli.verbose {
                 eprintln!(
                     "Index: {} files, {} updated in {} ms",
                     stats.files, stats.updated, stats.duration_ms
                 );
             }
-            let mut options = PackOptions {
-                task: args.task,
-                error: args.error,
-                since: args.since,
-                diff: args.diff,
-                file: args.file,
-                symbol: args.symbol,
-                max_files: args.max_files.unwrap_or(config.max_files),
-                budget_tokens: args.budget_tokens.unwrap_or(config.budget_tokens),
-                include: args.include,
-                exclude: args.exclude,
-                focus: args.focus,
-            };
+            let mut options = parent
+                .as_ref()
+                .and_then(|(_, m)| m.options.clone())
+                .unwrap_or_else(|| PackOptions {
+                    task: parent.as_ref().map(|(_, m)| m.task.raw.clone()),
+                    max_files: config.max_files,
+                    budget_tokens: config.budget_tokens,
+                    ..Default::default()
+                });
+            if args.task.is_some() {
+                options.task = args.task;
+            }
+            if args.error.is_some() {
+                options.error = args.error;
+            }
+            if args.since.is_some() {
+                options.since = args.since;
+            }
+            if args.diff.is_some() {
+                options.diff = args.diff;
+            }
+            if args.file.is_some() {
+                options.file = args.file;
+            }
+            if args.symbol.is_some() {
+                options.symbol = args.symbol;
+            }
+            if let Some(count) = args.max_files {
+                options.max_files = count;
+            }
+            if let Some(count) = args.budget_tokens {
+                options.budget_tokens = count;
+            }
+            if !args.include.is_empty() {
+                options.include = args.include;
+            }
+            if !args.exclude.is_empty() {
+                options.exclude = args.exclude;
+            }
+            if !args.focus.is_empty() {
+                options.focus = args.focus;
+            }
             if options.task.is_none()
                 && options.error.is_none()
                 && options.diff.is_none()
@@ -233,28 +331,148 @@ fn execute(cli: Cli) -> Result<()> {
             let resolution = resolver::resolve(&root, &options)?;
             let candidates =
                 discovery::discover(&root, &database, &resolution, &options, config.graph_depth)?;
-            let result = pack::compose(
+            let result = pack::compose_with_options(
                 &root,
                 &database,
                 &resolution,
                 &candidates,
                 &config,
-                options.budget_tokens,
+                &options,
+                parent.as_ref().map(|(_, m)| m),
             )?;
             if args.json {
                 println!("{}", serde_json::to_string_pretty(&result.manifest)?);
             } else {
                 println!("Context pack created at: {}", result.directory.display());
                 println!(
-                    "Selected {} files, approximately {} tokens",
+                    "Selected {} files, {} tokens ({})",
                     candidates.len(),
-                    result.manifest.budget_tokens
+                    result.manifest.budget_tokens,
+                    result.manifest.tokenizer
                 );
                 for candidate in candidates.iter().take(5) {
                     println!("  {:.0}% {}", candidate.score * 100.0, candidate.path);
                 }
             }
         }
+        Commands::Search {
+            query,
+            limit,
+            json,
+            verify,
+            tokenizer,
+        } => {
+            let (mut config, database) = context::query::prepare(&root, verify)?;
+            if let Some(name) = tokenizer {
+                config.tokenizer = name;
+            }
+            let result = context::query::search(&root, &database, &config, &query, limit)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&result)?);
+            } else {
+                for hit in result.hits {
+                    println!(
+                        "{:.3} {}: {}",
+                        hit.candidate.score,
+                        hit.candidate.path,
+                        hit.candidate.reasons.join("; ")
+                    );
+                    for excerpt in hit.excerpts {
+                        println!("  lines {}-{}", excerpt.start_line, excerpt.end_line);
+                        for line in excerpt.content.lines() {
+                            println!("  {line}");
+                        }
+                    }
+                }
+            }
+        }
+        Commands::Explain {
+            path,
+            task,
+            max_files,
+            exclude,
+            json,
+        } => {
+            let (config, database) = context::query::prepare(&root, false)?;
+            let options = PackOptions {
+                task: Some(task),
+                max_files: max_files.unwrap_or(config.max_files),
+                exclude,
+                ..Default::default()
+            };
+            let result = context::query::explain(&root, &database, &config, &path, &options)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&result)?);
+            } else {
+                println!(
+                    "{}: {} (score {:.3}, rank {:?})",
+                    result.path, result.status, result.score, result.rank
+                );
+                for (reason, contribution) in result.contributions {
+                    println!("  {contribution:+.3} {reason}");
+                }
+                for dependency in result.dependencies {
+                    println!("  {} -> {}", dependency.source_path, dependency.target_path);
+                }
+            }
+        }
+        Commands::Evaluate {
+            dataset,
+            projects,
+            split,
+            tokenizer,
+            max_files,
+            budget_tokens,
+            baseline,
+            output,
+            min_recall,
+            json,
+        } => {
+            if min_recall.is_some_and(|v| !v.is_finite() || !(0.0..=1.0).contains(&v)) {
+                bail!("--min-recall must be between 0 and 1");
+            }
+            let mut config = config::load(&root)?;
+            if let Some(value) = tokenizer {
+                config.tokenizer = value;
+            }
+            if let Some(value) = max_files {
+                config.max_files = value;
+            }
+            if let Some(value) = budget_tokens {
+                config.budget_tokens = value;
+            }
+            let dataset = context::evaluation::load(&root.join(dataset))?;
+            let mut report = context::evaluation::evaluate(
+                &dataset,
+                &root.join(projects.unwrap_or_default()),
+                &config,
+                &split,
+            )?;
+            if let Some(path) = baseline {
+                let baseline = serde_json::from_slice(&std::fs::read(root.join(path))?)?;
+                context::evaluation::compare(&mut report, &baseline)?;
+            }
+            if let Some(path) = output {
+                config::write_json(&root.join(path), &report)?;
+            }
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "{} cases: precision {:.3}, recall {:.3}, recall@5 {:.3}, {} tokens, {} forbidden matches",
+                    report.cases.len(),
+                    report.summary.precision,
+                    report.summary.recall,
+                    report.summary.recall_at5,
+                    report.summary.tokens,
+                    report.summary.forbidden_matches
+                );
+            }
+            if min_recall.is_some_and(|minimum| report.summary.recall < minimum) {
+                bail!("Recall is below --min-recall");
+            }
+        }
+        Commands::Mcp => context::mcp::run(&root)?,
         Commands::List { limit, json } => {
             let packs = pack::list(&root)?;
             if json {

@@ -1,0 +1,22 @@
+{
+  "platform": "Linux-7.2.5-3-omarchy-x86_64-with-glibc2.44",
+  "date": "2026-10-15",
+  "results": [
+    {
+      "implementation": "rust",
+      "sourceFiles": 1000,
+      "initialIndexMs": 129.5,
+      "unchangedIndexMedianMs": 11.3,
+      "packMedianMs": 73.0,
+      "repetitions": 3
+    },
+    {
+      "implementation": "rust",
+      "sourceFiles": 10000,
+      "initialIndexMs": 1418.2,
+      "unchangedIndexMedianMs": 59.4,
+      "packMedianMs": 577.5,
+      "repetitions": 3
+    }
+  ]
+}

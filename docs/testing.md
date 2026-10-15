@@ -18,6 +18,12 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 
 Additional regressions cover structural declarations and comment handling across every bundled grammar, deletion/rename cleanup, new import targets, verification with preserved metadata, nested ignore files and negation, file-size/binary exclusions, TypeScript and PHP aliases, Python relative imports, Rust grouped/public imports, cyclic graphs, deterministic ranking, Italian task resolution, custom/disabled domains, CLI validation, Git history/diff hints, log filtering, pack budgets and readable archives.
 
+`tests/features.rs` covers deep structural anchors, multiple complete functions, balanced allocation, both BPE vocabularies, inherited/nested project configuration, local exports, crate roots, explicit framework relationships, search/explain evidence, legacy manifests and chained incremental updates. `tests/mcp.rs` starts the actual stdio server and exercises SDK negotiation, tool calls, resources, validation errors and ping with response timeouts and automatic child cleanup.
+
+Use [quality evaluation](evaluation.md) to measure retrieval and line coverage separately from correctness tests. Its historical fixture pins real repository commits and supports baseline comparisons without modifying the source checkout.
+
+`evaluation-results.json` records the release-profile baseline on two pinned historical evaluation tasks, with 15 selected files per task and the default 32000-token approximate budget. It retrieves both labeled target files and covers 98.2% of the annotated lines. Positive annotations are deliberately sparse, so its precision value should not be read as a complete relevance judgment. Use this report as a reproducible starting point and add reviewed tasks before tuning ranking.
+
 Tests create task-specific temporary directories through tempfile. They never modify the checked-in codebases and automatically remove their temporary artifacts. Test Git commits disable signing and user hooks within their isolated invocation.
 
 ## Benchmarks
@@ -32,6 +38,8 @@ The script generates deterministic TypeScript source projects in a single owned 
 An optional `--baseline <compiled-cli.js>` runs the former implementation through Node on an equivalent copy. The baseline must have working native SQLite bindings for the installed Node version. `--output <report.json>` saves results; temporary projects are cleaned on success and failure.
 
 See `benchmark-results.json` for the measured results from the rewrite. Compare releases on the same machine, filesystem, options and workload.
+
+`feature-benchmark-results.json` records a subsequent release-profile run with structural excerpts and the new integrations, using the same synthetic generator and three warm repetitions. The recorded benchmark ran after this task's builds and tests completed. At 10000 generated source files it measured 1.418 s for initial indexing, 59.4 ms for unchanged indexing and 577.5 ms for pack creation. These are workload-specific measurements, not a statistically established speedup over the earlier run.
 
 ## Measured results
 

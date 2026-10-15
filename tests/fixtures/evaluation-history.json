@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "name": "Historical acronym completion change",
+      "root": ".",
+      "revision": "0033a5a951cbbdd1ad1bb325e8f1f80a1744311d",
+      "split": "eval",
+      "task": "Make acronym matching case-insensitive with segmented prefixes in autocomplete",
+      "expectedFiles": [
+        "src/cli/utils/interactive-prompt.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 208,
+          "end": 235
+        }
+      ]
+    },
+    {
+      "name": "Historical native pack composition",
+      "root": ".",
+      "revision": "d755358c04a8d8c6cb256d11b6aca2f9958f5d02",
+      "split": "eval",
+      "task": "Preserve atomic context pack output and normalize the compressed archive entries",
+      "expectedFiles": [
+        "src/pack.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/pack.rs",
+          "start": 344,
+          "end": 371
+        }
+      ]
+    },
+    {
+      "name": "Historical native import resolution",
+      "root": ".",
+      "revision": "d755358c04a8d8c6cb256d11b6aca2f9958f5d02",
+      "split": "train",
+      "task": "Resolve grouped Rust use statements and TypeScript module imports",
+      "expectedFiles": [
+        "src/parser.rs",
+        "src/database.rs"
+      ]
+    }
+  ]
+}

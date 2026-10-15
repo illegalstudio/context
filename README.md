@@ -110,6 +110,8 @@ context pack --task "Fix the payment webhook handler"
 context pack                         # Interactive task input with @ completion
 context list
 context open
+context search "payment validation"
+context explain src/payments.ts --task "Fix the payment webhook"
 ~~~
 
 Indexing initializes settings automatically. Every pack refreshes the index before selecting files. Use `context init` when you want to review settings and ignore patterns first.
@@ -149,7 +151,12 @@ Packs are published atomically after all files and the archive have been written
 - **Import resolution:** Relative imports, TypeScript .js specifiers, root tsconfig path mappings, Composer PSR-4 mappings, Python modules and Rust module imports.
 - **Framework discovery:** Node.js, Laravel and Statamic relationships and framework-specific task domains.
 - **Interactive input:** `@` file and symbol references with Tab completion and acronym matching.
-- **Context limits:** File count, excerpt line limits and an approximate token budget. Explicit exclusions also apply to hinted files.
+- **Structural excerpts:** Complete relevant declarations and multiple non-overlapping sections per file, including import context when it fits. Error locations, all changed regions, explicit symbols and task terms guide selection.
+- **Context limits:** Relevance-weighted allocation across files, with an approximate budget or offline `cl100k_base` / `o200k_base` BPE tokenization of the complete prompt. Explicit exclusions also apply to hinted files.
+- **Project relationships:** Inherited and nested TypeScript configs, project references, local package exports, Rust crate roots, Composer namespaces, Laravel views and Statamic templates/blueprints.
+- **Agent integration:** Search and numerical ranking explanations through CLI/JSON and an MCP stdio server with tools and saved-pack resources.
+- **Incremental packs:** Update a previous pack with changed/new context, removed files and obsolete relationships while retaining unchanged excerpts through the parent reference.
+- **Quality evaluation:** Labeled datasets, separate training/evaluation splits, historical Git snapshots, file retrieval and line coverage metrics, token costs and baseline comparisons.
 - **Automation:** JSON output for indexing, packs, listing and domains; `--root` selects the project directory.
 
 ## Commands
@@ -166,9 +173,16 @@ context domains add inventory --keywords stock,warehouse,sku
 context domains list --all --verbose
 context list --limit 10
 context open --file PACK.md
+context pack --task "Fix checkout" --tokenizer o200k_base --budget-tokens 8000
+context pack --update latest --json
+context search "checkout validation" --limit 5 --json
+context explain app/Services/StripeService.php --task "Fix webhook verification" --json
+context mcp
 ~~~
 
 See the [commands reference](docs/commands.md), [configuration guide](docs/configuration.md) and [implementation guide](docs/how-it-works.md).
+
+See [agent integration](docs/integrations.md) for MCP setup and [quality evaluation](docs/evaluation.md) for measuring file selection, excerpt coverage and token usage on repeatable tasks.
 
 ## Development
 

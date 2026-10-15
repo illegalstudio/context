@@ -22,6 +22,18 @@ pub struct Manifest {
     pub budget_tokens: usize,
     pub commit_base: Option<String>,
     pub tags: Vec<String>,
+    #[serde(default = "default_tokenizer")]
+    pub tokenizer: String,
+    #[serde(default)]
+    pub options: Option<PackOptions>,
+    #[serde(default)]
+    pub config: Option<Config>,
+    #[serde(default)]
+    pub parent_pack: Option<String>,
+    #[serde(default)]
+    pub changes: Option<PackChanges>,
+    #[serde(default)]
+    pub relationships: Vec<ImportRelation>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -31,9 +43,29 @@ pub struct ManifestFile {
     pub score: f64,
     pub reasons: Vec<String>,
     pub excerpt_range: Option<ExcerptRange>,
+    #[serde(default)]
+    pub excerpt_ranges: Vec<ExcerptRange>,
+    #[serde(default)]
+    pub source_hash: Option<String>,
+    #[serde(default)]
+    pub omission_reason: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+fn default_tokenizer() -> String {
+    "approx".into()
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PackChanges {
+    pub added: Vec<String>,
+    pub changed: Vec<String>,
+    pub removed: Vec<String>,
+    pub unchanged: Vec<String>,
+    pub stale_references: Vec<ImportRelation>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExcerptRange {
     pub start: usize,
     pub end: usize,
@@ -58,7 +90,7 @@ fn fence(content: &str) -> String {
     "\u{0060}".repeat(max + 1)
 }
 
-fn excerpt_markdown(excerpt: &Excerpt) -> String {
+pub(crate) fn excerpt_markdown(excerpt: &Excerpt) -> String {
     let fence = fence(&excerpt.content);
     format!(
         "### {}\n\nLines {}-{} of {}{}\n\n{}{}\n{}\n{}\n\n",
@@ -78,7 +110,7 @@ fn excerpt_markdown(excerpt: &Excerpt) -> String {
     )
 }
 
-fn header(task: &ResolvedTask, candidates: &[Candidate]) -> String {
+pub(crate) fn header(task: &ResolvedTask, candidates: &[Candidate]) -> String {
     let mut output = format!(
         "# Context Pack\n\n## Task\n\n{}\n\nChange type: {}\nDomains: {}\n\n## Selected files\n\n",
         task.raw,
@@ -105,102 +137,17 @@ pub fn excerpts(
     max_lines: usize,
     budget_bytes: usize,
 ) -> Result<Vec<Excerpt>> {
-    let symbols = database.symbols()?;
-    let canonical_root = root.canonicalize()?;
-    let mut remaining = budget_bytes;
-    let mut excerpts = Vec::new();
-    for candidate in candidates {
-        if remaining < 120 {
-            break;
-        }
-        let full_path = root.join(&candidate.path);
-        let canonical = full_path
-            .canonicalize()
-            .with_context(|| format!("Cannot read {}", candidate.path))?;
-        if !canonical.starts_with(&canonical_root) {
-            bail!("Source moved outside repository: {}", candidate.path);
-        }
-        let content = fs::read_to_string(&canonical)
-            .with_context(|| format!("Cannot read {}", candidate.path))?;
-        let lines: Vec<_> = content.lines().collect();
-        if lines.is_empty() {
-            continue;
-        }
-        let anchor = resolution
-            .stacktrace
-            .iter()
-            .find(|s| candidate.path == s.file || s.file.ends_with(&format!("/{}", candidate.path)))
-            .map(|s| s.line)
-            .or_else(|| {
-                resolution
-                    .diff
-                    .iter()
-                    .find(|d| d.file == candidate.path)
-                    .and_then(|d| d.changed_lines.first().copied())
-            })
-            .or_else(|| {
-                symbols
-                    .iter()
-                    .find(|s| {
-                        s.file_path == candidate.path && resolution.task.symbols.contains(&s.name)
-                    })
-                    .map(|s| s.start_line)
-            })
-            .unwrap_or(1)
-            .clamp(1, lines.len());
-        let mut start = anchor.saturating_sub(max_lines / 3 + 1);
-        if start + max_lines > lines.len() {
-            start = lines.len().saturating_sub(max_lines);
-        }
-        let end = (start + max_lines).min(lines.len());
-        let mut excerpt = Excerpt {
-            path: candidate.path.clone(),
-            content: lines[start..end].join("\n"),
-            start_line: start + 1,
-            end_line: end,
-            total_lines: lines.len(),
-            truncated: start > 0 || end < lines.len(),
-        };
-        let overhead = excerpt_markdown(&Excerpt {
-            content: String::new(),
-            ..excerpt.clone()
-        })
-        .len()
-            + 32;
-        if overhead >= remaining {
-            break;
-        }
-        let allowance = remaining - overhead;
-        if excerpt.content.len() > allowance {
-            let mut boundary = allowance;
-            while !excerpt.content.is_char_boundary(boundary) {
-                boundary -= 1;
-            }
-            let partial = &excerpt.content[..boundary];
-            let boundary = partial.rfind('\n').filter(|n| *n > 0).unwrap_or(boundary);
-            excerpt.content.truncate(boundary);
-            excerpt.end_line =
-                excerpt.start_line + excerpt.content.lines().count().saturating_sub(1);
-            excerpt.truncated = true;
-        }
-        while excerpt_markdown(&excerpt).len() > remaining && !excerpt.content.is_empty() {
-            let excess = excerpt_markdown(&excerpt).len() - remaining;
-            let mut boundary = excerpt.content.len().saturating_sub(excess.max(1));
-            while !excerpt.content.is_char_boundary(boundary) {
-                boundary -= 1;
-            }
-            excerpt.content.truncate(boundary);
-            excerpt.end_line =
-                excerpt.start_line + excerpt.content.lines().count().saturating_sub(1);
-            excerpt.truncated = true;
-        }
-        if excerpt_markdown(&excerpt).len() > remaining {
-            break;
-        }
-        remaining = remaining.saturating_sub(excerpt_markdown(&excerpt).len());
-        excerpts.push(excerpt);
-    }
-    Ok(excerpts)
+    Ok(crate::snippets::select(
+        root,
+        database,
+        resolution,
+        candidates,
+        max_lines,
+        "",
+        budget_bytes / 4,
+        &crate::tokens::Tokenizer::new("approx")?,
+    )?
+    .excerpts)
 }
 
 pub fn compose(
@@ -211,21 +158,113 @@ pub fn compose(
     config: &Config,
     budget_tokens: usize,
 ) -> Result<PackResult> {
-    let header = header(&resolution.task, candidates);
-    let byte_budget = budget_tokens
-        .checked_mul(4)
-        .context("Token budget is too large")?;
-    if header.len() + 128 > byte_budget {
-        bail!("Token budget is too small for the task and file list; increase --budget-tokens");
+    let options = PackOptions {
+        task: Some(resolution.task.raw.clone()),
+        budget_tokens,
+        ..Default::default()
+    };
+    compose_with_options(
+        root, database, resolution, candidates, config, &options, None,
+    )
+}
+
+pub fn compose_with_options(
+    root: &Path,
+    database: &Database,
+    resolution: &Resolution,
+    candidates: &[Candidate],
+    config: &Config,
+    options: &PackOptions,
+    parent: Option<&Manifest>,
+) -> Result<PackResult> {
+    let tokenizer = crate::tokens::Tokenizer::new(&config.tokenizer)?;
+    let relationships: Vec<_> = database
+        .imports()?
+        .into_iter()
+        .filter(|edge| {
+            candidates.iter().any(|c| c.path == edge.source_path)
+                && candidates.iter().any(|c| c.path == edge.target_path)
+        })
+        .collect();
+    let mut hashes = BTreeMap::new();
+    let mut changes = PackChanges::default();
+    let active: Vec<_> = if let Some(parent) = parent {
+        let reset = parent.task.raw != resolution.task.raw
+            || parent.tokenizer != config.tokenizer
+            || parent.config.as_ref().is_some_and(|old| {
+                old.max_lines_per_file != config.max_lines_per_file
+                    || old.budget_tokens != config.budget_tokens
+            })
+            || parent.options.as_ref().is_some_and(|old| {
+                serde_json::to_value(old).ok() != serde_json::to_value(options).ok()
+            });
+        for candidate in candidates {
+            let content = crate::snippets::read_source(root, &candidate.path)?;
+            let hash = blake3::hash(content.as_bytes()).to_hex().to_string();
+            if let Some(old) = parent.files.iter().find(|f| f.path == candidate.path) {
+                if reset || old.source_hash.as_ref() != Some(&hash) || old.excerpt_range.is_none() {
+                    changes.changed.push(candidate.path.clone());
+                } else {
+                    changes.unchanged.push(candidate.path.clone());
+                }
+            } else {
+                changes.added.push(candidate.path.clone());
+            }
+            hashes.insert(candidate.path.clone(), hash);
+        }
+        changes.removed = parent
+            .files
+            .iter()
+            .filter(|f| !candidates.iter().any(|c| c.path == f.path))
+            .map(|f| f.path.clone())
+            .collect();
+        changes.stale_references = parent
+            .relationships
+            .iter()
+            .filter(|edge| !relationships.contains(edge))
+            .cloned()
+            .collect();
+        candidates
+            .iter()
+            .filter(|c| !changes.unchanged.contains(&c.path))
+            .cloned()
+            .collect()
+    } else {
+        candidates.to_vec()
+    };
+    let mut header = header(&resolution.task, candidates);
+    if let Some(parent) = parent {
+        header.push_str(&format!("Update of pack {}. Apply this delta to the parent context. Unchanged excerpts are retained from the parent.\n\n", parent.slug));
+        for path in &changes.changed {
+            header.push_str(&format!("Replace previous excerpts for {path}; discard them even if no replacement fits this budget.\n"));
+        }
+        for path in &changes.added {
+            header.push_str(&format!("New context: {path}\n"));
+        }
+        for path in &changes.removed {
+            header.push_str(&format!("Remove previous context: {path}\n"));
+        }
+        for edge in &changes.stale_references {
+            header.push_str(&format!(
+                "Stale relationship: {} -> {}\n",
+                edge.source_path, edge.target_path
+            ));
+        }
+        header.push('\n');
     }
-    let excerpts = excerpts(
+    let selection = crate::snippets::select(
         root,
         database,
         resolution,
-        candidates,
+        &active,
         config.max_lines_per_file,
-        byte_budget - header.len(),
+        &header,
+        options.budget_tokens,
+        &tokenizer,
     )?;
+    hashes.extend(selection.hashes);
+    let omitted = selection.omitted;
+    let excerpts = selection.excerpts;
     let mut prompt = header;
     for excerpt in &excerpts {
         prompt.push_str(&excerpt_markdown(excerpt));
@@ -260,14 +299,43 @@ pub fn compose(
                 reasons: candidate.reasons.clone(),
                 excerpt_range: excerpts
                     .iter()
-                    .find(|excerpt| excerpt.path == candidate.path)
-                    .map(|excerpt| ExcerptRange {
-                        start: excerpt.start_line,
-                        end: excerpt.end_line,
+                    .find(|e| e.path == candidate.path)
+                    .map(|e| ExcerptRange {
+                        start: e.start_line,
+                        end: e.end_line,
+                    })
+                    .or_else(|| {
+                        parent
+                            .filter(|_| changes.unchanged.contains(&candidate.path))
+                            .and_then(|p| p.files.iter().find(|f| f.path == candidate.path))
+                            .and_then(|f| f.excerpt_range.clone())
                     }),
+                excerpt_ranges: if changes.unchanged.contains(&candidate.path) {
+                    parent
+                        .and_then(|p| p.files.iter().find(|f| f.path == candidate.path))
+                        .map(|f| f.excerpt_ranges.clone())
+                        .unwrap_or_default()
+                } else {
+                    excerpts
+                        .iter()
+                        .filter(|e| e.path == candidate.path)
+                        .map(|e| ExcerptRange {
+                            start: e.start_line,
+                            end: e.end_line,
+                        })
+                        .collect()
+                },
+                source_hash: hashes.get(&candidate.path).cloned(),
+                omission_reason: omitted.get(&candidate.path).cloned(),
             })
             .collect(),
-        budget_tokens: prompt.len().div_ceil(4),
+        budget_tokens: tokenizer.count(&prompt),
+        tokenizer: config.tokenizer.clone(),
+        options: Some(options.clone()),
+        config: Some(config.clone()),
+        parent_pack: parent.map(|p| p.slug.clone()),
+        changes: parent.map(|_| changes.clone()),
+        relationships,
         commit_base: crate::git::head(root),
         tags: resolution.task.domains.clone(),
     };
@@ -328,6 +396,15 @@ pub fn compose(
         "ctx.json".into(),
         format!("{}\n", serde_json::to_string_pretty(&manifest)?),
     );
+    if parent.is_some() {
+        output.insert(
+            "UPDATE.md".into(),
+            format!(
+                "# Context update\n\n{}\n",
+                serde_json::to_string_pretty(&changes)?
+            ),
+        );
+    }
     for excerpt in &excerpts {
         let name: String = excerpt
             .path
@@ -343,7 +420,12 @@ pub fn compose(
             .collect();
         let hash = blake3::hash(excerpt.path.as_bytes()).to_hex();
         output.insert(
-            format!("excerpts/{name}-{}.md", &hash[..12]),
+            format!(
+                "excerpts/{name}-{}-{}-{}.md",
+                &hash[..12],
+                excerpt.start_line,
+                excerpt.end_line
+            ),
             excerpt_markdown(excerpt),
         );
     }
@@ -426,6 +508,9 @@ pub fn list(root: &Path) -> Result<Vec<(PathBuf, Manifest)>> {
     if !packs.exists() {
         return Ok(vec![]);
     }
+    if !packs.canonicalize()?.starts_with(root.canonicalize()?) {
+        bail!("Pack directory must be inside the project");
+    }
     let mut paths = fs::read_dir(packs)?.collect::<std::io::Result<Vec<_>>>()?;
     paths.sort_by_key(|entry| std::cmp::Reverse(entry.file_name()));
     let mut result = vec![];
@@ -437,9 +522,58 @@ pub fn list(root: &Path) -> Result<Vec<(PathBuf, Manifest)>> {
         if !path.join("ctx.json").is_file() {
             continue;
         }
-        let manifest = serde_json::from_slice(&fs::read(path.join("ctx.json"))?)
+        let manifest = serde_json::from_slice(&fs::read(checked_file(root, &path, "ctx.json")?)?)
             .with_context(|| format!("Invalid pack manifest {}", path.display()))?;
         result.push((path, manifest));
     }
     Ok(result)
+}
+
+pub fn load(root: &Path, selector: &str) -> Result<(PathBuf, Manifest)> {
+    if selector.is_empty() || selector.contains(['/', '\\']) || selector == ".." {
+        bail!("Provide a pack slug, unique prefix or latest");
+    }
+    let packs = list(root)?;
+    let mut matches: Vec<_> = packs
+        .into_iter()
+        .filter(|(_, m)| selector == "latest" || m.slug == selector || m.slug.starts_with(selector))
+        .collect();
+    if selector == "latest" {
+        matches.truncate(1);
+    }
+    if matches.len() > 1
+        && let Some(position) = matches.iter().position(|(_, m)| m.slug == selector)
+    {
+        let exact = matches.swap_remove(position);
+        matches = vec![exact];
+    }
+    if matches.len() > 1 {
+        bail!("Pack prefix is ambiguous; use the full slug");
+    }
+    let (path, manifest) = matches.pop().context("Pack not found")?;
+    if !path
+        .canonicalize()?
+        .starts_with(root.join(".context/packs").canonicalize()?)
+    {
+        bail!("Pack must be inside the project pack directory");
+    }
+    Ok((path, manifest))
+}
+
+fn checked_file(root: &Path, directory: &Path, name: &str) -> Result<PathBuf> {
+    let directory = directory.canonicalize()?;
+    let file = directory.join(name).canonicalize()?;
+    if !directory.starts_with(root.canonicalize()?) || !file.starts_with(&directory) {
+        bail!("Pack resource must be inside the selected project pack");
+    }
+    if fs::metadata(&file)?.len() > 16 * 1024 * 1024 {
+        bail!("Pack resource exceeds 16 MiB");
+    }
+    Ok(file)
+}
+
+pub fn read_prompt(root: &Path, directory: &Path) -> Result<String> {
+    Ok(fs::read_to_string(checked_file(
+        root, directory, "PACK.md",
+    )?)?)
 }

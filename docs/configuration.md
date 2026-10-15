@@ -31,13 +31,18 @@ Edit `.context/config.json`:
   "maxFiles": 25,
   "maxLinesPerFile": 300,
   "budgetTokens": 32000,
-  "graphDepth": 2
+  "graphDepth": 2,
+  "tokenizer": "approx"
 }
 ~~~
 
 An empty language list accepts all readable UTF-8 text. Recognized binary content, empty files and oversized files are skipped. `graphDepth` can range from 0 to 8. Other limits must be positive.
 
-CLI `--max-files` and `--budget-tokens` override project settings. The token budget is a byte-based estimate (four bytes per token), applied to the complete `PACK.md` prompt including its file list. It is not an exact tokenizer count. Some selected files may have no excerpt when the budget is exhausted; the manifest indicates this with a null excerpt range.
+CLI `--max-files`, `--budget-tokens` and `--tokenizer` override project settings. `approx` retains the four-bytes-per-token estimate. `cl100k_base` and `o200k_base` count the complete `PACK.md` prompt with the selected BPE vocabulary, including headings, file lists and Markdown fences. Both vocabularies are embedded and require no downloads or API keys. These counts cover the prompt text, excluding any chat framing or additional instructions added by the consuming application. Choose an encoding supported by that application.
+
+Every file first receives a relevance-weighted budget share; unused capacity is then allocated to additional sections. Complete declarations are preferred. Sections too large for the available budget are clipped around their relevant lines and marked truncated. `maxLinesPerFile` limits the sum of included lines across that file's non-overlapping sections. Some selected files may have no excerpt when the budget is exhausted; the manifest indicates this with a null `excerptRange` and empty `excerptRanges`.
+
+Excerpt planning bounds retained source buffers and line metadata to approximately 64 MiB, excluding temporary parsing/derived output and a single source currently being read. A selected file without excerpts reports `omissionReason`: `token_budget` or `source_memory_limit`. Its source hash is still captured, and an incremental update retries files whose earlier excerpt was omitted.
 
 `--include tests,config,docs` chooses which optional categories are permitted. Omitting it permits all three. Main source files are always eligible. `--exclude` applies Git-style patterns to every candidate, including explicit hints.
 
@@ -54,7 +59,13 @@ Core domains are combined with detected Node.js/Laravel framework domains and pr
 
 ## Import mappings
 
-Root `tsconfig.json` path mappings and baseUrl are used to resolve TypeScript imports. Comments and trailing commas are accepted. Config inheritance, package exports, project references and nested compiler configs are not resolved automatically. Composer `autoload.psr-4` mappings resolve PHP namespaces. Relative Python imports and common Rust module paths are resolved against indexed files.
+TypeScript resolution reads root and nested `tsconfig.json`, referenced project configs and inherited configs, accepting comments, trailing commas and extensionless `extends` paths. Relative config extensions and package configs inside the project's `node_modules` are supported. Inheritance cycles, excessive depth and configs outside the project root are rejected. Relative mappings retain their defining config directory or effective `baseUrl`; the nearest source scope takes precedence.
+
+Indexed local `package.json` names resolve workspace imports, exact/wildcard exports, common source/types/import/default/require conditions and legacy entry fields. Exported paths must point to indexed files; Context does not infer source locations from missing generated output. This is static project discovery, not a complete implementation of every runtime or TypeScript module-resolution mode.
+
+Nested Composer `autoload.psr-4` and `autoload-dev.psr-4` mappings resolve PHP namespaces. Explicit `view()`, Blade include/extends/component calls, class references, Antlers partials and YAML template/layout/blueprint fields add relationships to indexed project resources. Dynamic expressions and application container execution are not evaluated. Rust imports use the nearest indexed package's library root and local crate names. Relative Python imports remain supported.
+
+Configuration metadata is discovered independently of `includeLanguages`, while ignore rules still control directory traversal. Changes to project configuration rebuild resolved edges even when importing source files have not changed.
 
 ## Environment
 

@@ -16,5 +16,23 @@
     "commit": "f975a621f4e7f532fe322e13c4f79495e0a7b2e7",
     "sha256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
     "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-typescript/f975a621f4e7f532fe322e13c4f79495e0a7b2e7/LICENSE"
+  },
+  "rmcp": {
+    "version": "3.5.1",
+    "commit": "79437f291b2c44053d00dcd5db969fd0cca7c887",
+    "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a",
+    "url": "https://raw.githubusercontent.com/modelcontextprotocol/rust-sdk/79437f291b2c44053d00dcd5db969fd0cca7c887/LICENSE"
+  },
+  "rmcp-macros": {
+    "version": "3.5.1",
+    "commit": "79437f291b2c44053d00dcd5db969fd0cca7c887",
+    "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a",
+    "url": "https://raw.githubusercontent.com/modelcontextprotocol/rust-sdk/79437f291b2c44053d00dcd5db969fd0cca7c887/LICENSE"
+  },
+  "tiktoken-rs": {
+    "version": "0.12.1",
+    "commit": "72a5a800651a1cea1ad609292446ba02c80e3bcd",
+    "sha256": "f7c6ddf9d84fd7b8ad5917e4074d4c05e4c1dfb752a28a0058f06bd0f5e2edcc",
+    "url": "https://raw.githubusercontent.com/zurawiki/tiktoken-rs/72a5a800651a1cea1ad609292446ba02c80e3bcd/LICENSE"
   }
 }

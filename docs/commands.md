@@ -33,7 +33,9 @@ context pack [options]
 | `-f, --file <path>` | Explicit file hint |
 | `-s, --symbol <name>` | Explicit symbol hint |
 | `--max-files <count>` | Maximum selected files |
-| `--budget-tokens <count>` | Approximate maximum tokens in PACK.md |
+| `--budget-tokens <count>` | Maximum tokens in PACK.md under the selected tokenizer |
+| `--tokenizer <name>` | `approx`, `cl100k_base` or `o200k_base` |
+| `--update <slug-or-prefix>` | Create a delta against a saved pack; accepts `latest` |
 | `--include <categories>` | Permitted optional categories: tests,config,docs |
 | `--exclude <patterns>` | Comma-separated Git-style exclusions |
 | `--focus <domains>` | Boost known task domains |
@@ -41,6 +43,46 @@ context pack [options]
 | `--json` | Print the generated manifest to stdout |
 
 No input options in a terminal enter interactive task input with `@` and Tab completion. Noninteractive input without a task source exits with an error. Packs always refresh the index first. Diff analysis covers tracked working-tree changes, including deletions, and reports renames as a deletion/addition pair. Untracked files enter the index but are not Git diff hints.
+
+An update inherits the parent's task, file/symbol/diff inputs, filters, limits and tokenizer unless overridden. Source hashes are fully verified for updates. The new manifest describes the complete selection, while `PACK.md` includes excerpts only for new/changed files and instructions to discard removed or replaced context. `UPDATE.md` lists changes and stale relationships. Keep the parent context when consuming a delta. A task/options/tokenizer change refreshes the retained excerpts. Updates of 0.3.0 manifests without source hashes refresh every selected file.
+
+Each file has `sourceHash` and `excerptRanges`. The existing `excerptRange` field remains the first section for compatibility. In an update, unchanged files retain their previous ranges through the parent reference. Historical packs remain readable. Manifests also record the tokenizer, effective configuration, options, parent slug and selected dependency relationships.
+
+## search
+
+~~~bash
+context search "payment validation" --limit 5 [--json] [--verify]
+context search "processPayment" --tokenizer cl100k_base --json
+~~~
+
+Refreshes the index and returns ranked files, matching reasons and score contributions, indexed symbols and focused excerpts. The limit is 1 to 1000. Search uses the same discovery pipeline as packs and bounds excerpt output to 8000 selected-tokenizer tokens and 60 lines per file. JSON metadata and symbol lists are additional to this excerpt budget. It does not create saved packs.
+
+## explain
+
+~~~bash
+context explain src/payments.ts --task "Fix checkout" --json
+context explain src/payments.ts --task "Fix checkout" --max-files 5 --exclude 'vendor/'
+~~~
+
+Reports whether a file is indexed and selected, its rank among candidates, normalized score contributions, reasons and dependency edges. The contributions sum to the file's score. Scores are relative heuristic weights, not probabilities. An excluded path is reported as `excluded_by_pattern`; a ranked candidate outside the limit is `below_file_limit`. An unknown/unranked path may be unindexed or have no matching signals. Ambiguous basenames require a project-relative path.
+
+## evaluate
+
+~~~bash
+context evaluate tests/fixtures/evaluation-history.json --max-files 15 --json
+context evaluate cases.json --projects /path/to/projects --split eval --output report.json
+context evaluate cases.json --baseline report.json --min-recall 0.9 --json
+~~~
+
+Runs labeled tasks against isolated copies or pinned Git revisions, without creating packs or editing source projects. Supports `--split train|eval|all`, `--max-files`, `--budget-tokens` and `--tokenizer`. Reports retrieval precision/recall, recall at five, reciprocal rank, expected line coverage, forbidden matches, tokens and timings. `--min-recall` causes exit 1 below the threshold. A baseline must describe the same dataset, splits and indexed source snapshots. See [evaluation](evaluation.md) for the dataset schema and interpretation.
+
+## mcp
+
+~~~bash
+context --root /path/to/project mcp
+~~~
+
+Starts the official Rust MCP SDK's stdio transport with a fixed project root. Stdout contains only protocol messages. Tools expose search, explanations, pack creation/updates, pack listing and pack reading. Saved prompts are also resources. See [integration](integrations.md) for configuration and tool parameters.
 
 ## list / ls
 

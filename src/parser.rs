@@ -72,6 +72,7 @@ fn grammar(path: &str) -> Option<Language> {
 
 pub fn parse(path: &str, content: &str, parser: &mut Parser) -> Result<Parsed> {
     let mut result = Parsed::default();
+    result.imports.extend(framework_imports(path, content));
     // Text references also cover prose, templates and framework string references.
     for word in content.split(|c: char| !c.is_alphanumeric() && c != '_') {
         if word.len() >= 3
@@ -111,6 +112,71 @@ pub fn parse(path: &str, content: &str, parser: &mut Parser) -> Result<Parsed> {
             }
         }
     }
+}
+
+fn framework_imports(path: &str, content: &str) -> Vec<RawImport> {
+    use std::sync::OnceLock;
+    static PATTERNS: OnceLock<Vec<(regex::Regex, &'static str)>> = OnceLock::new();
+    if !path.ends_with(".php")
+        && !path.ends_with(".html")
+        && !path.ends_with(".yaml")
+        && !path.ends_with(".yml")
+    {
+        return vec![];
+    }
+    let patterns = PATTERNS.get_or_init(|| {
+        [
+            (
+                r#"(?:\bview|View::make|->view)\s*\(\s*['"]([^'"]+)['"]"#,
+                "view",
+            ),
+            (
+                r#"@(?:include|extends|component|each)\s*\(\s*['"]([^'"]+)['"]"#,
+                "view",
+            ),
+            (r#"\{\{\s*(?:partial|include):([a-zA-Z0-9_./-]+)"#, "view"),
+            (r#"\{\{\s*partial\s+src=['"]([^'"]+)['"]"#, "view"),
+            (r#"([A-Za-z_\\][A-Za-z0-9_\\]*)::class"#, "class"),
+            (r#"['"]([A-Za-z_\\][A-Za-z0-9_\\]*Controller)@"#, "class"),
+            (
+                r#"(?m)^\s*(?:template|layout):\s*['"]?([a-zA-Z0-9_./-]+)"#,
+                "view",
+            ),
+            (
+                r#"(?m)^\s*blueprint:\s*['"]?([a-zA-Z0-9_./-]+)"#,
+                "blueprint",
+            ),
+        ]
+        .into_iter()
+        .map(|(pattern, kind)| {
+            (
+                regex::Regex::new(pattern).expect("Valid static framework pattern"),
+                kind,
+            )
+        })
+        .collect()
+    });
+    let content = content
+        .lines()
+        .filter(|line| {
+            !["//", "#", "*", "<!--"]
+                .iter()
+                .any(|prefix| line.trim_start().starts_with(prefix))
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    let mut imports: Vec<_> = patterns
+        .iter()
+        .flat_map(|(pattern, kind)| {
+            pattern.captures_iter(&content).map(move |c| RawImport {
+                module: c[1].into(),
+                kind: (*kind).into(),
+            })
+        })
+        .collect();
+    imports.sort_by(|a, b| a.kind.cmp(&b.kind).then(a.module.cmp(&b.module)));
+    imports.dedup_by(|a, b| a.kind == b.kind && a.module == b.module);
+    imports
 }
 
 fn text<'a>(node: Node<'_>, content: &'a str) -> &'a str {
@@ -344,6 +410,7 @@ pub fn resolve_import(
                 }
             }
         }
+        "project_path" => bases.push(PathBuf::from(module)),
         "php" => {
             for (alias, target) in aliases {
                 if let Some(rest) = module.strip_prefix(alias) {

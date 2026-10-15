@@ -32,7 +32,7 @@ Linux uses glibc 2.35 or newer. macOS builds set `MACOSX_DEPLOYMENT_TARGET=11.0`
 
 Each portable archive contains the executable, `LICENSE`, `COMMANDS.md`, `Cargo.lock`, `THIRD_PARTY_NOTICES.md`, dependency license files, the Rust standard library copyright inventory and SQLite's public-domain notice. Files have deterministic ordering and timestamps; the executable retains mode 0755. The macOS signature contains an Apple timestamp, so separate signed builds are not byte-identical.
 
-Some grammar crates omit the upstream license file from their published Cargo archive. Their notices are preserved in `licenses/`, with the exact upstream commit, crate version and file digest in `licenses/provenance.json`. Packaging fails if an update invalidates that provenance or a dependency has no notice. Install `rust-docs` before local packaging:
+Some dependency crates, including grammars, the MCP SDK and the tokenizer, omit the upstream license file from their published Cargo archive. Their notices are preserved in `licenses/`, with the exact upstream commit, crate version and file digest in `licenses/provenance.json`. Packaging fails if an update invalidates that provenance or a dependency has no notice. Install `rust-docs` before local packaging:
 
 ~~~bash
 rustup component add rust-docs
@@ -79,6 +79,6 @@ These workflows accept only the latest public release, so older releases cannot 
 
 ## Validation
 
-`make check` includes release script regressions as well as the Rust checks. CI builds portable and native Arch packages on both Linux architectures, packages macOS, runs tests on all three release targets, checks Rust 1.90, and retains Windows compatibility checks. Pull requests do not receive signing or publication credentials. Release builds add real Apple signing and notarization before upload.
+`make check` includes release script regressions as well as the Rust checks. CI builds portable and native Arch packages on both Linux architectures, packages macOS, runs tests and the pinned historical retrieval-quality gate on all three release targets, checks Rust 1.90, and retains Windows compatibility checks. Pull requests do not receive signing or publication credentials. Release builds add real Apple signing and notarization before upload.
 
 The release tests cover archive safety, architecture validation, permissions, checksum failures, formula generation, checksum-pinned Arch recipes, installed file integrity, version preparation, annotated tags and draft publication failures. Local Linux checks cannot validate Apple credentials, notarization acceptance or the organization's repository access policies; those are exercised by the release jobs.

@@ -1,0 +1,880 @@
+{
+  "version": "0.3.0",
+  "tokenizer": "approx",
+  "maxFiles": 15,
+  "budgetTokens": 32000,
+  "datasetHash": "a867c9bcbe672e9bba5dc4b1656974a68db9098c5ae124d4b33a23938edd0856",
+  "cases": [
+    {
+      "name": "Historical acronym completion change",
+      "split": "eval",
+      "sourceHash": "d0111a3ec0fa72a4cd51fd12b5cb940ee43ecacaa74080d52275e86ec8546eee",
+      "sourceRevision": "0033a5a951cbbdd1ad1bb325e8f1f80a1744311d",
+      "selectedFiles": [
+        "src/cli/utils/interactive-prompt.ts",
+        "src/core/discovery/CandidateDiscovery.ts",
+        "src/core/indexer/ImportGraphBuilder.ts",
+        "src/core/resolver/KeywordExtractor.ts",
+        "src/core/discovery/rules/laravel/index.ts",
+        "docs/commands.md",
+        "docs/getting-started.md",
+        "src/storage/Database.ts",
+        "tests/codebases/typescript-nestjs/src/users/dto/create-user.dto.ts",
+        "tests/codebases/laravel-app/database/migrations/2024_01_01_create_users_table.php",
+        "src/core/resolver/StacktraceParser.ts",
+        "README.md",
+        "src/core/discovery/ReferenceExtractor.ts",
+        "src/cli/commands/open.ts",
+        "tests/unit/discovery/Scorer.test.ts"
+      ],
+      "ranges": [
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 45,
+          "end": 82
+        },
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 84,
+          "end": 122
+        },
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 124,
+          "end": 163
+        },
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 165,
+          "end": 202
+        },
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 204,
+          "end": 220
+        },
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 222,
+          "end": 264
+        },
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 273,
+          "end": 293
+        },
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 362,
+          "end": 388
+        },
+        {
+          "path": "src/cli/utils/interactive-prompt.ts",
+          "start": 605,
+          "end": 641
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 114,
+          "end": 134
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 182,
+          "end": 206
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 234,
+          "end": 266
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 385,
+          "end": 423
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 460,
+          "end": 514
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 516,
+          "end": 557
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 641,
+          "end": 694
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 702,
+          "end": 704
+        },
+        {
+          "path": "src/core/discovery/CandidateDiscovery.ts",
+          "start": 706,
+          "end": 733
+        },
+        {
+          "path": "src/core/indexer/ImportGraphBuilder.ts",
+          "start": 1,
+          "end": 3
+        },
+        {
+          "path": "src/core/indexer/ImportGraphBuilder.ts",
+          "start": 81,
+          "end": 283
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 7,
+          "end": 13
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 15,
+          "end": 20
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 22,
+          "end": 27
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 33,
+          "end": 53
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 101,
+          "end": 107
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 128,
+          "end": 163
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 165,
+          "end": 187
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 189,
+          "end": 269
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 271,
+          "end": 308
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 310,
+          "end": 351
+        },
+        {
+          "path": "src/core/resolver/KeywordExtractor.ts",
+          "start": 353,
+          "end": 385
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 108,
+          "end": 125
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 128,
+          "end": 165
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 167,
+          "end": 208
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 210,
+          "end": 244
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 246,
+          "end": 306
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 387,
+          "end": 419
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 421,
+          "end": 456
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 458,
+          "end": 491
+        },
+        {
+          "path": "src/core/discovery/rules/laravel/index.ts",
+          "start": 493,
+          "end": 495
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 48,
+          "end": 62
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 73,
+          "end": 87
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 94,
+          "end": 120
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 128,
+          "end": 142
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 170,
+          "end": 184
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 188,
+          "end": 202
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 205,
+          "end": 219
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 243,
+          "end": 257
+        },
+        {
+          "path": "docs/commands.md",
+          "start": 261,
+          "end": 275
+        },
+        {
+          "path": "docs/getting-started.md",
+          "start": 39,
+          "end": 68
+        },
+        {
+          "path": "docs/getting-started.md",
+          "start": 70,
+          "end": 84
+        },
+        {
+          "path": "docs/getting-started.md",
+          "start": 128,
+          "end": 153
+        },
+        {
+          "path": "docs/getting-started.md",
+          "start": 167,
+          "end": 181
+        },
+        {
+          "path": "docs/getting-started.md",
+          "start": 234,
+          "end": 293
+        },
+        {
+          "path": "docs/getting-started.md",
+          "start": 301,
+          "end": 315
+        },
+        {
+          "path": "src/storage/Database.ts",
+          "start": 1,
+          "end": 17
+        },
+        {
+          "path": "src/storage/Database.ts",
+          "start": 24,
+          "end": 38
+        },
+        {
+          "path": "src/storage/Database.ts",
+          "start": 42,
+          "end": 304
+        },
+        {
+          "path": "tests/codebases/typescript-nestjs/src/users/dto/create-user.dto.ts",
+          "start": 1,
+          "end": 1
+        },
+        {
+          "path": "tests/codebases/typescript-nestjs/src/users/dto/create-user.dto.ts",
+          "start": 3,
+          "end": 12
+        },
+        {
+          "path": "tests/codebases/laravel-app/database/migrations/2024_01_01_create_users_table.php",
+          "start": 3,
+          "end": 5
+        },
+        {
+          "path": "tests/codebases/laravel-app/database/migrations/2024_01_01_create_users_table.php",
+          "start": 9,
+          "end": 20
+        },
+        {
+          "path": "src/core/resolver/StacktraceParser.ts",
+          "start": 1,
+          "end": 17
+        },
+        {
+          "path": "src/core/resolver/StacktraceParser.ts",
+          "start": 19,
+          "end": 103
+        },
+        {
+          "path": "src/core/resolver/StacktraceParser.ts",
+          "start": 123,
+          "end": 279
+        },
+        {
+          "path": "README.md",
+          "start": 1,
+          "end": 14
+        },
+        {
+          "path": "README.md",
+          "start": 23,
+          "end": 50
+        },
+        {
+          "path": "README.md",
+          "start": 62,
+          "end": 100
+        },
+        {
+          "path": "src/core/discovery/ReferenceExtractor.ts",
+          "start": 18,
+          "end": 288
+        },
+        {
+          "path": "src/cli/commands/open.ts",
+          "start": 1,
+          "end": 4
+        },
+        {
+          "path": "src/cli/commands/open.ts",
+          "start": 6,
+          "end": 9
+        },
+        {
+          "path": "src/cli/commands/open.ts",
+          "start": 33,
+          "end": 60
+        },
+        {
+          "path": "src/cli/commands/open.ts",
+          "start": 138,
+          "end": 149
+        },
+        {
+          "path": "tests/unit/discovery/Scorer.test.ts",
+          "start": 1,
+          "end": 28
+        },
+        {
+          "path": "tests/unit/discovery/Scorer.test.ts",
+          "start": 31,
+          "end": 45
+        },
+        {
+          "path": "tests/unit/discovery/Scorer.test.ts",
+          "start": 48,
+          "end": 62
+        },
+        {
+          "path": "tests/unit/discovery/Scorer.test.ts",
+          "start": 71,
+          "end": 85
+        },
+        {
+          "path": "tests/unit/discovery/Scorer.test.ts",
+          "start": 93,
+          "end": 107
+        },
+        {
+          "path": "tests/unit/discovery/Scorer.test.ts",
+          "start": 109,
+          "end": 153
+        },
+        {
+          "path": "tests/unit/discovery/Scorer.test.ts",
+          "start": 163,
+          "end": 177
+        },
+        {
+          "path": "tests/unit/discovery/Scorer.test.ts",
+          "start": 188,
+          "end": 211
+        }
+      ],
+      "metrics": {
+        "precision": 0.06666666666666667,
+        "recall": 1.0,
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "rangeCoverage": 0.9642857142857143,
+        "forbiddenMatches": 0,
+        "tokens": 25314,
+        "usefulLinesPer1000Tokens": 1.066603460535672,
+        "indexMs": 105.41710599999999,
+        "selectionMs": 51.151094
+      }
+    },
+    {
+      "name": "Historical native pack composition",
+      "split": "eval",
+      "sourceHash": "2d4a397a3c991c5af66987891d7348e30096b00323136ff977bc242c32b67c4f",
+      "sourceRevision": "d755358c04a8d8c6cb256d11b6aca2f9958f5d02",
+      "selectedFiles": [
+        "tests/test_packages.py",
+        "src/parser.rs",
+        "src/pack.rs",
+        "src/main.rs",
+        "src/model.rs",
+        "scripts/package.py",
+        "src/database.rs",
+        "src/resolver.rs",
+        "tests/regression.rs",
+        "tests/test_release.py",
+        "src/config.rs",
+        "src/discovery.rs",
+        "scripts/release_assets.py",
+        "src/indexer.rs",
+        "tests/codebases/circular-imports/package.json"
+      ],
+      "ranges": [
+        {
+          "path": "tests/test_packages.py",
+          "start": 1,
+          "end": 14
+        },
+        {
+          "path": "tests/test_packages.py",
+          "start": 17,
+          "end": 19
+        },
+        {
+          "path": "tests/test_packages.py",
+          "start": 22,
+          "end": 140
+        },
+        {
+          "path": "src/parser.rs",
+          "start": 73,
+          "end": 114
+        },
+        {
+          "path": "src/parser.rs",
+          "start": 120,
+          "end": 242
+        },
+        {
+          "path": "src/parser.rs",
+          "start": 311,
+          "end": 324
+        },
+        {
+          "path": "src/parser.rs",
+          "start": 326,
+          "end": 446
+        },
+        {
+          "path": "src/pack.rs",
+          "start": 42,
+          "end": 45
+        },
+        {
+          "path": "src/pack.rs",
+          "start": 81,
+          "end": 98
+        },
+        {
+          "path": "src/pack.rs",
+          "start": 105,
+          "end": 148
+        },
+        {
+          "path": "src/pack.rs",
+          "start": 206,
+          "end": 386
+        },
+        {
+          "path": "src/pack.rs",
+          "start": 390,
+          "end": 394
+        },
+        {
+          "path": "src/pack.rs",
+          "start": 397,
+          "end": 422
+        },
+        {
+          "path": "src/pack.rs",
+          "start": 424,
+          "end": 445
+        },
+        {
+          "path": "src/main.rs",
+          "start": 38,
+          "end": 74
+        },
+        {
+          "path": "src/main.rs",
+          "start": 76,
+          "end": 116
+        },
+        {
+          "path": "src/main.rs",
+          "start": 158,
+          "end": 314
+        },
+        {
+          "path": "src/main.rs",
+          "start": 316,
+          "end": 348
+        },
+        {
+          "path": "src/main.rs",
+          "start": 411,
+          "end": 442
+        },
+        {
+          "path": "src/model.rs",
+          "start": 1,
+          "end": 2
+        },
+        {
+          "path": "src/model.rs",
+          "start": 81,
+          "end": 85
+        },
+        {
+          "path": "src/model.rs",
+          "start": 87,
+          "end": 95
+        },
+        {
+          "path": "src/model.rs",
+          "start": 97,
+          "end": 121
+        },
+        {
+          "path": "src/model.rs",
+          "start": 130,
+          "end": 139
+        },
+        {
+          "path": "scripts/package.py",
+          "start": 1,
+          "end": 13
+        },
+        {
+          "path": "scripts/package.py",
+          "start": 23,
+          "end": 24
+        },
+        {
+          "path": "scripts/package.py",
+          "start": 38,
+          "end": 78
+        },
+        {
+          "path": "scripts/package.py",
+          "start": 81,
+          "end": 98
+        },
+        {
+          "path": "scripts/package.py",
+          "start": 101,
+          "end": 122
+        },
+        {
+          "path": "src/database.rs",
+          "start": 1,
+          "end": 11
+        },
+        {
+          "path": "src/database.rs",
+          "start": 30,
+          "end": 61
+        },
+        {
+          "path": "src/database.rs",
+          "start": 63,
+          "end": 82
+        },
+        {
+          "path": "src/database.rs",
+          "start": 84,
+          "end": 103
+        },
+        {
+          "path": "src/database.rs",
+          "start": 153,
+          "end": 165
+        },
+        {
+          "path": "src/database.rs",
+          "start": 187,
+          "end": 192
+        },
+        {
+          "path": "src/database.rs",
+          "start": 194,
+          "end": 346
+        },
+        {
+          "path": "src/database.rs",
+          "start": 348,
+          "end": 350
+        },
+        {
+          "path": "src/database.rs",
+          "start": 352,
+          "end": 369
+        },
+        {
+          "path": "src/database.rs",
+          "start": 372,
+          "end": 379
+        },
+        {
+          "path": "src/resolver.rs",
+          "start": 1,
+          "end": 11
+        },
+        {
+          "path": "src/resolver.rs",
+          "start": 18,
+          "end": 58
+        },
+        {
+          "path": "src/resolver.rs",
+          "start": 187,
+          "end": 191
+        },
+        {
+          "path": "src/resolver.rs",
+          "start": 193,
+          "end": 360
+        },
+        {
+          "path": "src/resolver.rs",
+          "start": 412,
+          "end": 433
+        },
+        {
+          "path": "src/resolver.rs",
+          "start": 435,
+          "end": 475
+        },
+        {
+          "path": "tests/regression.rs",
+          "start": 42,
+          "end": 55
+        },
+        {
+          "path": "tests/regression.rs",
+          "start": 188,
+          "end": 241
+        },
+        {
+          "path": "tests/regression.rs",
+          "start": 289,
+          "end": 313
+        },
+        {
+          "path": "tests/regression.rs",
+          "start": 416,
+          "end": 469
+        },
+        {
+          "path": "tests/regression.rs",
+          "start": 471,
+          "end": 480
+        },
+        {
+          "path": "tests/regression.rs",
+          "start": 482,
+          "end": 539
+        },
+        {
+          "path": "tests/regression.rs",
+          "start": 568,
+          "end": 619
+        },
+        {
+          "path": "tests/regression.rs",
+          "start": 662,
+          "end": 694
+        },
+        {
+          "path": "tests/test_release.py",
+          "start": 3,
+          "end": 13
+        },
+        {
+          "path": "tests/test_release.py",
+          "start": 17,
+          "end": 19
+        },
+        {
+          "path": "tests/test_release.py",
+          "start": 23,
+          "end": 58
+        },
+        {
+          "path": "tests/test_release.py",
+          "start": 74,
+          "end": 193
+        },
+        {
+          "path": "tests/test_release.py",
+          "start": 196,
+          "end": 300
+        },
+        {
+          "path": "src/config.rs",
+          "start": 1,
+          "end": 10
+        },
+        {
+          "path": "src/config.rs",
+          "start": 55,
+          "end": 62
+        },
+        {
+          "path": "src/config.rs",
+          "start": 64,
+          "end": 71
+        },
+        {
+          "path": "src/config.rs",
+          "start": 73,
+          "end": 84
+        },
+        {
+          "path": "src/config.rs",
+          "start": 102,
+          "end": 130
+        },
+        {
+          "path": "src/config.rs",
+          "start": 132,
+          "end": 168
+        },
+        {
+          "path": "src/discovery.rs",
+          "start": 21,
+          "end": 33
+        },
+        {
+          "path": "src/discovery.rs",
+          "start": 75,
+          "end": 320
+        },
+        {
+          "path": "src/discovery.rs",
+          "start": 502,
+          "end": 542
+        },
+        {
+          "path": "scripts/release_assets.py",
+          "start": 4,
+          "end": 24
+        },
+        {
+          "path": "scripts/release_assets.py",
+          "start": 35,
+          "end": 66
+        },
+        {
+          "path": "scripts/release_assets.py",
+          "start": 87,
+          "end": 87
+        },
+        {
+          "path": "scripts/release_assets.py",
+          "start": 101,
+          "end": 141
+        },
+        {
+          "path": "scripts/release_assets.py",
+          "start": 144,
+          "end": 167
+        },
+        {
+          "path": "src/indexer.rs",
+          "start": 34,
+          "end": 136
+        },
+        {
+          "path": "src/indexer.rs",
+          "start": 240,
+          "end": 283
+        },
+        {
+          "path": "src/indexer.rs",
+          "start": 285,
+          "end": 308
+        },
+        {
+          "path": "tests/codebases/circular-imports/package.json",
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "metrics": {
+        "precision": 0.06666666666666667,
+        "recall": 1.0,
+        "recallAt5": 1.0,
+        "reciprocalRank": 0.3333333333333333,
+        "rangeCoverage": 1.0,
+        "forbiddenMatches": 0,
+        "tokens": 31996,
+        "usefulLinesPer1000Tokens": 0.8751093886735842,
+        "indexMs": 64.627035,
+        "selectionMs": 53.914192
+      }
+    }
+  ],
+  "summary": {
+    "precision": 0.06666666666666667,
+    "recall": 1.0,
+    "recallAt5": 1.0,
+    "reciprocalRank": 0.6666666666666666,
+    "rangeCoverage": 0.9821428571428572,
+    "forbiddenMatches": 0,
+    "tokens": 57310,
+    "usefulLinesPer1000Tokens": 0.9708564246046281,
+    "indexMs": 85.0220705,
+    "selectionMs": 52.532643
+  }
+}
