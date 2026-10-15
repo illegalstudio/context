@@ -1,8 +1,10 @@
 node_modules/
 dist/
+target/
 .context/
 *.tgz
 .DS_Store
 coverage/
 
 .claude/
+__pycache__/

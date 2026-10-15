@@ -1,0 +1,323 @@
+[
+  {
+    "name": "auth",
+    "description": "Authentication and authorization",
+    "keywords": [
+      "auth",
+      "authentication",
+      "login",
+      "logout",
+      "session",
+      "token",
+      "jwt",
+      "oauth",
+      "password",
+      "permission",
+      "role",
+      "credential",
+      "sso",
+      "saml",
+      "2fa",
+      "mfa"
+    ]
+  },
+  {
+    "name": "payments",
+    "description": "Payment processing and billing",
+    "keywords": [
+      "payment",
+      "stripe",
+      "checkout",
+      "charge",
+      "invoice",
+      "subscription",
+      "billing",
+      "price",
+      "cart",
+      "order",
+      "webhook",
+      "refund",
+      "paypal",
+      "transaction",
+      "credit",
+      "wallet"
+    ]
+  },
+  {
+    "name": "api",
+    "description": "API endpoints and routing",
+    "keywords": [
+      "api",
+      "endpoint",
+      "route",
+      "rest",
+      "graphql",
+      "request",
+      "response",
+      "controller",
+      "middleware",
+      "cors",
+      "rate",
+      "limit",
+      "swagger",
+      "openapi"
+    ]
+  },
+  {
+    "name": "database",
+    "description": "Database operations and ORM",
+    "keywords": [
+      "database",
+      "db",
+      "query",
+      "migration",
+      "model",
+      "schema",
+      "table",
+      "column",
+      "index",
+      "sql",
+      "orm",
+      "relation",
+      "foreign",
+      "seed",
+      "factory"
+    ]
+  },
+  {
+    "name": "cache",
+    "description": "Caching and session storage",
+    "keywords": [
+      "cache",
+      "redis",
+      "memcache",
+      "session",
+      "store",
+      "ttl",
+      "invalidate",
+      "flush",
+      "memoize"
+    ]
+  },
+  {
+    "name": "queue",
+    "description": "Background jobs and queues",
+    "keywords": [
+      "queue",
+      "job",
+      "worker",
+      "dispatch",
+      "listener",
+      "event",
+      "async",
+      "background",
+      "schedule",
+      "cron"
+    ]
+  },
+  {
+    "name": "email",
+    "description": "Email and notifications",
+    "keywords": [
+      "email",
+      "mail",
+      "smtp",
+      "notification",
+      "template",
+      "send",
+      "inbox",
+      "mailer",
+      "newsletter"
+    ]
+  },
+  {
+    "name": "storage",
+    "description": "File storage and media",
+    "keywords": [
+      "storage",
+      "file",
+      "upload",
+      "download",
+      "s3",
+      "disk",
+      "filesystem",
+      "image",
+      "media",
+      "asset",
+      "attachment"
+    ]
+  },
+  {
+    "name": "testing",
+    "description": "Testing and quality assurance",
+    "keywords": [
+      "test",
+      "spec",
+      "mock",
+      "stub",
+      "fixture",
+      "assert",
+      "expect",
+      "unit",
+      "integration",
+      "e2e",
+      "coverage"
+    ]
+  },
+  {
+    "name": "security",
+    "description": "Security and vulnerability prevention",
+    "keywords": [
+      "security",
+      "xss",
+      "csrf",
+      "injection",
+      "sanitize",
+      "escape",
+      "validate",
+      "encrypt",
+      "decrypt",
+      "hash",
+      "vulnerability",
+      "firewall"
+    ]
+  },
+  {
+    "name": "performance",
+    "description": "Performance optimization",
+    "keywords": [
+      "performance",
+      "slow",
+      "fast",
+      "optimize",
+      "speed",
+      "latency",
+      "cache",
+      "index",
+      "query",
+      "n+1",
+      "profil"
+    ]
+  },
+  {
+    "name": "ui",
+    "description": "User interface and frontend",
+    "keywords": [
+      "ui",
+      "component",
+      "view",
+      "template",
+      "frontend",
+      "css",
+      "style",
+      "layout",
+      "form",
+      "button",
+      "modal"
+    ]
+  },
+  {
+    "name": "chat",
+    "description": "Messaging and chat functionality",
+    "keywords": [
+      "chat",
+      "message",
+      "messaging",
+      "conversation",
+      "inbox",
+      "dm",
+      "direct",
+      "unlock",
+      "thread",
+      "realtime",
+      "websocket",
+      "pusher"
+    ]
+  },
+  {
+    "name": "moderation",
+    "description": "Content moderation and user management",
+    "keywords": [
+      "report",
+      "ban",
+      "suspend",
+      "dispute",
+      "flag",
+      "moderate",
+      "block",
+      "abuse",
+      "spam",
+      "review"
+    ]
+  },
+  {
+    "name": "sms",
+    "description": "SMS and phone verification",
+    "keywords": [
+      "sms",
+      "text",
+      "mobile",
+      "phone",
+      "otp",
+      "verification",
+      "twilio",
+      "nexmo",
+      "vonage",
+      "pin"
+    ]
+  },
+  {
+    "name": "search",
+    "description": "Search functionality",
+    "keywords": [
+      "search",
+      "query",
+      "filter",
+      "sort",
+      "elasticsearch",
+      "algolia",
+      "meilisearch",
+      "fulltext"
+    ]
+  },
+  {
+    "name": "export",
+    "description": "Data export and reporting",
+    "keywords": [
+      "export",
+      "report",
+      "csv",
+      "excel",
+      "pdf",
+      "download",
+      "generate"
+    ]
+  },
+  {
+    "name": "localization",
+    "description": "Internationalization and translation",
+    "keywords": [
+      "i18n",
+      "l10n",
+      "translation",
+      "locale",
+      "language",
+      "translate",
+      "multilingual"
+    ]
+  },
+  {
+    "name": "logging",
+    "description": "Logging and monitoring",
+    "keywords": [
+      "log",
+      "logging",
+      "monitor",
+      "debug",
+      "trace",
+      "audit",
+      "sentry",
+      "bugsnag"
+    ]
+  }
+]

@@ -1,229 +1,41 @@
-# How Context Works
+# Implementation
 
-This document explains the internal architecture and algorithms used by Context.
+Context is a Rust library and CLI. The CLI has no Node runtime or npm dependencies.
 
-## Overview
+## Indexing
 
-Context uses a multi-stage pipeline to transform a task description into a focused context pack:
+`indexer.rs` traverses directories with the ignore crate, applies file/language limits and compares size and nanosecond modification time against the existing index. Eligible updates are read once and hashed with BLAKE3. Equal hashes update metadata without reparsing.
 
-```
-Task Input --> Resolve --> Discover --> Score --> Compose --> Output
-```
+Rayon workers reuse Tree-sitter parser instances within bounded batches. The batch size bounds retained source bytes to approximately 64 MiB before derived parser/search data, unless the configured individual file limit itself is larger. Metadata and index structures still grow with repository size.
 
-## Stage 1: Indexing
+`parser.rs` extracts real declarations and source ranges for TypeScript, JavaScript, PHP, Python, Go, Rust, Ruby and Java. Other UTF-8 files contribute searchable text and references. Parsing recovers useful declarations from incomplete code; it does not perform type checking or prove runtime dependency relationships.
 
-Before any pack can be created, the codebase must be indexed. This happens once and is incrementally updated.
+`database.rs` consumes parsed batches lazily inside a single SQLite transaction. Statements are reused. Deleted and newly excluded files lose their metadata, symbols, import requests, references and full-text entries. Import requests are stored separately from resolved edges, so newly created targets become connected even when the importing source did not change. Rust resolution handles grouped and public use declarations, crate/self/super prefixes and imports of symbols owned by a module file.
 
-### File Scanning
+SQLite FTS5 stores raw text and normalized search terms. Search combines task terms into a single indexed query. FTS row IDs follow file row IDs, so deleting or replacing one document avoids scanning full-text paths. Import requests have a source-path index. Rejected binary/invalid UTF-8 files retain only metadata, avoiding repeated reads until they change. The index schema is versioned and disposable.
 
-The indexer scans all files respecting `.ctxignore` patterns. For each file it records:
+## Task analysis
 
-- Path (relative to project root)
-- Language (detected from extension)
-- Size in bytes
-- Modification time
-- Content hash (for change detection)
+`resolver.rs` splits identifiers, filters stopwords and uses Snowball stemming. Embedded English and Italian synonym groups and Italian stem translations preserve the original vocabulary. Task analysis adds explicit paths, symbols, stacktrace locations, Git changes, domains and a change type.
 
-### Symbol Extraction
+Confidence scores are heuristic signal summaries, not calibrated probabilities. Timestamp filtering understands UTC log timestamps; logs without timestamps cannot be reliably filtered by age.
 
-For supported languages, symbols are extracted:
+## Discovery and ranking
 
-| Symbol Type | Examples |
-|-------------|----------|
-| Class | `class UserController`, `class PaymentService` |
-| Function | `function handleWebhook()`, `def process_payment()` |
-| Method | `public function store()`, `async createUser()` |
-| Interface | `interface PaymentGateway` |
-| Constant | `const API_VERSION`, `define('MAX_RETRIES')` |
+`discovery.rs` loads index metadata once per discovery pass and builds symbol, entity and adjacency maps. It combines exact hints, path terms, full-text content, import traversal, indexed references, related tests/configuration and Node.js/Laravel/Statamic relationships.
 
-Each symbol includes its name, kind, and line range (start/end).
+Explicit hints reserve slots within the file limit. Import expansion has bounded depth, seed count and visited-node count. Domain boosts reflect task domain weights. Git activity is a small secondary signal. Relevant tests and configuration get small quotas; unused slots remain available to other files. Equal scores are ordered by path.
 
-### Import Graph
+Ranking remains heuristic. Framework links and syntactic imports are useful context signals, not a complete semantic call graph.
 
-The indexer builds a directed graph of import relationships:
+## Git
 
-```
-UserController.php --> User.php
-UserController.php --> UserService.php
-UserService.php --> User.php
-UserService.php --> MailService.php
-```
+`git.rs` invokes Git directly without a shell. Revision arguments are validated before diff operations. Diff collection uses explicit prefixes and disables external diff tools, so user Git display configuration does not change parsing. History is collected in one batched log operation and cached by HEAD and the indexed path set. It covers the latest 500 commits.
 
-This graph is used to find related files during discovery.
+## Packs
 
-### Git Signals
+`pack.rs` prioritizes excerpt windows around error lines, modified lines and explicit symbols. Excerpts respect line and approximate token limits. Markdown fences adapt to source content and excerpt filenames include a path hash.
 
-For git repositories, additional signals are collected:
+All reports and a tar.gz archive are written to an owned staging directory. A successful rename makes the completed pack visible; failures remove the staging directory. Archive entry order, permissions and timestamps are normalized. The manifest and pack slug contain invocation timestamps.
 
-- **Last modified** - When the file was last changed
-- **Commit count** - How many commits touched this file
-- **Churn score** - Frequency of changes (high churn = hot spot)
-
-## Stage 2: Task Resolution
-
-The resolver analyzes the task input to understand intent.
-
-### Keyword Extraction
-
-Keywords are extracted using multiple techniques:
-
-1. **Tokenization** - Split on whitespace and punctuation
-2. **Stemming** - Reduce words to roots (e.g., "payments" -> "payment")
-3. **Stop word removal** - Filter common words (the, a, is, etc.)
-4. **N-gram extraction** - Capture multi-word phrases
-
-### Entity Detection
-
-The resolver looks for specific entities:
-
-- **File names** - `User.php`, `payment-service.ts`
-- **Class names** - `UserController`, `PaymentService`
-- **Method names** - `handleWebhook`, `processPayment`
-- **Route patterns** - `/api/users`, `/checkout`
-- **Error codes** - `E_USER_DEPRECATED`, `ECONNREFUSED`
-
-### Domain Detection
-
-Task keywords are matched against domain definitions to identify conceptual areas:
-
-```
-Task: "Fix the Stripe webhook payment confirmation"
-Matched domains: payments (stripe, webhook, payment)
-```
-
-### Change Type Classification
-
-The task is classified into a change type:
-
-| Type | Indicators |
-|------|------------|
-| bugfix | fix, bug, error, issue, broken, fails |
-| feature | add, implement, create, new, support |
-| refactor | refactor, clean, improve, optimize |
-| perf | performance, slow, fast, optimize, cache |
-| security | security, vulnerability, auth, permission |
-
-### Confidence Scoring
-
-A confidence score (0-1) is calculated based on:
-
-- Presence of exact file names
-- Presence of class/method names
-- Keyword match count
-- Domain match strength
-
-Low confidence tasks trigger suggestions for more specific input.
-
-## Stage 3: Discovery
-
-The discovery stage finds candidate files using multiple signals.
-
-### Signal Types
-
-| Signal | Weight | Description |
-|--------|--------|-------------|
-| `stacktraceHit` | High | File appears in error stacktrace |
-| `diffHit` | High | File was modified in the diff |
-| `fileHintExact` | High | File name exactly matches task mention |
-| `exactSymbolMention` | High | File contains symbol mentioned in task |
-| `symbolMatch` | Medium | File contains related symbols |
-| `keywordMatch` | Medium | File path/content matches keywords |
-| `graphRelated` | Medium | File is imported by/imports a candidate |
-| `gitHotspot` | Low | File has high git activity |
-| `relatedFile` | Low | Found by framework-specific rules |
-
-### Framework Rules
-
-Context includes framework-specific discovery rules:
-
-**Laravel:**
-- Controller -> Request, Resource, Model
-- Model -> Migration, Factory, Seeder
-- Route -> Controller, Middleware
-
-**Node.js/NestJS:**
-- Controller -> Service, DTO, Module
-- Service -> Repository, Entity
-
-**React:**
-- Component -> Hook, Context, Style
-
-### Graph Traversal
-
-Starting from high-confidence candidates, the import graph is traversed to find related files:
-
-1. Direct imports (depth 1) - High relevance
-2. Transitive imports (depth 2) - Medium relevance
-3. Further imports - Low relevance with decay
-
-## Stage 4: Scoring
-
-Candidates are scored and ranked.
-
-### Score Calculation
-
-Each signal contributes to the final score:
-
-```
-score = sum(signal_weight * signal_value) / max_possible_score
-```
-
-Weights are tuned to prioritize:
-1. Explicit mentions (file names, symbols in task)
-2. Error-driven signals (stacktrace, recent changes)
-3. Semantic matches (keywords, domains)
-4. Structural relationships (imports, framework patterns)
-
-### Filtering and Limits
-
-- Files are sorted by score descending
-- A configurable limit is applied (default: 25 files)
-- Test files are included but may be deprioritized
-- Config files are included when relevant
-
-## Stage 5: Composition
-
-The final stage generates the context pack.
-
-### Excerpt Extraction
-
-For each selected file, relevant excerpts are extracted:
-
-1. If specific symbols are mentioned, extract those symbol ranges
-2. If diff lines are known, extract changed regions
-3. Otherwise, extract the most relevant portions based on keywords
-4. Respect line limits (default: 300 lines per file)
-
-### Output Files
-
-| File | Content |
-|------|---------|
-| `PACK.md` | Combined prompt with task, files, and excerpts |
-| `TASK.md` | Detailed task analysis, keywords, domains |
-| `FILES.md` | File list with scores and relevance reasons |
-| `GRAPH.md` | ASCII dependency graph |
-| `excerpts/` | Individual file excerpts |
-| `ctx.json` | Machine-readable manifest |
-| `ctx.tgz` | Compressed archive of all outputs |
-
-### PACK.md Structure
-
-The main output file follows this structure:
-
-```markdown
-# Context Pack
-
-## Task
-[Original task description]
-
-## Analysis
-[Keywords, domains, change type, confidence]
-
-## Files
-[List of files with relevance reasons]
-
-## Code
-[Concatenated excerpts with file headers]
-```
-
-This format is optimized for AI coding assistants to quickly understand the context.
+`main.rs` provides Clap commands, JSON output, task completion through rustyline, and platform-native opening. Public Rust modules expose the same processing stages for integrations.

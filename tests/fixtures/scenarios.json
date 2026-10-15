@@ -1,0 +1,245 @@
+[
+  {
+    "codebase": "laravel-app",
+    "scenarios": [
+      {
+        "name": "Controller bug",
+        "task": "Bug in UserController when creating users",
+        "expectedFiles": [
+          "app/Http/Controllers/UserController.php"
+        ],
+        "expectedInTop5": [
+          "app/Http/Controllers/UserController.php",
+          "app/Models/User.php"
+        ]
+      },
+      {
+        "name": "Explicit file mention",
+        "task": "Fix issue in @app/Services/StripeService.php",
+        "expectedFiles": [
+          "app/Services/StripeService.php"
+        ],
+        "expectedInTop5": [
+          "app/Services/StripeService.php"
+        ]
+      },
+      {
+        "name": "Payment domain",
+        "task": "Payment webhook error with Stripe checkout",
+        "expectedFiles": [
+          "app/Http/Controllers/PaymentController.php"
+        ],
+        "expectedInTop5": [
+          "app/Services/StripeService.php"
+        ]
+      },
+      {
+        "name": "Model issue",
+        "task": "User model validation failing",
+        "expectedFiles": [
+          "app/Models/User.php"
+        ]
+      },
+      {
+        "name": "API authentication",
+        "task": "API authentication endpoint returns 401",
+        "expectedFiles": [
+          "app/Http/Controllers/Api/AuthController.php"
+        ]
+      }
+    ]
+  },
+  {
+    "codebase": "nodejs-express",
+    "scenarios": [
+      {
+        "name": "Service method bug",
+        "task": "Bug in PaymentService.createPayment method",
+        "expectedFiles": [
+          "src/services/PaymentService.ts"
+        ],
+        "expectedInTop5": [
+          "src/services/PaymentService.ts"
+        ]
+      },
+      {
+        "name": "Route handler issue",
+        "task": "Issue with /api/users endpoint returning wrong data",
+        "expectedFiles": [
+          "src/routes/users.ts"
+        ]
+      },
+      {
+        "name": "Controller error",
+        "task": "UserController throws TypeError on null input",
+        "expectedFiles": [
+          "src/controllers/UserController.ts"
+        ],
+        "expectedInTop5": [
+          "src/controllers/UserController.ts",
+          "src/models/User.ts"
+        ]
+      },
+      {
+        "name": "Entry point",
+        "task": "Server startup fails with port already in use",
+        "expectedFiles": [
+          "src/index.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "codebase": "react-frontend",
+    "scenarios": [
+      {
+        "name": "Component bug",
+        "task": "UserList component not rendering correctly",
+        "expectedFiles": [
+          "src/components/UserList.tsx"
+        ]
+      },
+      {
+        "name": "Hook issue",
+        "task": "useAuth hook returns stale token",
+        "expectedFiles": [
+          "src/hooks/useAuth.ts"
+        ]
+      },
+      {
+        "name": "Form validation",
+        "task": "UserForm validation not working on submit",
+        "expectedFiles": [
+          "src/components/UserForm.tsx"
+        ]
+      },
+      {
+        "name": "API service",
+        "task": "API calls failing with CORS error",
+        "expectedFiles": [
+          "src/services/api.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "codebase": "python-flask",
+    "scenarios": [
+      {
+        "name": "Route handler",
+        "task": "User creation endpoint returns 500 error",
+        "expectedFiles": [
+          "app/routes/users.py"
+        ]
+      },
+      {
+        "name": "Model validation",
+        "task": "User model __init__ raises ValueError",
+        "expectedFiles": [
+          "app/models/user.py"
+        ]
+      },
+      {
+        "name": "Service layer",
+        "task": "payment_service process_payment failing",
+        "expectedFiles": [
+          "app/services/payment_service.py"
+        ]
+      }
+    ]
+  },
+  {
+    "codebase": "typescript-nestjs",
+    "scenarios": [
+      {
+        "name": "Controller endpoint",
+        "task": "UsersController findOne returns null",
+        "expectedFiles": [
+          "src/users/users.controller.ts"
+        ]
+      },
+      {
+        "name": "Service injection",
+        "task": "UsersService dependency injection error",
+        "expectedFiles": [
+          "src/users/users.service.ts"
+        ],
+        "expectedInTop5": [
+          "src/users/users.module.ts"
+        ]
+      },
+      {
+        "name": "DTO validation",
+        "task": "CreateUserDto validation not working",
+        "expectedFiles": [
+          "src/users/dto/create-user.dto.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "codebase": "mixed-fullstack",
+    "scenarios": [
+      {
+        "name": "Backend server",
+        "task": "Backend server.ts not starting",
+        "expectedFiles": [
+          "backend/src/server.ts"
+        ]
+      },
+      {
+        "name": "Frontend app",
+        "task": "Frontend App component crash on mount",
+        "expectedFiles": [
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "name": "Shared types",
+        "task": "Shared types causing TypeScript errors",
+        "expectedFiles": [
+          "shared/types.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "codebase": "minimal-project",
+    "scenarios": [
+      {
+        "name": "Single file",
+        "task": "Main function not working",
+        "expectedFiles": [
+          "index.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "codebase": "circular-imports",
+    "scenarios": [
+      {
+        "name": "Circular dependency",
+        "task": "Module A import error",
+        "expectedFiles": [
+          "src/a.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "codebase": "with-ctxignore",
+    "scenarios": [
+      {
+        "name": "Respect ignore patterns",
+        "task": "Fix app.ts main function",
+        "expectedFiles": [
+          "src/app.ts"
+        ],
+        "forbiddenFiles": [
+          "vendor/dep.ts"
+        ]
+      }
+    ]
+  }
+]

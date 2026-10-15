@@ -1,316 +1,58 @@
 # Getting Started
 
-This guide walks you through installing and using Context for the first time.
+Install a native package with Homebrew, the Illegal Studio pacman repository, mise or a GitHub release archive. See the [installation instructions](../README.md#installation) for all platforms.
 
-## Installation
+For a source installation, use Rust 1.90 or newer and a C/C++ compiler:
 
-### Global Installation (Recommended)
+~~~bash
+git clone https://github.com/illegalstudio/context.git
+cd context
+cargo install --path . --locked
+~~~
 
-Install Context globally to use it in any project:
+The installed executable is independent of Node.js and the Rust toolchain.
 
-```bash
-npm install -g @illegalstudio/context
-```
+## First pack
 
-Verify the installation:
-
-```bash
-context --version
-```
-
-### Using npx
-
-Alternatively, run Context without installing:
-
-```bash
-npx @illegalstudio/context --help
-```
-
-## First Steps
-
-### 1. Navigate to Your Project
-
-```bash
-cd /path/to/your/project
-```
-
-Context works best with projects that have:
-- A clear directory structure
-- Source code in common languages (TypeScript, JavaScript, PHP, Python, etc.)
-- A git repository (optional, but enables additional features)
-
-### 2. Index the Codebase
-
-Before creating context packs, you need to index your codebase:
-
-```bash
+~~~bash
+cd /path/to/project
+context init
+# Review .ctxignore and .context/config.json.
 context index
-```
+context pack --task "Fix the payment webhook handler"
+~~~
 
-This creates a `.context/` directory containing the index database. The indexing process:
+Both indexing and packing initialize settings when necessary. Packing automatically refreshes the index. Unchanged files are skipped using size and modification time; use `--verify` to detect edits that preserve both values.
 
-- Scans all source files
-- Extracts symbols (classes, functions, methods)
-- Builds the import graph
-- Collects git signals (if available)
+## Interactive mode
 
-For large codebases, this may take a few seconds. Subsequent runs are incremental and faster.
+Run `context pack` in a terminal. Type your task and use `@` followed by a filename, path, symbol or acronym. Press Tab for completion, Enter to submit, or Ctrl+C to cancel. Multiple references in the task are preserved.
 
-### 3. Create Your First Pack
+~~~text
+Fix validation in @UserController and @createUser
+Refactor @app/Services/StripeService.php
+~~~
 
-Run the pack command with a task description:
+Noninteractive runs require `--task`, `--file`, `--symbol`, `--error` or `--diff`.
 
-```bash
-context pack --task "Fix the user authentication login flow"
-```
+## Other inputs
 
-Or enter interactive mode for autocomplete:
-
-```bash
-context pack
-```
-
-### 4. Review the Output
-
-Context creates a timestamped pack in `.context/packs/`:
-
-```
-.context/packs/20260202-143022-fix-user-authentication-login-flow/
-  PACK.md       # Ready-to-use prompt
-  TASK.md       # Task analysis
-  FILES.md      # Selected files with reasons
-  GRAPH.md      # Dependency graph
-  excerpts/     # Code excerpts
-  ctx.json      # Machine-readable manifest
-  ctx.tgz       # Portable archive
-```
-
-Open the main output:
-
-```bash
-context open --file PACK.md
-```
-
-List all your packs:
-
-```bash
-context list
-```
-
-### 5. Use with AI Assistants
-
-Copy the contents of `PACK.md` and paste it into your AI coding assistant (Claude, Cursor, ChatGPT, etc.) along with your question or request.
-
-The context pack provides the AI with:
-- Understanding of your task
-- Relevant code excerpts
-- File structure and dependencies
-- Framework-specific context
-
-## Example Workflows
-
-### Bug Fix Workflow
-
-You have a bug in your payment processing:
-
-```bash
-# Option 1: Describe the bug
-context pack --task "Stripe webhook returns 500 on duplicate events"
-
-# Option 2: Use the error log
+~~~bash
 context pack --error storage/logs/laravel.log --since 1h
-
-# Option 3: Combine both
-context pack --task "Fix webhook idempotency" --error logs/error.log
-```
-
-### Feature Development Workflow
-
-Adding a new feature:
-
-```bash
-# Describe what you want to build
-context pack --task "Add password reset functionality to user auth"
-
-# Focus on specific domains
-context pack --task "Add password reset" --focus auth,email
-```
-
-### Code Review Workflow
-
-Reviewing changes from a branch:
-
-```bash
-# Create context from diff
 context pack --diff origin/main
+context pack --file src/payments.ts --symbol processPayment
+context pack --task "Correggi il pagamento" --focus payments
+~~~
 
-# Or compare to a specific commit
-context pack --diff abc123
-```
+Errors from Node.js, Python and PHP stacktraces contribute file and line hints. Timestamped log filtering accepts UTC timestamps in `YYYY-MM-DD HH:MM:SS` form. Untimestamped lines remain attached to their preceding log entry.
 
-### Refactoring Workflow
+## Inspect and automate
 
-Refactoring existing code:
+~~~bash
+context list
+context open --file PACK.md
+context pack --task "Fix checkout" --json
+context --root /path/to/project index --json
+~~~
 
-```bash
-# Focus on a specific file
-context pack --file src/services/PaymentService.ts --task "Refactor to use dependency injection"
-
-# Or a specific symbol
-context pack --symbol handlePayment --task "Extract validation logic"
-```
-
-## Interactive Mode (REPL)
-
-When you run `context pack` without arguments in a terminal, you enter interactive mode with a REPL (Read-Eval-Print Loop) interface:
-
-```bash
-context pack
-```
-
-```
-Enter task (use @ for autocomplete): _
-```
-
-This mode provides real-time autocomplete suggestions as you type, making it easy to reference specific files and symbols from your codebase.
-
-### Using @ References
-
-The `@` character triggers autocomplete for files and symbols in your indexed codebase. This is the most powerful feature of interactive mode.
-
-**Referencing files:**
-
-```
-Fix the bug in @app/Http/Controllers/UserController.php
-```
-
-As you type after `@`, suggestions appear:
-
-```
-Enter task: Fix bug in @User
-                        app/Http/Controllers/UserController.php
-                        app/Models/User.php
-                        src/services/UserService.ts
-```
-
-**Referencing symbols (classes, methods, functions):**
-
-```
-Refactor the @handlePayment method to use async/await
-```
-
-```
-Enter task: Refactor @handle
-                      handlePayment (PaymentService.ts)
-                      handleWebhook (WebhookController.php)
-                      handleError (ErrorHandler.ts)
-```
-
-**Multiple references in one task:**
-
-```
-The @UserController should use @UserService instead of direct DB calls
-```
-
-### Keyboard Controls
-
-| Key | Action |
-|-----|--------|
-| `Tab` | Accept the highlighted suggestion |
-| `Up/Down` | Navigate through suggestions |
-| `Enter` | Submit the task |
-| `Ctrl+C` | Cancel and exit |
-| `Backspace` | Delete character (clears suggestions if @ is deleted) |
-
-### How References Work
-
-When you include `@` references in your task:
-
-1. The referenced files/symbols are automatically prioritized in discovery
-2. They appear at the top of the relevance ranking
-3. Related files (imports, dependencies) are also included
-4. The excerpt extraction focuses on the referenced symbols
-
-**Example session:**
-
-```
-$ context pack
-
-Enter task (use @ for autocomplete): Fix validation in @UserController createUser method
-
-Analyzing task...
-  Keywords: fix, validation, createUser
-  Domains: users
-  Type: bugfix
-
-Discovering relevant files...
-  Found 12 candidate files
-
-Top files:
-  98% app/Http/Controllers/UserController.php
-  85% app/Models/User.php
-  72% app/Http/Requests/CreateUserRequest.php
-  ...
-
-Context pack created at: .context/packs/20260202-143022-fix-validation-in-usercontroller-createuser/
-```
-
-### Tips for Interactive Mode
-
-1. **Start with @** - If you know the file or symbol, start typing `@` immediately
-2. **Partial matches work** - `@UserCont` will match `UserController`
-3. **Path prefixes** - Use `@src/` or `@app/` to filter by directory
-4. **Case insensitive** - `@user` matches `User`, `UserService`, `userHelper`
-5. **Combine references** - Use multiple `@` in one task for complex scenarios
-
-## Tips
-
-### Effective Task Descriptions
-
-Good task descriptions include:
-
-- Specific file or component names when known
-- The type of change (fix, add, refactor)
-- Domain context (payments, auth, api)
-- Error messages or symptoms (if applicable)
-
-**Good examples:**
-- "Fix the Stripe webhook handler to handle duplicate events"
-- "Add email verification to the user registration flow"
-- "Refactor UserService to use repository pattern"
-
-**Vague examples (less effective):**
-- "Fix the bug"
-- "Make it faster"
-- "Clean up the code"
-
-### Excluding Files
-
-Create a `.ctxignore` file to exclude irrelevant files:
-
-```
-# Exclude build artifacts
-dist/
-build/
-
-# Exclude dependencies
-node_modules/
-vendor/
-
-# Exclude generated files
-*.generated.ts
-```
-
-### Custom Domains
-
-Add project-specific domains to improve discovery:
-
-```bash
-context domains add billing --keywords "invoice,subscription,charge,plan"
-```
-
-## Next Steps
-
-- Read the [Commands Reference](commands.md) for all available options
-- Learn about [Configuration](configuration.md) options
-- Understand [How It Works](how-it-works.md) for advanced usage
+Each pack has a unique directory, structured reports, excerpts, a JSON manifest and a compressed archive. `PACK.md` contains the task and selected code, ready to pass to a coding assistant.

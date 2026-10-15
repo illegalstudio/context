@@ -1,0 +1,23 @@
+# Generated for a release with pinned upstream package bytes.
+pkgname=context
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc='Deterministic, explainable context packs for coding tasks'
+arch=('@ARCH@')
+url='https://github.com/illegalstudio/context'
+license=('MIT')
+depends=('glibc>=2.35' 'gcc-libs')
+optdepends=('git: diff analysis and history signals')
+options=('!strip' '!debug')
+source=('https://github.com/illegalstudio/context/releases/download/v@VERSION@/@SOURCE@')
+sha256sums=('@SHA256@')
+
+package() {
+  local upstream="$srcdir/@DIRECTORY@"
+  install -Dm755 "$upstream/context" "$pkgdir/usr/bin/context"
+  install -Dm644 "$upstream/LICENSE" "$pkgdir/usr/share/licenses/context/LICENSE"
+  install -dm755 "$pkgdir/usr/share/doc/context"
+  install -m644 "$upstream/COMMANDS.md" "$upstream/Cargo.lock" \
+    "$upstream/THIRD_PARTY_NOTICES.md" "$pkgdir/usr/share/doc/context/"
+  cp -r "$upstream/licenses" "$pkgdir/usr/share/doc/context/licenses"
+}

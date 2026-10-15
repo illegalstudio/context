@@ -1,0 +1,137 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing annotated release tag, for example v1.0.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: context-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.metadata.outputs.tag }}
+      version: ${{ steps.metadata.outputs.version }}
+      commit: ${{ steps.metadata.outputs.commit }}
+    steps:
+      - name: Validate requested tag syntax
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - name: Validate release and publication credentials
+        id: metadata
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          ILLEGAL_BOT_APP_ID: ${{ secrets.ILLEGAL_BOT_APP_ID }}
+          ILLEGAL_BOT_PRIVATE_KEY: ${{ secrets.ILLEGAL_BOT_PRIVATE_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os
+          names = ('APPLE_CERTIFICATE_P12', 'APPLE_CERTIFICATE_PASSWORD', 'APPLE_SIGNING_IDENTITY',
+                   'APPLE_ID', 'APPLE_TEAM_ID', 'APPLE_APP_PASSWORD',
+                   'ILLEGAL_BOT_APP_ID', 'ILLEGAL_BOT_PRIVATE_KEY')
+          missing = [name for name in names if not os.environ.get(name)]
+          if missing:
+              raise SystemExit('Missing release secrets: ' + ', '.join(missing))
+          PY
+          python3 scripts/release.py --check-tag "$RELEASE_TAG"
+          git merge-base --is-ancestor HEAD origin/main
+          {
+            echo "tag=$RELEASE_TAG"
+            echo "version=${RELEASE_TAG#v}"
+            echo "commit=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: prepare
+    uses: ./.github/workflows/build.yml
+    with:
+      release-tag: ${{ needs.prepare.outputs.tag }}
+      source-commit: ${{ needs.prepare.outputs.commit }}
+    secrets: inherit
+
+  pacman-build:
+    needs: [prepare, build]
+    uses: ./.github/workflows/pacman-build.yml
+    with:
+      source-commit: ${{ needs.prepare.outputs.commit }}
+
+  publish:
+    needs: [prepare, build, pacman-build]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ needs.prepare.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: context-*
+          path: dist
+          merge-multiple: true
+      - name: Install Arch package inspection tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends --yes libarchive-tools
+      - name: Validate final packages and collect checksums
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: python3 scripts/release_assets.py --version "$RELEASE_VERSION" --directory dist --pacman
+      - name: Publish release after all checks pass
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+          RELEASE_COMMIT: ${{ needs.prepare.outputs.commit }}
+          GH_REPO: illegalstudio/context
+        run: |
+          python3 scripts/publish_release.py --tag "$RELEASE_TAG" --commit "$RELEASE_COMMIT" --directory dist --pacman
+
+  homebrew:
+    needs: [prepare, publish]
+    uses: ./.github/workflows/homebrew.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+    secrets: inherit
+
+  pacman:
+    needs: [prepare, publish]
+    uses: ./.github/workflows/pacman.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+    secrets:
+      ILLEGAL_BOT_APP_ID: ${{ secrets.ILLEGAL_BOT_APP_ID }}
+      ILLEGAL_BOT_PRIVATE_KEY: ${{ secrets.ILLEGAL_BOT_PRIVATE_KEY }}

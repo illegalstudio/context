@@ -1,0 +1,97 @@
+name: Build native pacman packages
+
+on:
+  workflow_call:
+    inputs:
+      source-commit:
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            image: archlinux:base-devel
+            arch: x86_64
+            target: x86_64-unknown-linux-gnu
+          - runner: ubuntu-24.04-arm
+            image: menci/archlinuxarm:base-devel
+            arch: aarch64
+            target: aarch64-unknown-linux-gnu
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.image }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      PACKAGER: 'illegal-studio[bot] <327907755+illegal-studio[bot]@users.noreply.github.com>'
+    steps:
+      - name: Install package tools before checkout
+        env:
+          PACKAGE_ARCH: ${{ matrix.arch }}
+        run: |
+          download_options=()
+          if [[ "$PACKAGE_ARCH" == aarch64 ]]; then
+            # The hosted ARM container cannot apply pacman's Landlock rules.
+            if pacman --sync --help | grep -Fq -- '--disable-sandbox-filesystem'; then
+              download_options+=(--disable-sandbox-filesystem)
+            else
+              # Older pacman versions expose only the combined sandbox switch.
+              download_options+=(--disable-sandbox)
+            fi
+          fi
+          pacman -Syu --noconfirm --needed "${download_options[@]}" git sudo python libarchive zstd glibc gcc-libs
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source-commit || github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: context-${{ matrix.target }}
+          path: dist
+      - name: Generate checksum-pinned recipe
+        env:
+          PACKAGE_ARCH: ${{ matrix.arch }}
+        run: |
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("Cargo.toml", "rb"))["package"]["version"])')
+          echo "PACKAGE_VERSION=$version" >> "$GITHUB_ENV"
+          source_date_epoch=$(git -c safe.directory="$GITHUB_WORKSPACE" show -s --format=%ct HEAD)
+          [[ "$source_date_epoch" =~ ^[0-9]+$ ]]
+          echo "SOURCE_DATE_EPOCH=$source_date_epoch" >> "$GITHUB_ENV"
+          python3 scripts/pacman_package.py prepare --version "$version" --arch "$PACKAGE_ARCH" \
+            --directory dist --destination dist/arch-build
+      - name: Build without changing the upstream executable
+        working-directory: dist/arch-build
+        run: |
+          useradd -m builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+          # Arch Linux ARM defaults to a different compression format.
+          # Pin the output format and paths after sudo sanitizes the environment.
+          sudo --preserve-env=SOURCE_DATE_EPOCH,PACKAGER -u builder env \
+            PKGEXT=.pkg.tar.zst PKGDEST="$GITHUB_WORKSPACE/dist" \
+            SRCDEST="$PWD" BUILDDIR="$PWD" \
+            makepkg --nosign --noconfirm --cleanbuild
+      - name: Verify package metadata, notices and executable bytes
+        env:
+          PACKAGE_ARCH: ${{ matrix.arch }}
+        run: |
+          python3 scripts/pacman_package.py check --version "$PACKAGE_VERSION" --arch "$PACKAGE_ARCH" --directory dist
+          case "$PACKAGE_ARCH" in
+            x86_64) binary_arch=amd64 ;;
+            aarch64) binary_arch=arm64 ;;
+          esac
+          binary="dist/arch-build/src/context_${PACKAGE_VERSION}_linux_${binary_arch}/context"
+          test "$("$binary" --version)" = "context $PACKAGE_VERSION"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: context-pacman-${{ matrix.arch }}
+          path: |
+            dist/*.pkg.tar.zst
+            dist/*.pkg.tar.zst.sha256
+          if-no-files-found: error

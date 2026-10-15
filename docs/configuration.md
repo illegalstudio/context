@@ -1,155 +1,69 @@
-# Configuration Guide
+# Configuration
 
-## .ctxignore
+## Ignore rules
 
-The `.ctxignore` file controls which files are excluded from indexing. It uses the same syntax as `.gitignore`.
+`.ctxignore` uses Git ignore syntax, including root anchors, directory rules, globs and negation. Nested `.ctxignore` files apply to their own directories. Git's own ignore files are not used automatically; this lets Context index useful files even when the project does not track them.
 
-Create a `.ctxignore` file in your project root:
-
-```
-# Dependencies
+~~~gitignore
 node_modules/
-vendor/
-.venv/
-
-# Build output
-dist/
-build/
-out/
-.next/
-
-# Generated files
+vendor/*
+!vendor/important.php
 *.generated.ts
-*.min.js
-*.min.css
-*.bundle.js
-
-# IDE and editor files
-.idea/
-.vscode/
-*.swp
-
-# Test coverage
-coverage/
-.nyc_output/
-
-# Temporary files
-tmp/
-temp/
-*.tmp
-
-# Large binary files
-*.zip
-*.tar.gz
-*.pdf
-
-# Secrets (should also be in .gitignore)
 .env
-.env.local
-*.pem
-```
+.env.*
+!.env.example
+target/
+~~~
 
-### Pattern Syntax
+To reinclude a file, its parent directory must remain traversable. Use `vendor/*` rather than `vendor/` in the example above. The `.git` and `.context` directories are always excluded; symlinks are not followed.
 
-| Pattern | Description |
-|---------|-------------|
-| `file.txt` | Matches `file.txt` in any directory |
-| `/file.txt` | Matches `file.txt` only in the root |
-| `dir/` | Matches the directory and all contents |
-| `*.js` | Matches all `.js` files |
-| `**/*.test.ts` | Matches all `.test.ts` files in any subdirectory |
-| `!important.js` | Negates a previous pattern (include the file) |
+Initialization generates generic and framework-specific defaults, including dependencies, build output, logs and common credential filenames. Existing ignore files are preserved unless `context init --force` is requested.
 
-### Framework-Specific Defaults
+## Project settings
 
-Context automatically applies sensible defaults based on detected frameworks:
+Edit `.context/config.json`:
 
-**Node.js projects:**
-- `node_modules/`
-- `package-lock.json`
-- `*.min.js`
+~~~json
+{
+  "version": "0.3.0",
+  "includeLanguages": [],
+  "maxFileSize": 1048576,
+  "maxFiles": 25,
+  "maxLinesPerFile": 300,
+  "budgetTokens": 32000,
+  "graphDepth": 2
+}
+~~~
 
-**Laravel projects:**
-- `vendor/`
-- `storage/framework/`
-- `bootstrap/cache/`
-- `public/build/`
+An empty language list accepts all readable UTF-8 text. Recognized binary content, empty files and oversized files are skipped. `graphDepth` can range from 0 to 8. Other limits must be positive.
 
-**Python projects:**
-- `.venv/`
-- `__pycache__/`
-- `*.pyc`
+CLI `--max-files` and `--budget-tokens` override project settings. The token budget is a byte-based estimate (four bytes per token), applied to the complete `PACK.md` prompt including its file list. It is not an exact tokenizer count. Some selected files may have no excerpt when the budget is exhausted; the manifest indicates this with a null excerpt range.
+
+`--include tests,config,docs` chooses which optional categories are permitted. Omitting it permits all three. Main source files are always eligible. `--exclude` applies Git-style patterns to every candidate, including explicit hints.
 
 ## Domains
 
-Domains are conceptual areas of your codebase that help Context understand task context. Built-in domains include:
-
-- **auth** - Authentication and authorization
-- **payments** - Payment processing
-- **api** - API endpoints and handlers
-- **database** - Database operations
-- **email** - Email sending and templates
-- **storage** - File storage and uploads
-- **cache** - Caching logic
-- **queue** - Background jobs and queues
-- **testing** - Test utilities and helpers
-
-### Custom Domains
-
-Add project-specific domains:
-
-```bash
-context domains add inventory --keywords "stock,warehouse,sku,product" --description "Inventory management"
-```
-
-Domain keywords are matched against task descriptions to boost relevant files.
-
-### Disabling Domains
-
-Disable built-in domains you don't need:
-
-```bash
+~~~bash
+context domains list --all --verbose
+context domains add inventory --keywords stock,warehouse,sku --description "Inventory"
 context domains remove queue
-```
-
-Re-enable later:
-
-```bash
 context domains enable queue
-```
+~~~
 
-## Index Location
+Core domains are combined with detected Node.js/Laravel framework domains and project custom domains. Custom definitions override definitions with the same name. Removing a custom domain deletes that override; removing a built-in domain disables it. `--focus` boosts known, enabled domains. Definitions are stored in `.context/domains.json`.
 
-The index is stored in `.context/index.db`. This is a SQLite database containing:
+## Import mappings
 
-- File metadata (path, size, hash, modification time)
-- Symbols (classes, functions, methods with line numbers)
-- Import relationships
-- Git signals (commit count, churn score)
+Root `tsconfig.json` path mappings and baseUrl are used to resolve TypeScript imports. Comments and trailing commas are accepted. Config inheritance, package exports, project references and nested compiler configs are not resolved automatically. Composer `autoload.psr-4` mappings resolve PHP namespaces. Relative Python imports and common Rust module paths are resolved against indexed files.
 
-You can safely delete `.context/` and re-run `context index` to rebuild.
+## Environment
 
-## Output Directory
+| Variable | Purpose |
+| --- | --- |
+| `CONTEXT_MAX_FILES` | File limit when no CLI limit is supplied |
+| `CONTEXT_VERBOSE` | Enable detailed progress output |
+| `RAYON_NUM_THREADS` | Limit the indexing worker pool |
 
-Context packs are created in `.context/packs/` with unique timestamped slugs:
+## Stored data
 
-```
-.context/packs/20260202-143022-fix-payment-webhook/
-.context/packs/20260202-150100-add-user-validation/
-```
-
-Each pack is preserved - they don't overwrite each other. Use `context list` to see all packs and `context open <pack>` to open a specific one.
-
-Add `.context/packs/` to your `.gitignore` if you don't want to commit context packs:
-
-```
-# Context packs (keep the index)
-.context/packs/
-```
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `CONTEXT_MAX_FILES` | Maximum files to include in pack | 25 |
-| `CONTEXT_VERBOSE` | Enable verbose output | false |
+The disposable index is `.context/index.db`. Updates are transactional, including deletion of stale symbols, references and search entries. Schema changes rebuild the index while preserving configuration and saved packs. Pack output lives in `.context/packs/`. Add `.context/` to your project ignore rules if these artifacts should remain local.

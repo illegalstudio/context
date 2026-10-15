@@ -1,0 +1,254 @@
+{
+  "generic": {
+    "ignorePatterns": "# === Universal ===\n.git/\n.context/\n\n# Logs\n*.log\nlogs/\n\n# Minified/compiled assets\n*.min.js\n*.min.css\n*.map\n*.bundle.js\n*.bundle.css\n\n# Build outputs\ndist/\nbuild/\nout/\n\n# Cache\n.cache/\n.tmp/\ntmp/\ntemp/\n\n# IDE/Editor\n.idea/\n.vscode/\n*.swp\n*.swo\n.DS_Store\n\n# Lock files\npackage-lock.json\nyarn.lock\npnpm-lock.yaml\ncomposer.lock\nGemfile.lock\nCargo.lock\npoetry.lock\n\n# Security - never index\n.env\n.env.*\n!.env.example\n*.pem\n*.key\n*.p12\n*.pfx\nid_rsa\nid_dsa\nid_ecdsa\nid_ed25519\ncredentials.json\nsecrets.json\nsecrets.yaml",
+    "domains": []
+  },
+  "nodejs": {
+    "ignorePatterns": "# === Node.js ===\nnode_modules/\ndist/\nbuild/\nout/\n.next/\n.nuxt/\n.output/\ncoverage/\n.nyc_output/\n.cache/\n.parcel-cache/\n.turbo/",
+    "domains": [
+      {
+        "name": "express",
+        "description": "Express.js routing and middleware",
+        "keywords": [
+          "express",
+          "router",
+          "middleware",
+          "req",
+          "res",
+          "next",
+          "app.use",
+          "app.get",
+          "app.post"
+        ]
+      },
+      {
+        "name": "prisma",
+        "description": "Prisma ORM",
+        "keywords": [
+          "prisma",
+          "schema",
+          "migration",
+          "client",
+          "model",
+          "findMany",
+          "create",
+          "update",
+          "delete"
+        ]
+      },
+      {
+        "name": "nextjs",
+        "description": "Next.js framework",
+        "keywords": [
+          "nextjs",
+          "getServerSideProps",
+          "getStaticProps",
+          "getStaticPaths",
+          "useRouter",
+          "Image",
+          "Link",
+          "Head",
+          "app router",
+          "page router"
+        ]
+      },
+      {
+        "name": "nestjs",
+        "description": "NestJS framework",
+        "keywords": [
+          "nestjs",
+          "@nestjs",
+          "@Controller",
+          "@Injectable",
+          "@Module",
+          "@Guard",
+          "@Pipe",
+          "@Interceptor",
+          "@Get",
+          "@Post",
+          "@Put",
+          "@Delete",
+          "@Patch"
+        ]
+      },
+      {
+        "name": "react",
+        "description": "React components and hooks",
+        "keywords": [
+          "react",
+          "useState",
+          "useEffect",
+          "useContext",
+          "useReducer",
+          "useMemo",
+          "useCallback",
+          "useRef",
+          "component",
+          "jsx",
+          "tsx"
+        ]
+      },
+      {
+        "name": "redux",
+        "description": "Redux state management",
+        "keywords": [
+          "redux",
+          "store",
+          "reducer",
+          "action",
+          "dispatch",
+          "selector",
+          "slice",
+          "thunk",
+          "saga",
+          "toolkit"
+        ]
+      },
+      {
+        "name": "vue",
+        "description": "Vue.js framework",
+        "keywords": [
+          "vue",
+          "ref",
+          "reactive",
+          "computed",
+          "watch",
+          "onMounted",
+          "defineComponent",
+          "setup",
+          "template"
+        ]
+      },
+      {
+        "name": "graphql",
+        "description": "GraphQL API",
+        "keywords": [
+          "graphql",
+          "query",
+          "mutation",
+          "subscription",
+          "resolver",
+          "schema",
+          "type",
+          "apollo",
+          "gql"
+        ]
+      }
+    ]
+  },
+  "laravel": {
+    "ignorePatterns": "# === Laravel ===\nvendor/\nstorage/app/\nstorage/framework/\nstorage/logs/\nbootstrap/cache/\npublic/build/\npublic/vendor/\npublic/hot\npublic/storage",
+    "domains": [
+      {
+        "name": "eloquent",
+        "description": "Laravel Eloquent ORM",
+        "keywords": [
+          "eloquent",
+          "model",
+          "relation",
+          "scope",
+          "accessor",
+          "mutator",
+          "cast",
+          "factory",
+          "seeder",
+          "hasMany",
+          "belongsTo",
+          "morphTo"
+        ]
+      },
+      {
+        "name": "blade",
+        "description": "Laravel Blade templates",
+        "keywords": [
+          "blade",
+          "template",
+          "view",
+          "component",
+          "slot",
+          "directive",
+          "layout",
+          "section",
+          "yield"
+        ]
+      },
+      {
+        "name": "artisan",
+        "description": "Laravel Artisan commands",
+        "keywords": [
+          "artisan",
+          "command",
+          "console",
+          "schedule",
+          "cron",
+          "tinker"
+        ]
+      },
+      {
+        "name": "filament",
+        "description": "Filament admin panel",
+        "keywords": [
+          "filament",
+          "resource",
+          "widget",
+          "page",
+          "panel",
+          "admin",
+          "form",
+          "infolist"
+        ]
+      },
+      {
+        "name": "livewire",
+        "description": "Laravel Livewire components",
+        "keywords": [
+          "livewire",
+          "wire",
+          "alpine",
+          "reactive",
+          "emit",
+          "dispatch"
+        ]
+      },
+      {
+        "name": "nova",
+        "description": "Laravel Nova admin",
+        "keywords": [
+          "nova",
+          "resource",
+          "lens",
+          "action",
+          "filter",
+          "metric",
+          "card"
+        ]
+      },
+      {
+        "name": "sanctum",
+        "description": "Laravel Sanctum authentication",
+        "keywords": [
+          "sanctum",
+          "token",
+          "ability",
+          "personalAccessToken",
+          "spa"
+        ]
+      },
+      {
+        "name": "horizon",
+        "description": "Laravel Horizon queue management",
+        "keywords": [
+          "horizon",
+          "supervisor",
+          "balance",
+          "queue",
+          "redis"
+        ]
+      }
+    ]
+  },
+  "statamic": {
+    "ignorePatterns": "# === Statamic ===\n.meta/\n*.meta.yaml\ncontent/assets/\nusers/*.yaml\nstorage/statamic/",
+    "domains": []
+  }
+}

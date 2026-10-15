@@ -1,0 +1,80 @@
+name: Publish Homebrew formula
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+    secrets:
+      ILLEGAL_BOT_APP_ID:
+        required: true
+      ILLEGAL_BOT_PRIVATE_KEY:
+        required: true
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Latest published release tag, for example v1.0.0'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: context-homebrew
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - name: Download and validate latest published packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: illegalstudio/context
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          python3 - <<'PY'
+          import os, re
+          if not re.fullmatch(r'v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)', os.environ['RELEASE_TAG']):
+              raise SystemExit('Invalid release tag')
+          PY
+          latest=$(gh api repos/illegalstudio/context/releases/latest --jq .tag_name)
+          [[ "$RELEASE_TAG" == "$latest" ]] || { echo 'Only the latest release may update the tap'; exit 1; }
+          gh release download "$RELEASE_TAG" --dir dist --pattern 'context_*'
+          python3 scripts/release_assets.py --version "${RELEASE_TAG#v}" --directory dist --formula Formula/context.rb
+      - name: Create Illegal Bot tap token
+        id: token
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349
+        with:
+          app-id: ${{ secrets.ILLEGAL_BOT_APP_ID }}
+          private-key: ${{ secrets.ILLEGAL_BOT_PRIVATE_KEY }}
+          owner: illegalstudio
+          repositories: homebrew-tap
+      - uses: actions/checkout@v7
+        with:
+          repository: illegalstudio/homebrew-tap
+          token: ${{ steps.token.outputs.token }}
+          path: homebrew-tap
+      - name: Update formula
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          mkdir -p homebrew-tap/Formula
+          cp Formula/context.rb homebrew-tap/Formula/context.rb
+          ruby -c homebrew-tap/Formula/context.rb
+          git -C homebrew-tap config user.name 'illegal-studio[bot]'
+          git -C homebrew-tap config user.email '327907755+illegal-studio[bot]@users.noreply.github.com'
+          git -C homebrew-tap add Formula/context.rb
+          if ! git -C homebrew-tap diff --cached --quiet; then
+            git -C homebrew-tap commit -m "brew formula context $RELEASE_TAG"
+            git -C homebrew-tap push origin HEAD:main
+          fi

@@ -1,0 +1,20 @@
+{
+  "tree-sitter-java": {
+    "version": "0.23.5",
+    "commit": "94703d5a6bed02b98e438d7cad1136c01a60ba2c",
+    "sha256": "52ed137b039cd9c46409bc22e89938af911c95b157feae2d040b51e6084369a7",
+    "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-java/94703d5a6bed02b98e438d7cad1136c01a60ba2c/LICENSE"
+  },
+  "tree-sitter-ruby": {
+    "version": "0.23.1",
+    "commit": "71bd32fb7607035768799732addba884a37a6210",
+    "sha256": "ee006f02a3d856df282e409be2a86e24a65bb573a98b9c28343771141351bb6b",
+    "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-ruby/71bd32fb7607035768799732addba884a37a6210/LICENSE"
+  },
+  "tree-sitter-typescript": {
+    "version": "0.23.2",
+    "commit": "f975a621f4e7f532fe322e13c4f79495e0a7b2e7",
+    "sha256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+    "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-typescript/f975a621f4e7f532fe322e13c4f79495e0a7b2e7/LICENSE"
+  }
+}

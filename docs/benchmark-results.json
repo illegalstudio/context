@@ -1,0 +1,29 @@
+{
+  "platform": "Linux-7.2.5-3-omarchy-x86_64-with-glibc2.44",
+  "date": "2026-10-14",
+  "results": [
+    {
+      "implementation": "rust",
+      "sourceFiles": 1000,
+      "initialIndexMs": 198.3,
+      "unchangedIndexMedianMs": 24.6,
+      "packMedianMs": 83.8,
+      "repetitions": 3
+    },
+    {
+      "implementation": "rust",
+      "sourceFiles": 10000,
+      "initialIndexMs": 1380.8,
+      "unchangedIndexMedianMs": 57.9,
+      "packMedianMs": 595.7,
+      "repetitions": 3
+    }
+  ],
+  "baselineUnavailable": "The legacy better-sqlite3 11.10.0 module failed to load and failed rebuilding under local Node 26.7.0. No TypeScript comparison is claimed.",
+  "indexingOptimization": {
+    "sourceFiles": 10000,
+    "beforeRowidAndImportIndexMs": 32674.2,
+    "afterRowidAndImportIndexMs": 1380.8,
+    "note": "Before/after measurements of this Rust implementation, not a comparison with TypeScript."
+  }
+}
