@@ -44,6 +44,8 @@ pub struct ResolvedTask {
     pub raw: String,
     pub raw_words: Vec<String>,
     pub keywords: Vec<String>,
+    #[serde(default)]
+    pub query_terms: Vec<crate::terms::QueryTerm>,
     pub files_hint: Vec<String>,
     pub symbols: Vec<String>,
     pub domains: Vec<String>,
@@ -65,8 +67,32 @@ pub struct Candidate {
     pub reasons: Vec<String>,
     #[serde(default)]
     pub contributions: BTreeMap<String, f64>,
+    #[serde(default)]
+    pub evidence: Vec<MatchEvidence>,
     #[serde(skip)]
     pub reserved: bool,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MatchEvidence {
+    pub signal: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub terms: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relation: Option<String>,
+    #[serde(default)]
+    pub hops: usize,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Dependency {
+    pub source_path: String,
+    pub target_path: String,
+    pub kind: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

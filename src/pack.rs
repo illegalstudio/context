@@ -42,6 +42,10 @@ pub struct ManifestFile {
     pub path: String,
     pub score: f64,
     pub reasons: Vec<String>,
+    #[serde(default)]
+    pub contributions: BTreeMap<String, f64>,
+    #[serde(default)]
+    pub evidence: Vec<MatchEvidence>,
     pub excerpt_range: Option<ExcerptRange>,
     #[serde(default)]
     pub excerpt_ranges: Vec<ExcerptRange>,
@@ -190,6 +194,7 @@ pub fn compose_with_options(
     let mut changes = PackChanges::default();
     let active: Vec<_> = if let Some(parent) = parent {
         let reset = parent.task.raw != resolution.task.raw
+            || parent.task.query_terms != resolution.task.query_terms
             || parent.tokenizer != config.tokenizer
             || parent.config.as_ref().is_some_and(|old| {
                 old.max_lines_per_file != config.max_lines_per_file
@@ -297,6 +302,8 @@ pub fn compose_with_options(
                 path: candidate.path.clone(),
                 score: candidate.score,
                 reasons: candidate.reasons.clone(),
+                contributions: candidate.contributions.clone(),
+                evidence: candidate.evidence.clone(),
                 excerpt_range: excerpts
                     .iter()
                     .find(|e| e.path == candidate.path)

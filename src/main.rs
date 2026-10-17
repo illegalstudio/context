@@ -79,6 +79,8 @@ enum Commands {
     /// Evaluate retrieval and excerpt quality on a labeled dataset without modifying its projects.
     Evaluate {
         dataset: PathBuf,
+        #[arg(long,default_value="context",value_parser=["context","lexical"])]
+        method: String,
         #[arg(long)]
         projects: Option<PathBuf>,
         #[arg(long,default_value="eval",value_parser=["train","eval","all"])]
@@ -328,7 +330,7 @@ fn execute(cli: Cli) -> Result<()> {
                 };
                 options.task = Some(task);
             }
-            let resolution = resolver::resolve(&root, &options)?;
+            let resolution = resolver::resolve_indexed(&root, &database, &options)?;
             let candidates =
                 discovery::discover(&root, &database, &resolution, &options, config.graph_depth)?;
             let result = pack::compose_with_options(
@@ -418,6 +420,7 @@ fn execute(cli: Cli) -> Result<()> {
         }
         Commands::Evaluate {
             dataset,
+            method,
             projects,
             split,
             tokenizer,
@@ -442,11 +445,12 @@ fn execute(cli: Cli) -> Result<()> {
                 config.budget_tokens = value;
             }
             let dataset = context::evaluation::load(&root.join(dataset))?;
-            let mut report = context::evaluation::evaluate(
+            let mut report = context::evaluation::evaluate_method(
                 &dataset,
                 &root.join(projects.unwrap_or_default()),
                 &config,
                 &split,
+                &method,
             )?;
             if let Some(path) = baseline {
                 let baseline = serde_json::from_slice(&std::fs::read(root.join(path))?)?;

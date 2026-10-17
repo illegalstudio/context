@@ -4,40 +4,17 @@ use crate::{
 };
 use anyhow::{Context, Result, bail};
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeSet, fs, path::Path, time::Instant};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs,
+    path::Path,
+    time::Instant,
+};
 
-#[derive(Deserialize, Serialize)]
-pub struct Dataset {
-    pub cases: Vec<Case>,
-}
-
-#[derive(Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Case {
-    pub name: String,
-    pub root: String,
-    pub task: String,
-    #[serde(default)]
-    pub revision: Option<String>,
-    #[serde(default = "evaluation_split")]
-    pub split: String,
-    pub expected_files: Vec<String>,
-    #[serde(default)]
-    pub forbidden_files: Vec<String>,
-    #[serde(default)]
-    pub expected_ranges: Vec<ExpectedRange>,
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct ExpectedRange {
-    pub path: String,
-    pub start: usize,
-    pub end: usize,
-}
-
-fn evaluation_split() -> String {
-    "eval".into()
-}
+mod annotations;
+mod lexical;
+mod scoring;
+pub use annotations::{Case, Dataset, ExpectedRange, Metadata};
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -52,6 +29,20 @@ pub struct Metrics {
     pub useful_lines_per1000_tokens: Option<f64>,
     pub index_ms: f64,
     pub selection_ms: f64,
+    #[serde(default)]
+    pub excerpt_recall: f64,
+    #[serde(default)]
+    pub complete_context: f64,
+    #[serde(default)]
+    pub supporting_recall: Option<f64>,
+    #[serde(default)]
+    pub supporting_range_coverage: Option<f64>,
+    #[serde(default)]
+    pub judged_precision: Option<f64>,
+    #[serde(default)]
+    pub unknown_files: usize,
+    #[serde(default)]
+    pub forbidden_tokens: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -64,6 +55,28 @@ pub struct CaseReport {
     pub selected_files: Vec<String>,
     pub ranges: Vec<RangeReport>,
     pub metrics: Metrics,
+    #[serde(default)]
+    pub metadata: Metadata,
+    #[serde(default)]
+    pub missing_files: Vec<String>,
+    #[serde(default)]
+    pub missing_ranges: Vec<RangeReport>,
+    #[serde(default)]
+    pub missing_supporting_ranges: Vec<RangeReport>,
+    #[serde(default)]
+    pub unknown_files: Vec<String>,
+    #[serde(default)]
+    pub omissions: BTreeMap<String, String>,
+    #[serde(default)]
+    pub indexed_files: usize,
+    #[serde(default)]
+    pub indexed_bytes: u64,
+    #[serde(default)]
+    pub indexed_languages: BTreeMap<String, usize>,
+    #[serde(default)]
+    pub indexed_symbols: usize,
+    #[serde(default)]
+    pub indexed_dependencies: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -85,6 +98,23 @@ pub struct Report {
     pub summary: Metrics,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comparison: Option<serde_json::Value>,
+    #[serde(default = "context_method")]
+    pub method: String,
+    #[serde(default)]
+    pub groups: BTreeMap<String, BTreeMap<String, GroupReport>>,
+    #[serde(default)]
+    pub project_macro_summary: Metrics,
+}
+
+fn context_method() -> String {
+    "context".into()
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupReport {
+    pub cases: usize,
+    pub metrics: Metrics,
 }
 
 fn matches(path: &str, expected: &str) -> bool {
@@ -185,7 +215,10 @@ pub fn load(path: &Path) -> Result<Dataset> {
                 cases.push(serde_json::from_value(value)?);
             }
         }
-        Ok(Dataset { cases })
+        Ok(Dataset {
+            project_isolation: false,
+            cases,
+        })
     } else {
         Ok(serde_json::from_value(value)?)
     }
@@ -197,6 +230,20 @@ pub fn evaluate(
     config: &Config,
     split: &str,
 ) -> Result<Report> {
+    evaluate_method(dataset, projects, config, split, "context")
+}
+
+pub fn evaluate_method(
+    dataset: &Dataset,
+    projects: &Path,
+    config: &Config,
+    split: &str,
+    method: &str,
+) -> Result<Report> {
+    if !matches!(method, "context" | "lexical") {
+        bail!("Method must be context or lexical");
+    }
+    scoring::validate_isolation(dataset)?;
     if !matches!(split, "train" | "eval" | "all") {
         bail!("Split must be train, eval or all");
     }
@@ -238,14 +285,15 @@ pub fn evaluate(
             copy_project(&source, &root)?;
             None
         };
+        scoring::validate_annotations(case, &root)?;
         let mut database = Database::open(&root)?;
         let started = Instant::now();
         indexer::index(&root, &mut database, config, false)?;
+        let files = database.files()?;
         let source_hash = blake3::hash(&serde_json::to_vec(&(
-            database
-                .files()?
-                .into_iter()
-                .map(|(path, file)| (path, file.hash))
+            files
+                .iter()
+                .map(|(path, file)| (path, &file.hash))
                 .collect::<Vec<_>>(),
             database.state("project_map")?,
         ))?)
@@ -259,9 +307,19 @@ pub fn evaluate(
             ..Default::default()
         };
         let started = Instant::now();
-        let resolution = resolver::resolve(&root, &options)?;
-        let candidates =
-            discovery::discover(&root, &database, &resolution, &options, config.graph_depth)?;
+        let mut resolution = resolver::resolve_indexed(&root, &database, &options)?;
+        let candidates = if method == "lexical" {
+            let candidates = lexical::select(&database, &resolution, config.max_files)?;
+            resolution
+                .task
+                .query_terms
+                .retain(|term| term.origin == crate::terms::Origin::Literal);
+            resolution.task.keywords = resolution.task.raw_words.clone();
+            resolution.task.domains.clear();
+            candidates
+        } else {
+            discovery::discover(&root, &database, &resolution, &options, config.graph_depth)?
+        };
         let header = pack::header(&resolution.task, &candidates);
         let selected = snippets::select(
             &root,
@@ -313,6 +371,7 @@ pub fn evaluate(
             })
             .count();
         let range_coverage = (!wanted.is_empty()).then(|| covered as f64 / wanted.len() as f64);
+        let details = scoring::details(case, &paths, &selected, &files, &tokenizer);
         let metrics = Metrics {
             precision: if paths.is_empty() {
                 0.0
@@ -335,6 +394,19 @@ pub fn evaluate(
                 .map(|_| covered as f64 * 1000.0 / tokens.max(1) as f64),
             index_ms,
             selection_ms,
+            excerpt_recall: details.excerpt_recall,
+            complete_context: if details.missing_files.is_empty()
+                && details.missing_ranges.is_empty()
+            {
+                1.0
+            } else {
+                0.0
+            },
+            supporting_recall: details.supporting_recall,
+            supporting_range_coverage: details.supporting_range_coverage,
+            judged_precision: details.judged_precision,
+            unknown_files: details.unknown_files.len(),
+            forbidden_tokens: details.forbidden_tokens,
         };
         reports.push(CaseReport {
             name: case.name.clone(),
@@ -352,44 +424,38 @@ pub fn evaluate(
                 })
                 .collect(),
             metrics,
+            metadata: {
+                let mut metadata = case.metadata.clone();
+                if metadata.project.is_empty() {
+                    metadata.project = case.root.clone();
+                }
+                metadata
+            },
+            missing_files: details.missing_files,
+            missing_ranges: details.missing_ranges,
+            missing_supporting_ranges: details.missing_supporting_ranges,
+            unknown_files: details.unknown_files,
+            omissions: details.omissions,
+            indexed_files: files.len(),
+            indexed_bytes: files.values().map(|file| file.size).sum(),
+            indexed_languages: {
+                let mut counts = BTreeMap::new();
+                for file in files.values() {
+                    *counts.entry(file.language.clone()).or_default() += 1;
+                }
+                counts
+            },
+            indexed_symbols: database.counts()?.1,
+            indexed_dependencies: database.counts()?.2,
         });
     }
     if reports.is_empty() {
         bail!("No evaluation cases match split {split}");
     }
-    let n = reports.len() as f64;
-    let range_reports: Vec<_> = reports
-        .iter()
-        .filter(|r| r.metrics.range_coverage.is_some())
-        .collect();
-    let summary = Metrics {
-        precision: reports.iter().map(|r| r.metrics.precision).sum::<f64>() / n,
-        recall: reports.iter().map(|r| r.metrics.recall).sum::<f64>() / n,
-        recall_at5: reports.iter().map(|r| r.metrics.recall_at5).sum::<f64>() / n,
-        reciprocal_rank: reports
-            .iter()
-            .map(|r| r.metrics.reciprocal_rank)
-            .sum::<f64>()
-            / n,
-        range_coverage: (!range_reports.is_empty()).then(|| {
-            range_reports
-                .iter()
-                .filter_map(|r| r.metrics.range_coverage)
-                .sum::<f64>()
-                / range_reports.len() as f64
-        }),
-        forbidden_matches: reports.iter().map(|r| r.metrics.forbidden_matches).sum(),
-        tokens: reports.iter().map(|r| r.metrics.tokens).sum(),
-        useful_lines_per1000_tokens: (!range_reports.is_empty()).then(|| {
-            range_reports
-                .iter()
-                .filter_map(|r| r.metrics.useful_lines_per1000_tokens)
-                .sum::<f64>()
-                / range_reports.len() as f64
-        }),
-        index_ms: reports.iter().map(|r| r.metrics.index_ms).sum::<f64>() / n,
-        selection_ms: reports.iter().map(|r| r.metrics.selection_ms).sum::<f64>() / n,
-    };
+    let summary = scoring::average(reports.iter().map(|report| &report.metrics));
+    let groups = scoring::groups(&reports);
+    let project_macro_summary =
+        scoring::average(groups["project"].values().map(|group| &group.metrics));
     Ok(Report {
         version: env!("CARGO_PKG_VERSION").into(),
         tokenizer: config.tokenizer.clone(),
@@ -401,6 +467,9 @@ pub fn evaluate(
         cases: reports,
         summary,
         comparison: None,
+        method: method.into(),
+        groups,
+        project_macro_summary,
     })
 }
 
@@ -427,6 +496,10 @@ pub fn compare(report: &mut Report, baseline: &Report) -> Result<()> {
         "recallAt5Delta":report.summary.recall_at5-baseline.summary.recall_at5,
         "tokensDelta":report.summary.tokens as i64-baseline.summary.tokens as i64,
         "selectionMsDelta":report.summary.selection_ms-baseline.summary.selection_ms,
+        "excerptRecallDelta": (!baseline.groups.is_empty()).then_some(report.summary.excerpt_recall-baseline.summary.excerpt_recall),
+        "completeContextDelta": (!baseline.groups.is_empty()).then_some(report.summary.complete_context-baseline.summary.complete_context),
+        "baselineMethod": baseline.method,
+        "method": report.method,
     }));
     Ok(())
 }

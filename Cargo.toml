@@ -9,9 +9,9 @@ repository = "https://github.com/illegalstudio/context"
 readme = "README.md"
 default-run = "context"
 include = [
-    "/Cargo.toml", "/Cargo.lock", "/README.md", "/LICENSE", "/src/*.rs", "/resources/*.json",
+    "/Cargo.toml", "/Cargo.lock", "/README.md", "/LICENSE", "/src/**/*.rs", "/resources/*.json",
     "/docs/*", "/licenses/**", "/scripts/*.py", "/scripts/*.sh", "/packaging/**", "/Makefile",
-    "/tests/*.rs", "/tests/test_*.py", "/tests/fixtures/**",
+    "/benchmarks/*.json", "/tests/*.rs", "/tests/test_*.py", "/tests/fixtures/**",
     "/tests/codebases/**/*.ts", "/tests/codebases/**/*.tsx", "/tests/codebases/**/*.php",
     "/tests/codebases/**/*.py", "/tests/codebases/**/package.json", "/tests/codebases/**/composer.json",
     "/tests/codebases/**/tsconfig.json", "/tests/codebases/**/.ctxignore", "/tests/codebases/**/requirements.txt",

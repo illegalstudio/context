@@ -1,0 +1,3840 @@
+{
+  "version": 1,
+  "protocol": {
+    "description": "Initial frozen baseline with repository-level split isolation. Source/patch annotations are agent-reviewed, sparse, and not independently validated ground truth. No ranking adjustments are made using these runs.",
+    "budgets": [
+      8000,
+      16000,
+      32000
+    ],
+    "tokenizer": "o200k_base",
+    "maxFiles": 25,
+    "maxLinesPerFile": 300,
+    "maxFileSize": 1048576,
+    "graphDepth": 2
+  },
+  "projects": [
+    {
+      "id": "koel/koel",
+      "repository": "koel/koel",
+      "url": "https://github.com/koel/koel",
+      "language": "php",
+      "framework": "laravel-vue",
+      "kind": "application",
+      "split": "train",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "37723d53c5305e7377a594228a6a2c68458087a799bf098ed77c7d9bc1336f5e",
+          "url": "https://github.com/koel/koel/blob/7bcb241b88713f3bb97df8ca8996f4f3458b89e7/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "id": "symfony/http-foundation",
+      "repository": "symfony/http-foundation",
+      "url": "https://github.com/symfony/http-foundation",
+      "language": "php",
+      "framework": "symfony",
+      "kind": "library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "18da7e490d2aa77197a0619b25bcc771a0110132a9d76071665718d3295e73cb",
+          "url": "https://github.com/symfony/http-foundation/blob/d8ef4cab992ac9b91b7186164153749a9b1430a0/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "pallets/flask",
+      "repository": "pallets/flask",
+      "url": "https://github.com/pallets/flask",
+      "language": "python",
+      "framework": "flask",
+      "kind": "framework",
+      "split": "train",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "489a8e1108509ed98a37bb983e11e0f7e1d31f0bd8f99a79c8448e7ff37d07ea",
+          "url": "https://github.com/pallets/flask/blob/de8429ffda8cfb54db175529e2bae72a24e1fa7e/LICENSE.txt"
+        }
+      ]
+    },
+    {
+      "id": "wagtail/wagtail",
+      "repository": "wagtail/wagtail",
+      "url": "https://github.com/wagtail/wagtail",
+      "language": "python",
+      "framework": "django-wagtail",
+      "kind": "application",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "d1a88beff449d9890e8ec726448ee8a709ae511ad8ea1f0c474076e27add4505",
+          "url": "https://github.com/wagtail/wagtail/blob/504b195d072e195135082b207db62309024cd119/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "nestjs/nest",
+      "repository": "nestjs/nest",
+      "url": "https://github.com/nestjs/nest",
+      "language": "typescript",
+      "framework": "nestjs",
+      "kind": "framework",
+      "split": "train",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "56967de93525b12a30717e4446ccef3bbe32fafdbe2350f143c1cc6971b19ed3",
+          "url": "https://github.com/nestjs/nest/blob/bb3d572080ba5c3a34b65fcc39ca598c324cb32f/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "outline/outline",
+      "repository": "outline/outline",
+      "url": "https://github.com/outline/outline",
+      "language": "typescript",
+      "framework": "express-react",
+      "kind": "application",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "0571299da9446555c0a3eb00c3aed43019ae12b0f20941428b95ff510b91c78c",
+          "url": "https://github.com/outline/outline/blob/a58962101de8b9a54b251429df58b7595cdb9836/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "expressjs/express",
+      "repository": "expressjs/express",
+      "url": "https://github.com/expressjs/express",
+      "language": "javascript",
+      "framework": "express",
+      "kind": "framework",
+      "split": "train",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "95a5762890e5c1c9808921cef095661fc482c5e1f0bba31446ac85595df6237c",
+          "url": "https://github.com/expressjs/express/blob/3ce6d0eb86e9d93529ff3191c6bb5db8ce6e72c8/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "node-red/node-red",
+      "repository": "node-red/node-red",
+      "url": "https://github.com/node-red/node-red",
+      "language": "javascript",
+      "framework": "node-red",
+      "kind": "application-monorepo",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "876efc5b0ea06ac893b0d5f88bba8abfc050d82d157d65a95453abcb4dd6b0e0",
+          "url": "https://github.com/node-red/node-red/blob/277bf6e2bf3f14d5759e4bb9e7b345a58f38a258/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "go-chi/chi",
+      "repository": "go-chi/chi",
+      "url": "https://github.com/go-chi/chi",
+      "language": "go",
+      "framework": "chi",
+      "kind": "library",
+      "split": "train",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "a2d51b7515acfaff2f7a88688650f2fc4fd99561383e72bba2305e3db59a1647",
+          "url": "https://github.com/go-chi/chi/blob/c9744a3641452cfe4fbb9929ceb554659d6bd950/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "spf13/cobra",
+      "repository": "spf13/cobra",
+      "url": "https://github.com/spf13/cobra",
+      "language": "go",
+      "framework": "cobra",
+      "kind": "cli-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "5e3400b93bbb099e83e52bab885e7441750673c21f97988ca3f1240639b63283",
+          "url": "https://github.com/spf13/cobra/blob/f2878bab8c96afd6e36968af96343b35dbb82a82/LICENSE.txt"
+        }
+      ]
+    },
+    {
+      "id": "tokio-rs/axum",
+      "repository": "tokio-rs/axum",
+      "url": "https://github.com/tokio-rs/axum",
+      "language": "rust",
+      "framework": "axum",
+      "kind": "framework",
+      "split": "train",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "008c87afcd2e626eaf564093250bed06dd7efb5732113264bba3dda8f1c556a1",
+          "url": "https://github.com/tokio-rs/axum/blob/9f1226db155f4ae15a86a806f2560dbb874a4238/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "starship/starship",
+      "repository": "starship/starship",
+      "url": "https://github.com/starship/starship",
+      "language": "rust",
+      "framework": "starship",
+      "kind": "cli",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "2587580d0ec4ddc43d1534745a19ffeec0b63186497c2ed4bc36832da91b13e2",
+          "url": "https://github.com/starship/starship/blob/69c1a5714abeb0ee8acf29e95a34de6ef5a5cc27/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "sinatra/sinatra",
+      "repository": "sinatra/sinatra",
+      "url": "https://github.com/sinatra/sinatra",
+      "language": "ruby",
+      "framework": "sinatra",
+      "kind": "framework",
+      "split": "train",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "f2f60556a2d5c8d7ef9d54ec1c62152ff40d626b807aba5bdc5126f669ed500f",
+          "url": "https://github.com/sinatra/sinatra/blob/fa99a21461d4f1f5337b9b9d7a38a1b51c8f4e55/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "rubocop/rubocop",
+      "repository": "rubocop/rubocop",
+      "url": "https://github.com/rubocop/rubocop",
+      "language": "ruby",
+      "framework": "rubocop",
+      "kind": "cli",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "102cbdf7e36a90dea7e545c683cf457ea8b993bce627b417744609088fd8b377",
+          "url": "https://github.com/rubocop/rubocop/blob/8053d208a575c4f3fd7c6d13523d511aacecd379/LICENSE.txt"
+        }
+      ]
+    },
+    {
+      "id": "google/gson",
+      "repository": "google/gson",
+      "url": "https://github.com/google/gson",
+      "language": "java",
+      "framework": "gson",
+      "kind": "library",
+      "split": "train",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "url": "https://github.com/google/gson/blob/b3f4ca20087f9066de4c340522ff84e0558e1ad1/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "spring-projects/spring-framework",
+      "repository": "spring-projects/spring-framework",
+      "url": "https://github.com/spring-projects/spring-framework",
+      "language": "java",
+      "framework": "spring",
+      "kind": "framework-monorepo",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "56dfc19e0dc836e30177332f73e8e6fbc297941acf3d906eec6eaaa46c2c452a",
+          "url": "https://github.com/spring-projects/spring-framework/blob/bcb4fbf31ca15f88697da1281894281ba4d6324d/LICENSE.txt"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "koel--koel-1",
+      "project": "koel/koel",
+      "split": "train",
+      "revision": "7bcb241b88713f3bb97df8ca8996f4f3458b89e7",
+      "fixCommit": "ba0f217eaa034a4edfadd145dbc49335b1fb5425",
+      "archiveSha256": "0f37c5ffd1b3e0946732b27b07994e77aa9a731e6f74410190a526c5ee061d15",
+      "task": "Passkey authentication and registration are rejected on another valid address below the configured domain.",
+      "category": "authentication",
+      "expectedFiles": [
+        "app/Services/Auth/PasskeyService.php",
+        "routes/api.base.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "app/Services/Auth/PasskeyService.php",
+          "start": 67,
+          "end": 71,
+          "sha256": "c6d29faeb8b7be5603c9a7149f94ecc81d5e24d5c41d88886453641f0692226b"
+        },
+        {
+          "path": "app/Services/Auth/PasskeyService.php",
+          "start": 102,
+          "end": 106,
+          "sha256": "a4b073345a4b0f9a769848063efa8026351234c1d999f21567c681fba4e65668"
+        },
+        {
+          "path": "app/Services/Auth/PasskeyService.php",
+          "start": 157,
+          "end": 161,
+          "sha256": "f60d4b7dd8e73b1e39ac60ff33bb8eed0facd21dd1464151fb70d31feb645e8a"
+        },
+        {
+          "path": "app/Services/Auth/PasskeyService.php",
+          "start": 181,
+          "end": 185,
+          "sha256": "54ce80ead8e2358ebee5c605e04198a65d300c1607cf2923ad00c122b8975167"
+        },
+        {
+          "path": "routes/api.base.php",
+          "start": 125,
+          "end": 129,
+          "sha256": "aeaa669c481ffb447ce0cef3352a997a2ca5aecbaf3625694af0cced0e7c9ffb"
+        },
+        {
+          "path": "routes/api.base.php",
+          "start": 278,
+          "end": 282,
+          "sha256": "0d89fa9be886f33c1212286997dc002b1a59ce14a7e97d75423d119c6dfe7e1b"
+        }
+      ],
+      "supportingFiles": [
+        "tests/Feature/Auth/PasskeyTest.php"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/Feature/Auth/PasskeyTest.php",
+          "start": 186,
+          "end": 190,
+          "sha256": "b0836f50778908e24b880d7f34d360de6e54e0ceac8f29f50962b96defea42d1"
+        },
+        {
+          "path": "tests/Feature/Auth/PasskeyTest.php",
+          "start": 227,
+          "end": 231,
+          "sha256": "33cac061eb6a8658ace5b5d22b72fb0dda7f8d6e2283d44462db2a8050771504"
+        }
+      ],
+      "forbiddenFiles": [
+        "app/Http/Controllers/API/EqualizerPresetController.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/koel/koel/commit/ba0f217eaa034a4edfadd145dbc49335b1fb5425",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "koel--koel-2",
+      "project": "koel/koel",
+      "split": "train",
+      "revision": "100a982af4f5bc8b133a4cc39d4b82fe3662aef5",
+      "fixCommit": "c2c94e6101d40c83a96f2ce76db357f7de9dec5f",
+      "archiveSha256": "850d1c73b1ffd5d9e5c19deadb3e7d4e5c3b445bdcbbebc17cc02614a0557733",
+      "task": "Requests to hosts with both address families fail when the server has no working IPv6 connection.",
+      "category": "networking",
+      "expectedFiles": [
+        "app/Services/Network/SafeHttp.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "app/Services/Network/SafeHttp.php",
+          "start": 142,
+          "end": 146,
+          "sha256": "507ff1a1e02be7d843ad3304a13a07ca741c59530a6d19b2add97d588f6b9487"
+        }
+      ],
+      "supportingFiles": [
+        "tests/Unit/Services/Network/SafeHttpTest.php"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/Unit/Services/Network/SafeHttpTest.php",
+          "start": 61,
+          "end": 65,
+          "sha256": "a56e8d80a1d0ffda464c518d6c543304eeb7eda6076d289dbf4b24bdd5d0eb3d"
+        }
+      ],
+      "forbiddenFiles": [
+        "app/Http/Controllers/API/EqualizerPresetController.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/koel/koel/commit/c2c94e6101d40c83a96f2ce76db357f7de9dec5f",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "koel--koel-3",
+      "project": "koel/koel",
+      "split": "train",
+      "revision": "28175061350e05889e8749f1b83f77da3d359da1",
+      "fixCommit": "ed5d905fe34b5ef80e227a1d0ba0e5b08ae5a18c",
+      "archiveSha256": "56b911ea35b9ce221f97286e9c89ab60aaa793e139da577561064e31a673af87",
+      "task": "Synchronizing a podcast with thousands of newly published episodes becomes too slow or fails.",
+      "category": "data-processing",
+      "expectedFiles": [
+        "app/Services/Podcast/PodcastService.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "app/Services/Podcast/PodcastService.php",
+          "start": 158,
+          "end": 162,
+          "sha256": "4adcbae60cefdbf203d118d065f768b252bcb0791ccbd2ac1829561e72023c5c"
+        },
+        {
+          "path": "app/Services/Podcast/PodcastService.php",
+          "start": 180,
+          "end": 184,
+          "sha256": "606522ad612f6fd37f702cd31b28c0986fce4b6c9db9c0e4b6e28d1a5cafc98d"
+        },
+        {
+          "path": "app/Services/Podcast/PodcastService.php",
+          "start": 200,
+          "end": 204,
+          "sha256": "29fc3452c368af71f0fcda398ea6295028754e292c41f840ab35618573ba3f65"
+        }
+      ],
+      "supportingFiles": [
+        "tests/Integration/Services/Podcast/PodcastServiceTest.php"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/Integration/Services/Podcast/PodcastServiceTest.php",
+          "start": 426,
+          "end": 430,
+          "sha256": "0de419a6564841b12f96283ce07036af05752e92d99ce6879685c64d4bc18d38"
+        }
+      ],
+      "forbiddenFiles": [
+        "app/Http/Controllers/API/EqualizerPresetController.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/koel/koel/commit/ed5d905fe34b5ef80e227a1d0ba0e5b08ae5a18c",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "koel--koel-4",
+      "project": "koel/koel",
+      "split": "train",
+      "revision": "0dbac9993506b23a7baf3569419422925dc304e4",
+      "fixCommit": "70d7d785246315ffb04b453e50357d4c365a1370",
+      "archiveSha256": "96d215c858a750b95ad782d04fcebb7f32de12b43c9e2e0989d651019b48e918",
+      "task": "Marking several thousand media items as favorites fails because the database query is too large.",
+      "category": "database",
+      "expectedFiles": [
+        "app/Services/FavoriteService.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "app/Services/FavoriteService.php",
+          "start": 60,
+          "end": 64,
+          "sha256": "7142f30745598e20f1d47d913c6adc144c98aaa7bce60fb90298542957bed694"
+        }
+      ],
+      "supportingFiles": [
+        "tests/Integration/Services/FavoriteServiceTest.php"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/Integration/Services/FavoriteServiceTest.php",
+          "start": 124,
+          "end": 128,
+          "sha256": "cd0d9561980f1fdf8f913b968186d1a1ca9a1c0eb506d5d79ed267258054d6ba"
+        }
+      ],
+      "forbiddenFiles": [
+        "app/Http/Controllers/API/EqualizerPresetController.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/koel/koel/commit/70d7d785246315ffb04b453e50357d4c365a1370",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "koel--koel-5",
+      "project": "koel/koel",
+      "split": "train",
+      "revision": "9e750d5ed2b95bdd305e3a1ab5e9738d3b3c0b1b",
+      "fixCommit": "0dbac9993506b23a7baf3569419422925dc304e4",
+      "archiveSha256": "e82a1d664d7556aff635cbf06d6ac3476d5f7aba098a818729ff147078fbc3fd",
+      "task": "Adding songs to a collaborative playlist returns duplicates and collaboration details from other playlists.",
+      "category": "authorization",
+      "expectedFiles": [
+        "app/Repositories/SongRepository.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "app/Repositories/SongRepository.php",
+          "start": 450,
+          "end": 454,
+          "sha256": "6f5eb017bf004df2ce037ab24e813e0baac1538cf7a1d7ab0923c08b2c4a5d68"
+        }
+      ],
+      "supportingFiles": [
+        "tests/Feature/KoelPlus/PlaylistSongTest.php"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/Feature/KoelPlus/PlaylistSongTest.php",
+          "start": 67,
+          "end": 71,
+          "sha256": "9a694724cc376ac49efd7fed9d59df0e0542029179c36a8ad00f5b9a519b1377"
+        }
+      ],
+      "forbiddenFiles": [
+        "app/Http/Controllers/API/EqualizerPresetController.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/koel/koel/commit/0dbac9993506b23a7baf3569419422925dc304e4",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "symfony--http-foundation-1",
+      "project": "symfony/http-foundation",
+      "split": "eval",
+      "revision": "d8ef4cab992ac9b91b7186164153749a9b1430a0",
+      "fixCommit": "c6e625c6aa0abe3b70d87b87ea5b22862284ed00",
+      "archiveSha256": "b27e3f86a68d773aa039b3fc5bce1a921ac246f9ef5da7b19e278afaba2b3b11",
+      "task": "Rotating the secret used for signed URLs invalidates links issued with the previous secret.",
+      "category": "authentication",
+      "expectedFiles": [
+        "UriSigner.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "UriSigner.php",
+          "start": 43,
+          "end": 47,
+          "sha256": "1ae6491527081428c8b9fac7aba8f8104491014e932cad2059a09e092a183913"
+        },
+        {
+          "path": "UriSigner.php",
+          "start": 95,
+          "end": 99,
+          "sha256": "1fcf94d2b15ee95f939491847133509c986ea52340e2a8abbf5e793b9f933d2f"
+        },
+        {
+          "path": "UriSigner.php",
+          "start": 148,
+          "end": 152,
+          "sha256": "630b23b3a277da556c8085e10717a084ac286b8ea0aa0218f6bc4b5f4b66cde6"
+        },
+        {
+          "path": "UriSigner.php",
+          "start": 213,
+          "end": 217,
+          "sha256": "7085b0084d8778bcc2689892ec0a7009fb82ab7e238a2ac136064cd08e9062cb"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "File/UploadedFile.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/symfony/http-foundation/commit/c6e625c6aa0abe3b70d87b87ea5b22862284ed00",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "symfony--http-foundation-2",
+      "project": "symfony/http-foundation",
+      "split": "eval",
+      "revision": "775c6595966ff452da7a2d2a1b1fd7eacab0b9b0",
+      "fixCommit": "ec778b2a79fb1c571a23275a41865a17653b9138",
+      "archiveSha256": "a020aa95b46437a6de226367548ad8c98c531c41b061a0871d94b8d460d5c1db",
+      "task": "An HTTP header cannot be split correctly when whitespace itself is the delimiter.",
+      "category": "http",
+      "expectedFiles": [
+        "HeaderUtils.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "HeaderUtils.php",
+          "start": 63,
+          "end": 67,
+          "sha256": "93cdd97db7bec1e706476828ad3d3f9ab08ab535eb4219b70f257499cd4ad3c8"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "File/UploadedFile.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/symfony/http-foundation/commit/ec778b2a79fb1c571a23275a41865a17653b9138",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "symfony--http-foundation-3",
+      "project": "symfony/http-foundation",
+      "split": "eval",
+      "revision": "94d8b4ecfb97396d06b12fc81790c6782dafc315",
+      "fixCommit": "8e115a89f7f75d0f673406db24285bf3eca286b2",
+      "archiveSha256": "0f15da12efcc3c6adf8a7c0d7b216ccc35193c433e0b6a61e8ea81d4583c1863",
+      "task": "The client address is truncated incorrectly when forwarded headers contain an IPv4-mapped IPv6 address and port.",
+      "category": "http",
+      "expectedFiles": [
+        "Request.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "Request.php",
+          "start": 2173,
+          "end": 2177,
+          "sha256": "417125a321cbf021c756b2454fdaa24a89ff245e1adf49924133da3cf4626886"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "File/UploadedFile.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/symfony/http-foundation/commit/8e115a89f7f75d0f673406db24285bf3eca286b2",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "symfony--http-foundation-4",
+      "project": "symfony/http-foundation",
+      "split": "eval",
+      "revision": "b2951f156243b7bff8da55ba82cdf270580915e8",
+      "fixCommit": "f22c90ed36911cf357d2b1672be098df1a1e381d",
+      "archiveSha256": "30757758b7b6c0ce1d4eb4d7a34d13ffbd27999470b0ffc9b84c475ed8954b07",
+      "task": "Privacy masking produces the wrong result for an IPv4-mapped address written in a different valid textual form.",
+      "category": "privacy",
+      "expectedFiles": [
+        "IpUtils.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "IpUtils.php",
+          "start": 214,
+          "end": 218,
+          "sha256": "77c59cdf3684ce8bfde951fbd963e836d563ec506440770ca8a001e321f1400b"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "File/UploadedFile.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/symfony/http-foundation/commit/f22c90ed36911cf357d2b1672be098df1a1e381d",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "symfony--http-foundation-5",
+      "project": "symfony/http-foundation",
+      "split": "eval",
+      "revision": "472c2d3346396fb21f1c0681541fa3cbbd8fff16",
+      "fixCommit": "10e157d71f378d3518ed2cd5d4a2da1dcd205cf8",
+      "archiveSha256": "7b8fc6900460283296ff449e7e690059a3e776ded875ac010e89121f843d2f7b",
+      "task": "Configuring a large list of trusted host patterns exceeds the regular expression engine size limit.",
+      "category": "configuration",
+      "expectedFiles": [
+        "Request.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "Request.php",
+          "start": 226,
+          "end": 230,
+          "sha256": "fd770d01f17c4c1abe6dd9b7342e074aebb43dee0d0761702642f30206c1d080"
+        },
+        {
+          "path": "Request.php",
+          "start": 676,
+          "end": 680,
+          "sha256": "9670f731ca3321c01a4e802a462ffd95e8305693983f144a8e2faa7309c7e9ce"
+        },
+        {
+          "path": "Request.php",
+          "start": 1250,
+          "end": 1254,
+          "sha256": "44dc576fdd1b12d508d35f9dc75e0eb5d6360fadaffd5032a98ba8afc1c8323e"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "File/UploadedFile.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/symfony/http-foundation/commit/10e157d71f378d3518ed2cd5d4a2da1dcd205cf8",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "pallets--flask-1",
+      "project": "pallets/flask",
+      "split": "train",
+      "revision": "de8429ffda8cfb54db175529e2bae72a24e1fa7e",
+      "fixCommit": "7203feabf723edae0286ae5dc64fec8ac4c91735",
+      "archiveSha256": "cf914c66800a57ce2318e5d93b1e85f0a5eb017ae0a718383d328bd1e4a75ec7",
+      "task": "Development server startup chooses the wrong host or port when the configured server name is an IPv6 literal.",
+      "category": "configuration",
+      "expectedFiles": [
+        "src/flask/app.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/flask/app.py",
+          "start": 722,
+          "end": 726,
+          "sha256": "61666351be4de24a4c6daa3cbe2a0dd4694c55e00d23dce697f4e6a0122b2d9f"
+        },
+        {
+          "path": "src/flask/app.py",
+          "start": 732,
+          "end": 736,
+          "sha256": "589cd1a1eb428fc34074eed4ffc73792f710421aba5f6d2228a9eaac062ccc6b"
+        },
+        {
+          "path": "src/flask/app.py",
+          "start": 746,
+          "end": 750,
+          "sha256": "24c5bd3e7ac14a349d01e84e227ecce9b9445309f91845ce9f43ef0145d6ec5c"
+        }
+      ],
+      "supportingFiles": [
+        "tests/test_basic.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/test_basic.py",
+          "start": 1913,
+          "end": 1917,
+          "sha256": "1de9c04d64cb334ee35611ec94a8d388d367c381c8f2598d3912aa1c669dde00"
+        }
+      ],
+      "forbiddenFiles": [
+        "examples/tutorial/flaskr/db.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/pallets/flask/commit/7203feabf723edae0286ae5dc64fec8ac4c91735",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "pallets--flask-2",
+      "project": "pallets/flask",
+      "split": "train",
+      "revision": "514fc6b3e8402e4c646d5284e97a4f0ab50a7c4b",
+      "fixCommit": "de8429ffda8cfb54db175529e2bae72a24e1fa7e",
+      "archiveSha256": "ae847fae876e263cd7552e2261a5787b0ca61730d88ff9f3eb43cb5f633544db",
+      "task": "Session changes made through the test client fail for IPv6 host addresses.",
+      "category": "session",
+      "expectedFiles": [
+        "src/flask/testing.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/flask/testing.py",
+          "start": 178,
+          "end": 182,
+          "sha256": "789ef1c73b6eba4399b967e1139faa0324fab2430c2b7327f1ad25a0d51139ec"
+        }
+      ],
+      "supportingFiles": [
+        "tests/test_testing.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/test_testing.py",
+          "start": 173,
+          "end": 177,
+          "sha256": "202eb664601aa6adaec9323bc1bffec91dcd5cca6ff42dafdf1450ba8c23e46a"
+        }
+      ],
+      "forbiddenFiles": [
+        "examples/tutorial/flaskr/db.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/pallets/flask/commit/de8429ffda8cfb54db175529e2bae72a24e1fa7e",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "pallets--flask-3",
+      "project": "pallets/flask",
+      "split": "train",
+      "revision": "d3b78fd18a8d9e224cb9ef58a23cec9b1ffc9ce9",
+      "fixCommit": "e82db2ca3a22c9614c1987392c9cfaa8c6ce99ad",
+      "archiveSha256": "44793407c9bdcebae341bb82c5dab6f98bb9bf8a9ce7a944d758d5fb7d55bdd9",
+      "task": "A route-specific override of automatic OPTIONS handling is ignored after registering the route.",
+      "category": "http",
+      "expectedFiles": [
+        "src/flask/sansio/app.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/flask/sansio/app.py",
+          "start": 635,
+          "end": 639,
+          "sha256": "50b8b6080299976b78608f8da4ffd1424ed6653373b4bb1d0e6ba1ee05de14b7"
+        }
+      ],
+      "supportingFiles": [
+        "tests/test_basic.py",
+        "tests/test_blueprints.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/test_basic.py",
+          "start": 68,
+          "end": 72,
+          "sha256": "d2521f4b9e51294a1c41e80703ee74ab1f4e8ea4e93d408e9ee8e2c69cd95e9c"
+        },
+        {
+          "path": "tests/test_blueprints.py",
+          "start": 221,
+          "end": 225,
+          "sha256": "1f6db8dfc215e8df6c8f9d2baca132655920e58db2cb894df3625c77e44a1679"
+        }
+      ],
+      "forbiddenFiles": [
+        "examples/tutorial/flaskr/db.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/pallets/flask/commit/e82db2ca3a22c9614c1987392c9cfaa8c6ce99ad",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "pallets--flask-4",
+      "project": "pallets/flask",
+      "split": "train",
+      "revision": "941efd4a36ed0f27e13758874f95e3aa1d3ee163",
+      "fixCommit": "fb54159861708558b5f5658ebdc14709d984361c",
+      "archiveSha256": "0936601ea48c33a7a28901d769cf537d20b46f08bd1844efc4004016ccdf393c",
+      "task": "New session cookies are signed with an old fallback key after rotating the application secret.",
+      "category": "session",
+      "expectedFiles": [
+        "src/flask/sessions.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/flask/sessions.py",
+          "start": 319,
+          "end": 323,
+          "sha256": "34a7f9fa01daa9c06dd205e640b254f83ea0ee05def1f19cf2cbd3e2c8e1d1c1"
+        }
+      ],
+      "supportingFiles": [
+        "tests/test_basic.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tests/test_basic.py",
+          "start": 386,
+          "end": 390,
+          "sha256": "8c5621473d790b22307602229146bd218e4f3ec325e81527f7970a62b37dc531"
+        }
+      ],
+      "forbiddenFiles": [
+        "examples/tutorial/flaskr/db.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/pallets/flask/commit/fb54159861708558b5f5658ebdc14709d984361c",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "pallets--flask-5",
+      "project": "pallets/flask",
+      "split": "train",
+      "revision": "08c480b3b31e896698bb773069026a61eb53d158",
+      "fixCommit": "da600394865c06a4772c433c1a560453dcf4f868",
+      "archiveSha256": "440fe826e7f6b154ae3398d659fc093df2a446b08f60bd30c54e11bd4546524e",
+      "task": "Invoking only the CLI help option should display help without trying to locate an application first.",
+      "category": "cli",
+      "expectedFiles": [
+        "src/flask/cli.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/flask/cli.py",
+          "start": 685,
+          "end": 689,
+          "sha256": "bb891365d3430f569f93389c6aa9585f4168f5110dec0ba68d40fda9e84aac61"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "examples/tutorial/flaskr/db.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/pallets/flask/commit/da600394865c06a4772c433c1a560453dcf4f868",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "wagtail--wagtail-1",
+      "project": "wagtail/wagtail",
+      "split": "eval",
+      "revision": "504b195d072e195135082b207db62309024cd119",
+      "fixCommit": "66869c72ea54a07ad330b0522f7ce956a24ee850",
+      "archiveSha256": "b4680810a6b2e680abf58ed6d6beece6aeadaa0913cb18cbe6dcdb37c3f010d9",
+      "task": "Reading a foreign-key field through version three of the content API fails while constructing its response schema.",
+      "category": "api",
+      "expectedFiles": [
+        "wagtail/api/v3/schemas/generators/read.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "wagtail/api/v3/schemas/generators/read.py",
+          "start": 168,
+          "end": 172,
+          "sha256": "0a9c0e76f59951a8d8b0fdd06cfb9b8a20191ef53e39a94ae0090ec1ba6ce34b"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "wagtail/embeds/finders/oembed.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/wagtail/wagtail/commit/66869c72ea54a07ad330b0522f7ce956a24ee850",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "wagtail--wagtail-2",
+      "project": "wagtail/wagtail",
+      "split": "eval",
+      "revision": "dc84814886489744b7ce3a494bce2898b898c5ff",
+      "fixCommit": "50b6fe1dd0dc958695c1f2a5225f7013c5f95f7b",
+      "archiveSha256": "6f870759b00140ebb8ab32252c79456f807ee6614ec375bcb346b8aecf423371",
+      "task": "Nested inline child records disappear from API response schemas, while cyclic model relations must still terminate.",
+      "category": "api",
+      "expectedFiles": [
+        "wagtail/api/v3/schemas/generators/read.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "wagtail/api/v3/schemas/generators/read.py",
+          "start": 118,
+          "end": 122,
+          "sha256": "2d4df79417c9cf99062c2625b646a8add616330ec7af1b0e06e228501c6b315d"
+        },
+        {
+          "path": "wagtail/api/v3/schemas/generators/read.py",
+          "start": 175,
+          "end": 179,
+          "sha256": "58123263541133d1868ba096612e8ee99fbc7f187883f9550bb758a592af5770"
+        },
+        {
+          "path": "wagtail/api/v3/schemas/generators/read.py",
+          "start": 227,
+          "end": 231,
+          "sha256": "cd43b0895c7b74ad458986d1ed3ca0672661caf6198a793433f7690d1a1c2b4a"
+        },
+        {
+          "path": "wagtail/api/v3/schemas/generators/read.py",
+          "start": 280,
+          "end": 284,
+          "sha256": "f8ea38266f1e0668eb9332c69c08bde36852d2035b958ea92b1896d87c1ac004"
+        }
+      ],
+      "supportingFiles": [
+        "wagtail/api/v3/tests/test_page_create.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "wagtail/api/v3/tests/test_page_create.py",
+          "start": 1221,
+          "end": 1225,
+          "sha256": "d39453f9b99ff1cee82b45fd1b0436d0e7ac6eee752c98077d788de53b8a1ace"
+        }
+      ],
+      "forbiddenFiles": [
+        "wagtail/embeds/finders/oembed.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/wagtail/wagtail/commit/50b6fe1dd0dc958695c1f2a5225f7013c5f95f7b",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "wagtail--wagtail-3",
+      "project": "wagtail/wagtail",
+      "split": "eval",
+      "revision": "48318032581de79fd2e1cb36e2fa87af37631f18",
+      "fixCommit": "dc84814886489744b7ce3a494bce2898b898c5ff",
+      "archiveSha256": "e3044213ee9b7b68c11a8cf55a01831394f6551e4958a42e5f653c69ac537562",
+      "task": "The write API cannot update inline child records which themselves contain nested inline children.",
+      "category": "api",
+      "expectedFiles": [
+        "wagtail/api/v3/form_data.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "wagtail/api/v3/form_data.py",
+          "start": 513,
+          "end": 517,
+          "sha256": "61f6e4c96414bca7abae6650cea09a82bf95ba612db79e0a6a87b3d66e282beb"
+        }
+      ],
+      "supportingFiles": [
+        "wagtail/api/v3/tests/test_page_create.py",
+        "wagtail/api/v3/tests/test_page_update.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "wagtail/api/v3/tests/test_page_create.py",
+          "start": 1165,
+          "end": 1168,
+          "sha256": "6231929732a6a3abc3135aa0db0d0919f859942bfce9f730cab2a6fca944489d"
+        },
+        {
+          "path": "wagtail/api/v3/tests/test_page_update.py",
+          "start": 1335,
+          "end": 1337,
+          "sha256": "a50c920bdec6673aa46d91b3b655e4c37d7c11f1614b22baae3cb558a079638d"
+        }
+      ],
+      "forbiddenFiles": [
+        "wagtail/embeds/finders/oembed.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/wagtail/wagtail/commit/dc84814886489744b7ce3a494bce2898b898c5ff",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "wagtail--wagtail-4",
+      "project": "wagtail/wagtail",
+      "split": "eval",
+      "revision": "c66e22a0a33de1a8d0bae4fb2434fa6f3aad2a06",
+      "fixCommit": "6482a1321908680cb11c571bc9aa398aa53c9082",
+      "archiveSha256": "6ab902d6c50f372d59c0f6dae6634703b2d6cdd843af8b4f773b47f4ddfb0e92",
+      "task": "The content API ignores reverse child relations when their query name differs from the accessor name or the name is implicit.",
+      "category": "api",
+      "expectedFiles": [
+        "wagtail/api/conf.py",
+        "wagtail/api/v3/form_data.py",
+        "wagtail/api/v3/schemas/generators/read.py",
+        "wagtail/api/v3/schemas/generators/write.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "wagtail/api/conf.py",
+          "start": 33,
+          "end": 37,
+          "sha256": "310721b4a1d647eb50322103439d29370ffbeb7699887fbeb7f566c36c1bb8c0"
+        },
+        {
+          "path": "wagtail/api/v3/form_data.py",
+          "start": 53,
+          "end": 57,
+          "sha256": "0aaa132ded01650f17509b53c1ff3fa77dc9d931c7be0378552a2daf373f6b57"
+        },
+        {
+          "path": "wagtail/api/v3/schemas/generators/read.py",
+          "start": 220,
+          "end": 224,
+          "sha256": "b417976dd94087fc5ac5a55dd61a9bc1fb5f3387b1c8d3f17aa6acefcdedc585"
+        },
+        {
+          "path": "wagtail/api/v3/schemas/generators/write.py",
+          "start": 155,
+          "end": 159,
+          "sha256": "53e2410754db111fa132690171b8e43cac7716d0de98c8a60840617cb825e191"
+        }
+      ],
+      "supportingFiles": [
+        "wagtail/admin/tests/api/test_pages.py",
+        "wagtail/api/v3/tests/test_page_create.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "wagtail/admin/tests/api/test_pages.py",
+          "start": 1259,
+          "end": 1263,
+          "sha256": "15cc9dd7e0be0c4a70a06a7e3ad0447342df1607e8b4a093357e971086c92a4a"
+        },
+        {
+          "path": "wagtail/admin/tests/api/test_pages.py",
+          "start": 1617,
+          "end": 1621,
+          "sha256": "b3501bf74f4314db5ed30323a26d439064c358b0e7aafb7538004eeca584389d"
+        },
+        {
+          "path": "wagtail/admin/tests/api/test_pages.py",
+          "start": 1752,
+          "end": 1756,
+          "sha256": "fe4d54e439c9d603a5a09184ce85104956af8d300c107b054ae8d6173a0779e7"
+        },
+        {
+          "path": "wagtail/api/v3/tests/test_page_create.py",
+          "start": 1101,
+          "end": 1103,
+          "sha256": "696d180e84196912c6832670087bfe05ae775c902d4a62d97d6db27e0f093bfe"
+        }
+      ],
+      "forbiddenFiles": [
+        "wagtail/embeds/finders/oembed.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/wagtail/wagtail/commit/6482a1321908680cb11c571bc9aa398aa53c9082",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "wagtail--wagtail-5",
+      "project": "wagtail/wagtail",
+      "split": "eval",
+      "revision": "aff664ae657c0685ed6cdd1d4448ad1047d5eb76",
+      "fixCommit": "9fc768327437b22efafc30134f06229ecd33328e",
+      "archiveSha256": "4d2791878bfd467d4fd635ab0fb3db33ed117fe1f55de6383c9a4f2bc9996d72",
+      "task": "Updating inline child records through the API returns a server error when the child model uses a custom primary-key name.",
+      "category": "api",
+      "expectedFiles": [
+        "wagtail/api/v3/form_data.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "wagtail/api/v3/form_data.py",
+          "start": 420,
+          "end": 424,
+          "sha256": "aae0d312f5cfe0f143ee157b00bb03748080369b5a06cee6092dd6310ae03a6a"
+        }
+      ],
+      "supportingFiles": [
+        "wagtail/api/v3/tests/test_page_update.py",
+        "wagtail/test/testapp/models.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "wagtail/api/v3/tests/test_page_update.py",
+          "start": 1212,
+          "end": 1215,
+          "sha256": "c85fcd5d179f853278d8b33000e0a887117853bbdf698ac36de53833c8c94382"
+        },
+        {
+          "path": "wagtail/test/testapp/models.py",
+          "start": 503,
+          "end": 507,
+          "sha256": "8bfa7d6da02bf8c9eb3585c0a55bb13f97ce69af9465ac200123f8802bd497d0"
+        },
+        {
+          "path": "wagtail/test/testapp/models.py",
+          "start": 524,
+          "end": 528,
+          "sha256": "11c5d3c40cb9e1e4567f8257ad30e85864750a383e36773360a281497e7c0f57"
+        }
+      ],
+      "forbiddenFiles": [
+        "wagtail/embeds/finders/oembed.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/wagtail/wagtail/commit/9fc768327437b22efafc30134f06229ecd33328e",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "nestjs--nest-1",
+      "project": "nestjs/nest",
+      "split": "train",
+      "revision": "bb3d572080ba5c3a34b65fcc39ca598c324cb32f",
+      "fixCommit": "1c2f689518412cbc6a6bc09662dd5cfed779f2bf",
+      "archiveSha256": "10c581a1dde535867613138ed30eb0853632d8af615cd16cb6ee2fb965a174a5",
+      "task": "Invalid request input from the Fastify adapter is reported as an internal server error instead of a client validation error.",
+      "category": "api",
+      "expectedFiles": [
+        "packages/core/exceptions/base-exception-filter.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/core/exceptions/base-exception-filter.ts",
+          "start": 92,
+          "end": 96,
+          "sha256": "bf1f13469919d5a39259af21f243e1f62ad26b91a4f5f6ed388f4c48ce71ae9f"
+        }
+      ],
+      "supportingFiles": [
+        "integration/hello-world/e2e/exceptions.spec.ts",
+        "packages/core/test/exceptions/exceptions-handler.spec.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "integration/hello-world/e2e/exceptions.spec.ts",
+          "start": 76,
+          "end": 80,
+          "sha256": "9a724d55045330d376ab427e4d439bcf26f663cfdd9af237fc5e225ca089a086"
+        },
+        {
+          "path": "packages/core/test/exceptions/exceptions-handler.spec.ts",
+          "start": 72,
+          "end": 76,
+          "sha256": "53446980d1e049503f612cf7506f66fcc574c5eaf51e4c5a576597e0d654f456"
+        }
+      ],
+      "forbiddenFiles": [
+        "packages/microservices/serializers/identity.serializer.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/nestjs/nest/commit/1c2f689518412cbc6a6bc09662dd5cfed779f2bf",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "nestjs--nest-2",
+      "project": "nestjs/nest",
+      "split": "train",
+      "revision": "832549f24171406c90103e13d2268f8784bcf860",
+      "fixCommit": "743d25527374cdb6c94f81c541357342e4890b70",
+      "archiveSha256": "240ffc8c31099021b43a5d365391c4c800041c6337b687a53f3a1e9ef74dc19b",
+      "task": "A custom JSON logging replacer loses access to its logger instance while serializing messages.",
+      "category": "logging",
+      "expectedFiles": [
+        "packages/common/services/console-logger.service.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/common/services/console-logger.service.ts",
+          "start": 774,
+          "end": 778,
+          "sha256": "99629696e93c4faeed7a5a0ecfbd02aefbade96ff87dbfc280a781cad66ab79f"
+        }
+      ],
+      "supportingFiles": [
+        "packages/common/test/services/logger.service.spec.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "packages/common/test/services/logger.service.spec.ts",
+          "start": 1300,
+          "end": 1304,
+          "sha256": "cdffce595fa5af9fb6d5bbd114fcaed017b99380ded001be5177d41ec2c45979"
+        }
+      ],
+      "forbiddenFiles": [
+        "packages/microservices/serializers/identity.serializer.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/nestjs/nest/commit/743d25527374cdb6c94f81c541357342e4890b70",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "nestjs--nest-3",
+      "project": "nestjs/nest",
+      "split": "train",
+      "revision": "7726a675b3a29c5746f98bf7b731bd28e524c304",
+      "fixCommit": "832549f24171406c90103e13d2268f8784bcf860",
+      "archiveSha256": "997f22eb9727defee966df9633449d9e60f23c9455f7ce8a864e5a856a3b1255",
+      "task": "Logging an exception whose message spans several lines fails to recognize the stack trace.",
+      "category": "logging",
+      "expectedFiles": [
+        "packages/common/services/console-logger.service.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/common/services/console-logger.service.ts",
+          "start": 922,
+          "end": 926,
+          "sha256": "b5b01c088b0a8f7e23dd0e8f1101882d152e688cb6b6023cf9bad0412c8d90bc"
+        }
+      ],
+      "supportingFiles": [
+        "packages/common/test/services/logger.service.spec.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "packages/common/test/services/logger.service.spec.ts",
+          "start": 93,
+          "end": 97,
+          "sha256": "1334ea10589a60d0f66739a6d3d16421b74d4c04431193cd3a06b4187a152918"
+        }
+      ],
+      "forbiddenFiles": [
+        "packages/microservices/serializers/identity.serializer.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/nestjs/nest/commit/832549f24171406c90103e13d2268f8784bcf860",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "nestjs--nest-4",
+      "project": "nestjs/nest",
+      "split": "train",
+      "revision": "47000ed8dc2e8e97e2f3f2fc8fe5922eb10922df",
+      "fixCommit": "5caf036b01804650972938bec38e68bb05ec3117",
+      "archiveSha256": "1cba5c80a4d0aa0c30723a8e0b85f22a118a5abaf92e1195d0bfa7f2191c46fb",
+      "task": "Error logging misinterprets a single stack argument or an explicitly undefined stack as message context.",
+      "category": "logging",
+      "expectedFiles": [
+        "packages/common/services/console-logger.service.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/common/services/console-logger.service.ts",
+          "start": 872,
+          "end": 876,
+          "sha256": "bded17a1bd17dbd3c7512273b91ddb652839a919cae04191a7da459aa389526e"
+        }
+      ],
+      "supportingFiles": [
+        "packages/common/test/services/logger.service.spec.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "packages/common/test/services/logger.service.spec.ts",
+          "start": 1523,
+          "end": 1527,
+          "sha256": "c72186c05353ca9a1fd5ad25bc487000b88c0c9c154bf0ad4e233c79925b5565"
+        }
+      ],
+      "forbiddenFiles": [
+        "packages/microservices/serializers/identity.serializer.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/nestjs/nest/commit/5caf036b01804650972938bec38e68bb05ec3117",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "nestjs--nest-5",
+      "project": "nestjs/nest",
+      "split": "train",
+      "revision": "245a768bab758c1aafe32b69b64878b8c3c568d2",
+      "fixCommit": "47000ed8dc2e8e97e2f3f2fc8fe5922eb10922df",
+      "archiveSha256": "e745b627dd6dedb316ab8b3c14024ef97e8028aeaa3730931487fb58d99eae95",
+      "task": "Two controller classes with the same name incorrectly share cached handler metadata.",
+      "category": "dependency-injection",
+      "expectedFiles": [
+        "packages/core/helpers/handler-metadata-storage.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/core/helpers/handler-metadata-storage.ts",
+          "start": 48,
+          "end": 52,
+          "sha256": "c0c1b1e01a9c2b6b09ba4bbedb19004be0ccb5dcb6fa8beecfefa93d48ea2e25"
+        }
+      ],
+      "supportingFiles": [
+        "packages/websockets/test/context/ws-context-creator.spec.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "packages/websockets/test/context/ws-context-creator.spec.ts",
+          "start": 147,
+          "end": 151,
+          "sha256": "ef41b331ac948604a0e5be68e41847487146bfe7989705aa174b4853ee4630ae"
+        }
+      ],
+      "forbiddenFiles": [
+        "packages/microservices/serializers/identity.serializer.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/nestjs/nest/commit/47000ed8dc2e8e97e2f3f2fc8fe5922eb10922df",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "outline--outline-1",
+      "project": "outline/outline",
+      "split": "eval",
+      "revision": "a58962101de8b9a54b251429df58b7595cdb9836",
+      "fixCommit": "316e4a47d8a0d858a7cd743f9702d6aa59293ca4",
+      "archiveSha256": "e8d68e7dc080c54cc26310d048bf2f48de2d20b54fa66b809d4e2fbe82efaa12",
+      "task": "Slack link previews fail because the integration chooses the wrong authentication token.",
+      "category": "integration",
+      "expectedFiles": [
+        "plugins/slack/server/api/hooks.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "plugins/slack/server/api/hooks.ts",
+          "start": 64,
+          "end": 68,
+          "sha256": "c4bed67c6e9c1934cdc312b7b2611594039710e0b8ab98bd2616836ae93da5e6"
+        },
+        {
+          "path": "plugins/slack/server/api/hooks.ts",
+          "start": 123,
+          "end": 127,
+          "sha256": "1486d111ae8b6aa55d4436f27c2e60cf348ad97a0dbb39b7f856b138b170025d"
+        }
+      ],
+      "supportingFiles": [
+        "plugins/slack/server/api/hooks.test.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "plugins/slack/server/api/hooks.test.ts",
+          "start": 18,
+          "end": 22,
+          "sha256": "c105ff91d8604db8ecb5f43cad7a80832f516957781356949610a89e2c653aa4"
+        },
+        {
+          "path": "plugins/slack/server/api/hooks.test.ts",
+          "start": 52,
+          "end": 56,
+          "sha256": "5689b2ac6a1c0701f080939c98348ff507559c0d1080ff17546f5d0064c7b9f6"
+        }
+      ],
+      "forbiddenFiles": [
+        "shared/utils/currency.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/outline/outline/commit/316e4a47d8a0d858a7cd743f9702d6aa59293ca4",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "outline--outline-2",
+      "project": "outline/outline",
+      "split": "eval",
+      "revision": "c762db123fd18c817987a3eb99dd0f1e5916a878",
+      "fixCommit": "a58962101de8b9a54b251429df58b7595cdb9836",
+      "archiveSha256": "c857aa264ff6e7977b5f2c7dc5a7b071c3b5b71110a529ffbff4fddafeb902af",
+      "task": "An email sign-in link can be redeemed repeatedly, including by concurrent requests.",
+      "category": "authentication",
+      "expectedFiles": [
+        "server/utils/jwt.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "server/utils/jwt.ts",
+          "start": 145,
+          "end": 149,
+          "sha256": "757e11a70d36d8adefa98bff8e4f0d4ae87687ef0bc3a509da7615d5533c9095"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "shared/utils/currency.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/outline/outline/commit/a58962101de8b9a54b251429df58b7595cdb9836",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "outline--outline-3",
+      "project": "outline/outline",
+      "split": "eval",
+      "revision": "ee0f099439ec6fe5a26881759bc6b36064014ff1",
+      "fixCommit": "22ab9ff592b5e6db7bd71415b122e781f5f28872",
+      "archiveSha256": "120962e4e8485a99a1d0669055d59316e9185b13bfa2f2b6f164f930332e2172",
+      "task": "Exporting markdown inserts an unnecessary backslash into decimal numbers at the beginning of a line.",
+      "category": "editor",
+      "expectedFiles": [
+        "shared/editor/lib/markdown/serializer.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "shared/editor/lib/markdown/serializer.ts",
+          "start": 571,
+          "end": 575,
+          "sha256": "8ab519ea674b6093dbe50095a9252b8b18b921d6a4a7b5aeeeb7673aefe7dbbd"
+        }
+      ],
+      "supportingFiles": [
+        "shared/editor/lib/markdown/serializer.test.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "shared/editor/lib/markdown/serializer.test.ts",
+          "start": 115,
+          "end": 117,
+          "sha256": "6855f58c7b80f6c4714ee0bf8818a231c477a8b854f7aff7b0bd66e8bed8cad3"
+        }
+      ],
+      "forbiddenFiles": [
+        "shared/utils/currency.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/outline/outline/commit/22ab9ff592b5e6db7bd71415b122e781f5f28872",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "outline--outline-4",
+      "project": "outline/outline",
+      "split": "eval",
+      "revision": "0f17ef8982eb489acd9b1cb1ecd8fb3a65576e89",
+      "fixCommit": "ee0f099439ec6fe5a26881759bc6b36064014ff1",
+      "archiveSha256": "cedf6f0b31a22e7443b013efa1e33abc2feb31815a5aa04f92a2b6d220209945",
+      "task": "Dropping a video file without a MIME type into the editor inserts it as an ordinary attachment.",
+      "category": "editor",
+      "expectedFiles": [
+        "app/editor/index.tsx",
+        "shared/editor/commands/insertFiles.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "app/editor/index.tsx",
+          "start": 841,
+          "end": 845,
+          "sha256": "9e5d312d87a7dd04368da8fe805604cdd72d0f9ff8a403f59b2ae5d3ee148c6c"
+        },
+        {
+          "path": "shared/editor/commands/insertFiles.ts",
+          "start": 75,
+          "end": 79,
+          "sha256": "8cca4ff7b03877e36028f8fe078e8454518b2dcab9c90d843b6b9a853fc50365"
+        }
+      ],
+      "supportingFiles": [
+        "shared/editor/lib/FileHelper.test.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "shared/editor/lib/FileHelper.test.ts",
+          "start": 32,
+          "end": 34,
+          "sha256": "a538b2b29ad5c5f4b4b5ef8094076aa4d61b031fef3911c5a04d510cb9dd360d"
+        }
+      ],
+      "forbiddenFiles": [
+        "shared/utils/currency.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/outline/outline/commit/ee0f099439ec6fe5a26881759bc6b36064014ff1",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "outline--outline-5",
+      "project": "outline/outline",
+      "split": "eval",
+      "revision": "d3e991f977b68abdebd361341b15215fdb06c7e3",
+      "fixCommit": "95216810f823b78dd563311d85f330d2aa4a9abb",
+      "archiveSha256": "25285c3f4c5e06c8e78a32ab64af3d023de1097e0733680f5ff55c983de70650",
+      "task": "Clicking a form field label can activate its prefix button instead of focusing the input.",
+      "category": "accessibility",
+      "expectedFiles": [
+        "app/components/Input.tsx"
+      ],
+      "expectedRanges": [
+        {
+          "path": "app/components/Input.tsx",
+          "start": 311,
+          "end": 315,
+          "sha256": "9279e7867b6bcb6c95981e85a05bced61e8745cccf5bafb4bf99e7e29514fed0"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "shared/utils/currency.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/outline/outline/commit/95216810f823b78dd563311d85f330d2aa4a9abb",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "expressjs--express-1",
+      "project": "expressjs/express",
+      "split": "train",
+      "revision": "3ce6d0eb86e9d93529ff3191c6bb5db8ce6e72c8",
+      "fixCommit": "9a34acf03cb818ff3f8bc40e44176e277a25cbb9",
+      "archiveSha256": "d7b9a00049ba6becb65f3f3763eb55cff9326a447a0df95c9ac0ee15868e7780",
+      "task": "Sending a response with chunked transfer encoding stops generating the entity tag.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/response.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/response.js",
+          "start": 166,
+          "end": 170,
+          "sha256": "c48f51bb52841ac084b90506b83cc7c08dbb1acb618dcaa2e062996db1acf197"
+        },
+        {
+          "path": "lib/response.js",
+          "start": 180,
+          "end": 184,
+          "sha256": "af999ea043e041de76c5d1ed6a20c541a501e2941962e399ac0de8041a7e5555"
+        }
+      ],
+      "supportingFiles": [
+        "test/res.send.js"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/res.send.js",
+          "start": 618,
+          "end": 620,
+          "sha256": "3db7ff7a2222fb43da11fb96ea8fcb6435ab2685cb6e97ebac961f2280fbc4e0"
+        }
+      ],
+      "forbiddenFiles": [
+        "examples/auth/index.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/expressjs/express/commit/9a34acf03cb818ff3f8bc40e44176e277a25cbb9",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "expressjs--express-2",
+      "project": "expressjs/express",
+      "split": "train",
+      "revision": "ba006766fb964571723138708eacaba0f55759cd",
+      "fixCommit": "ae6dd37680e3a00618d6c8a3e522f0ee4eeba1a4",
+      "archiveSha256": "8633c634f6eeca9fbcb2ab0e91027d624ac9c19f9b760d93be91cdbc91d0e89d",
+      "task": "Conditional requests using the QUERY HTTP method are never treated as fresh cache hits.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/request.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/request.js",
+          "start": 473,
+          "end": 477,
+          "sha256": "543bc4cf96a5e4df7626a4a2bf72ed429fb32a97b9dc9b9fc44cb46c35e2b264"
+        }
+      ],
+      "supportingFiles": [
+        "test/req.fresh.js"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/req.fresh.js",
+          "start": 5,
+          "end": 9,
+          "sha256": "48f9d195075c298ef2bb46e555ff49d621617260be422c11962bfe486dbc128e"
+        },
+        {
+          "path": "test/req.fresh.js",
+          "start": 50,
+          "end": 54,
+          "sha256": "b21afd80354ecf16b08c0696ee319402df118c01b407881366c1c441dbd28fab"
+        }
+      ],
+      "forbiddenFiles": [
+        "examples/auth/index.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/expressjs/express/commit/ae6dd37680e3a00618d6c8a3e522f0ee4eeba1a4",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "expressjs--express-3",
+      "project": "expressjs/express",
+      "split": "train",
+      "revision": "59e205a57a04fced6bb7b8ec0b5dec29461a9996",
+      "fixCommit": "18e5985b8a9d5e8423db0a9121f22bdaecd5b120",
+      "archiveSha256": "26e1da6ea7551ea7014d5f7ab605466d50284f706101ddad365ad683c98036de",
+      "task": "A response incorrectly includes both Content-Length and Transfer-Encoding headers.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/response.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/response.js",
+          "start": 165,
+          "end": 169,
+          "sha256": "29dc22a69165fdb87e319f0181448becf2027095c3c854810e688638b232a8b4"
+        }
+      ],
+      "supportingFiles": [
+        "test/res.send.js"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/res.send.js",
+          "start": 593,
+          "end": 595,
+          "sha256": "6555fbf4aa7f73f50a12b538fb904f86bf837938c21f8f69c5855672e22921fa"
+        }
+      ],
+      "forbiddenFiles": [
+        "examples/auth/index.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/expressjs/express/commit/18e5985b8a9d5e8423db0a9121f22bdaecd5b120",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "expressjs--express-4",
+      "project": "expressjs/express",
+      "split": "train",
+      "revision": "90ec6206d3275fdf2787f2028c6f48a2d92e8042",
+      "fixCommit": "9d8223d92ee81137a50a28eb6ad55a096791091d",
+      "archiveSha256": "c427c332593de96d48463ee5dea4de90d4049319e15f6dfe0253205f70217181",
+      "task": "Reading the forwarded host invokes a deprecated trailing-whitespace string API.",
+      "category": "compatibility",
+      "expectedFiles": [
+        "lib/request.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/request.js",
+          "start": 425,
+          "end": 429,
+          "sha256": "800cad6f64ca55ee37688f393937b819762c9c99608f4f0da624b84cb284bd0f"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "examples/auth/index.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/expressjs/express/commit/9d8223d92ee81137a50a28eb6ad55a096791091d",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "expressjs--express-5",
+      "project": "expressjs/express",
+      "split": "train",
+      "revision": "6b7ccfcf120e77f20aa22ff96ccf98a994c7d35b",
+      "fixCommit": "d12772393c8249666e0fcc11e298f48ce4632a11",
+      "archiveSha256": "e2ff6a9c4bf48dbf57e190e2eace5355a5ffcd77ec74384433a7e323c9a8015b",
+      "task": "The bundled search application fails to initialize or execute lookups with the modern Redis client API.",
+      "category": "integration",
+      "expectedFiles": [
+        "examples/search/index.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "examples/search/index.js",
+          "start": 20,
+          "end": 24,
+          "sha256": "39cb96b99de6f362fdcd2c11c9c1d8f009a419621da6cdca452852217e0a84ba"
+        },
+        {
+          "path": "examples/search/index.js",
+          "start": 56,
+          "end": 60,
+          "sha256": "1e2eff21242d49dfa634df8d78ba13d61c428f5d9f2a0963e2a0cb8262b90b5e"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "examples/auth/index.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/expressjs/express/commit/d12772393c8249666e0fcc11e298f48ce4632a11",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "node-red--node-red-1",
+      "project": "node-red/node-red",
+      "split": "eval",
+      "revision": "277bf6e2bf3f14d5759e4bb9e7b345a58f38a258",
+      "fixCommit": "2f94043a19e4f0d84b6096281bd161410560db66",
+      "archiveSha256": "1506537fecae7dfcb52614d41ba25d8ef23f36eab267d5c8f27e8ff52ec44700",
+      "task": "The editor explorer sidebar cannot reorder flows by dragging them, while preserving the relative subflow positions.",
+      "category": "editor",
+      "expectedFiles": [
+        "packages/node_modules/@node-red/editor-client/src/js/ui/common/treeList.js",
+        "packages/node_modules/@node-red/editor-client/src/js/ui/tab-info-outliner.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/node_modules/@node-red/editor-client/src/js/ui/common/treeList.js",
+          "start": 298,
+          "end": 302,
+          "sha256": "4260e6d264476c7bec60b3c3a1ddb1c341d81b45623294e022c98ccd31606dfb"
+        },
+        {
+          "path": "packages/node_modules/@node-red/editor-client/src/js/ui/tab-info-outliner.js",
+          "start": 20,
+          "end": 24,
+          "sha256": "a5e5cd7e5fb9e60a8e604886df7ae63ada83be59e9c4b905e1c705923d933862"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "packages/node_modules/@node-red/nodes/core/parsers/70-JSON.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/node-red/node-red/commit/2f94043a19e4f0d84b6096281bd161410560db66",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "node-red--node-red-2",
+      "project": "node-red/node-red",
+      "split": "eval",
+      "revision": "91b54929cd5ceb8206492154612c634412fd72fc",
+      "fixCommit": "9ce8d76bd68514dff26659c8b2aeaf693b6d2ad7",
+      "archiveSha256": "2131a0555fc59a07e439c71dcf060899b8d0d7b84076432d5afee39435cc88fc",
+      "task": "A built-in Node module with the node: prefix is incorrectly treated as a third-party package.",
+      "category": "dependency-resolution",
+      "expectedFiles": [
+        "packages/node_modules/@node-red/registry/lib/externalModules.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/node_modules/@node-red/registry/lib/externalModules.js",
+          "start": 12,
+          "end": 16,
+          "sha256": "263ee87b9b1e593ef020318c606ee001b5299fe15f7977a5a4d85aea64a6d532"
+        },
+        {
+          "path": "packages/node_modules/@node-red/registry/lib/externalModules.js",
+          "start": 141,
+          "end": 145,
+          "sha256": "6bea60a3f120d46c970d76b06713bdf4647ecbb3e90d445ed6f611c4689ce54f"
+        }
+      ],
+      "supportingFiles": [
+        "test/unit/@node-red/registry/lib/externalModules_spec.js"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/unit/@node-red/registry/lib/externalModules_spec.js",
+          "start": 326,
+          "end": 330,
+          "sha256": "bcef9349fbd39c28df43759382d8ba82effb34754a761fdb1dca0b9a80dc4cc4"
+        }
+      ],
+      "forbiddenFiles": [
+        "packages/node_modules/@node-red/nodes/core/parsers/70-JSON.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/node-red/node-red/commit/9ce8d76bd68514dff26659c8b2aeaf693b6d2ad7",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "node-red--node-red-3",
+      "project": "node-red/node-red",
+      "split": "eval",
+      "revision": "ab24e9df4f594d40cdefc9db9698ac5b4ec89d88",
+      "fixCommit": "236d6852865406e14951529aac5f11e462ab4fd2",
+      "archiveSha256": "8693f81252910de6002dc03970f7efe617d44a6ca52423be87024d0036f3cae2",
+      "task": "The report-by-exception node drops the first message when its value is an empty object.",
+      "category": "data-processing",
+      "expectedFiles": [
+        "packages/node_modules/@node-red/nodes/core/function/rbe.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/node_modules/@node-red/nodes/core/function/rbe.js",
+          "start": 47,
+          "end": 51,
+          "sha256": "2a8106130b5437025fe40c424a5008959b9a9934d271116ebacb7f332f66ba81"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "packages/node_modules/@node-red/nodes/core/parsers/70-JSON.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/node-red/node-red/commit/236d6852865406e14951529aac5f11e462ab4fd2",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "node-red--node-red-4",
+      "project": "node-red/node-red",
+      "split": "eval",
+      "revision": "935b8d3e12ec8be064f3a72ac6547131f778a7b1",
+      "fixCommit": "91b54929cd5ceb8206492154612c634412fd72fc",
+      "archiveSha256": "f8dc248fa2b31b485e0d04fbec928bd48dad15676cc23838356460051ddc91c6",
+      "task": "Parsing an external module name fails to recognize a node:-prefixed core module.",
+      "category": "dependency-resolution",
+      "expectedFiles": [
+        "packages/node_modules/@node-red/registry/lib/externalModules.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/node_modules/@node-red/registry/lib/externalModules.js",
+          "start": 143,
+          "end": 147,
+          "sha256": "f9ca4c680bda7f247240e7c81a0f4d92a5c893f6d4bfe1013805132c929c126f"
+        }
+      ],
+      "supportingFiles": [
+        "test/unit/@node-red/registry/lib/externalModules_spec.js"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/unit/@node-red/registry/lib/externalModules_spec.js",
+          "start": 96,
+          "end": 100,
+          "sha256": "19a8e733234c5c45744203becdfd90741be73ec104256d5817961c3ff448c69b"
+        },
+        {
+          "path": "test/unit/@node-red/registry/lib/externalModules_spec.js",
+          "start": 314,
+          "end": 318,
+          "sha256": "733783f8647996428574d96c9b5f7772fd7473a6945a99ab9c7c2bb8456c2592"
+        }
+      ],
+      "forbiddenFiles": [
+        "packages/node_modules/@node-red/nodes/core/parsers/70-JSON.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/node-red/node-red/commit/91b54929cd5ceb8206492154612c634412fd72fc",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "node-red--node-red-5",
+      "project": "node-red/node-red",
+      "split": "eval",
+      "revision": "935b8d3e12ec8be064f3a72ac6547131f778a7b1",
+      "fixCommit": "7964d5944b6812ccbfc7d97ecad1f1f27a106e2f",
+      "archiveSha256": "f8dc248fa2b31b485e0d04fbec928bd48dad15676cc23838356460051ddc91c6",
+      "task": "A WebSocket authentication packet crashes the editor communications channel when administrator authentication is disabled.",
+      "category": "authentication",
+      "expectedFiles": [
+        "packages/node_modules/@node-red/editor-api/lib/editor/comms.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/node_modules/@node-red/editor-api/lib/editor/comms.js",
+          "start": 135,
+          "end": 139,
+          "sha256": "9bff2268f09f418a1163305e5bf029abdf4cc1ac9566f1981b9075e5752c43aa"
+        }
+      ],
+      "supportingFiles": [
+        "test/unit/@node-red/editor-api/lib/editor/comms_spec.js"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/unit/@node-red/editor-api/lib/editor/comms_spec.js",
+          "start": 121,
+          "end": 125,
+          "sha256": "d1d2b6891ac64821eaef9fcc4bb84b84aa327e20bc90a887e01d6ba90c7362d6"
+        }
+      ],
+      "forbiddenFiles": [
+        "packages/node_modules/@node-red/nodes/core/parsers/70-JSON.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/node-red/node-red/commit/7964d5944b6812ccbfc7d97ecad1f1f27a106e2f",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "go-chi--chi-1",
+      "project": "go-chi/chi",
+      "split": "train",
+      "revision": "c9744a3641452cfe4fbb9929ceb554659d6bd950",
+      "fixCommit": "c6e33a1a9dd43e2601e2e0447b838cb0a9a74856",
+      "archiveSha256": "10cb67f81cf7127fe01a12246bcdb0bc455e9e5cab53208b91891d5e67727bad",
+      "task": "Conditional middleware rebuilds its wrapped handler on every incoming request instead of constructing it once.",
+      "category": "performance",
+      "expectedFiles": [
+        "middleware/maybe.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "middleware/maybe.go",
+          "start": 10,
+          "end": 14,
+          "sha256": "0742a4302d48926ed8e49475890c31a335055e1cd5aee7a4aa1d0b26e9458cc9"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "middleware/heartbeat.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/go-chi/chi/commit/c6e33a1a9dd43e2601e2e0447b838cb0a9a74856",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "go-chi--chi-2",
+      "project": "go-chi/chi",
+      "split": "train",
+      "revision": "9b6ddcddb96aa14648702e7eaabef38e14e65157",
+      "fixCommit": "38939062c5df4d3e8814aad1a488983112627ced",
+      "archiveSha256": "b8d17e556e0f5c0c0df455c341d4417c9166b2b7a4dcc2aac7ceb35863991193",
+      "task": "Response compression accepts catch-all wildcard content types even though only a wildcard subtype is supported.",
+      "category": "http",
+      "expectedFiles": [
+        "middleware/compress.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "middleware/compress.go",
+          "start": 74,
+          "end": 78,
+          "sha256": "0d0c5d6eeeb9637000b2c41bdd63b78e9070337224872ae4c17d70f59fc55a32"
+        }
+      ],
+      "supportingFiles": [
+        "middleware/compress_test.go"
+      ],
+      "supportingRanges": [
+        {
+          "path": "middleware/compress_test.go",
+          "start": 154,
+          "end": 158,
+          "sha256": "69874f49cd6b60c2f88189645da6edc75b33db9f16ca3d170de0e9c987af4112"
+        }
+      ],
+      "forbiddenFiles": [
+        "middleware/heartbeat.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/go-chi/chi/commit/38939062c5df4d3e8814aad1a488983112627ced",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "go-chi--chi-3",
+      "project": "go-chi/chi",
+      "split": "train",
+      "revision": "29164f023bf9319e74d5961a21a712653bb98c83",
+      "fixCommit": "9b6ddcddb96aa14648702e7eaabef38e14e65157",
+      "archiveSha256": "1560a30c353b204cac98efefd2cf2e216088b772ad8f459674fe772217539711",
+      "task": "A method-not-allowed response repeats the same HTTP method multiple times in its Allow header.",
+      "category": "routing",
+      "expectedFiles": [
+        "tree.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "tree.go",
+          "start": 480,
+          "end": 484,
+          "sha256": "209e1d5883f84799a5803ee8f557d272fd0de22be8ca3d724aaaee0092a7b928"
+        },
+        {
+          "path": "tree.go",
+          "start": 526,
+          "end": 530,
+          "sha256": "8285cd4c87ae0b66a2fbae82286898eb420d3183588e6407584571247180a32e"
+        }
+      ],
+      "supportingFiles": [
+        "mux_test.go"
+      ],
+      "supportingRanges": [
+        {
+          "path": "mux_test.go",
+          "start": 395,
+          "end": 399,
+          "sha256": "cda4d61fd3a0e98e2390c60e612c9169f0e20d38704b471fde45f76dcb9d2d22"
+        }
+      ],
+      "forbiddenFiles": [
+        "middleware/heartbeat.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/go-chi/chi/commit/9b6ddcddb96aa14648702e7eaabef38e14e65157",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "go-chi--chi-4",
+      "project": "go-chi/chi",
+      "split": "train",
+      "revision": "bc02284e9db220c644912320fe1db6bc9b4a087c",
+      "fixCommit": "29164f023bf9319e74d5961a21a712653bb98c83",
+      "archiveSha256": "d1e89c93a84c7c0f049651c7643008fd11c8526519d5eb43c7fa98dcd10bb9b1",
+      "task": "Inspecting mounted routes drops a handler that shares a pattern with a mounted subrouter.",
+      "category": "routing",
+      "expectedFiles": [
+        "tree.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "tree.go",
+          "start": 630,
+          "end": 634,
+          "sha256": "f9b69a51fe9dce767fe61da9aef0e54e13e2fb7c4cb841e5aacd08247613bdb5"
+        },
+        {
+          "path": "tree.go",
+          "start": 652,
+          "end": 656,
+          "sha256": "754106556aec4425679278794e9a7780a247ddf6245e9f5782dcdd9ee5ee53a7"
+        }
+      ],
+      "supportingFiles": [
+        "tree_test.go"
+      ],
+      "supportingRanges": [
+        {
+          "path": "tree_test.go",
+          "start": 575,
+          "end": 579,
+          "sha256": "12b2af1ce4e27f53e5cf32be8043d47cb538638500fc3ef8a55539cf3da9126f"
+        }
+      ],
+      "forbiddenFiles": [
+        "middleware/heartbeat.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/go-chi/chi/commit/29164f023bf9319e74d5961a21a712653bb98c83",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "go-chi--chi-5",
+      "project": "go-chi/chi",
+      "split": "train",
+      "revision": "d7b767bcbea51e486bdc9fd06d25136767ec14b5",
+      "fixCommit": "878fe71fc9e506a63ea6957ed09c9ce84f789e97",
+      "archiveSha256": "16923ba390b091c547dfea7af34290156969386133750a2336a6cb9cbbc94cb8",
+      "task": "Panic stack traces still contain terminal color escapes when color output has been disabled.",
+      "category": "logging",
+      "expectedFiles": [
+        "middleware/logger.go",
+        "middleware/recoverer.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "middleware/logger.go",
+          "start": 167,
+          "end": 171,
+          "sha256": "33e695278fa40afc99724d879b8666d251257a6189d80bf2296120dec3156387"
+        },
+        {
+          "path": "middleware/recoverer.go",
+          "start": 55,
+          "end": 59,
+          "sha256": "f128af664d98814600843d175b0382b584e857937c7428276172d2f3c94a8e92"
+        },
+        {
+          "path": "middleware/recoverer.go",
+          "start": 67,
+          "end": 71,
+          "sha256": "98310949da04c01e6a9b11073c00bdae9da0322233cc3fc7f02fdb1c8546bc35"
+        }
+      ],
+      "supportingFiles": [
+        "middleware/recoverer_test.go"
+      ],
+      "supportingRanges": [
+        {
+          "path": "middleware/recoverer_test.go",
+          "start": 14,
+          "end": 18,
+          "sha256": "084ea9affc0dd1cf24eb41c8168359a6c299e283768ced58dc41cfa3d3a96fd3"
+        },
+        {
+          "path": "middleware/recoverer_test.go",
+          "start": 44,
+          "end": 48,
+          "sha256": "fb9790dee8158dd3b25506d93e0317c4c5f4c323151a754d57ccf70ad7fc4f5c"
+        }
+      ],
+      "forbiddenFiles": [
+        "middleware/heartbeat.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/go-chi/chi/commit/878fe71fc9e506a63ea6957ed09c9ce84f789e97",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spf13--cobra-1",
+      "project": "spf13/cobra",
+      "split": "eval",
+      "revision": "f2878bab8c96afd6e36968af96343b35dbb82a82",
+      "fixCommit": "746ef07158728502482cea9f880a6f4b21ef29a9",
+      "archiveSha256": "a5bf800501db193a1f1c17a6f3484b7e45adf3b4cc0899c760710a3c4beb6060",
+      "task": "Generating shell completions unexpectedly changes the process's original command-line arguments.",
+      "category": "cli",
+      "expectedFiles": [
+        "completions.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "completions.go",
+          "start": 318,
+          "end": 322,
+          "sha256": "123a256d45d44f9677bc732fcc71ef5888a36a7de93078b5e412703127f03cdf"
+        }
+      ],
+      "supportingFiles": [
+        "completions_test.go"
+      ],
+      "supportingRanges": [
+        {
+          "path": "completions_test.go",
+          "start": 4070,
+          "end": 4074,
+          "sha256": "1493a282cc334569ff08a2f9bcd7e4c60751b43cf0140f4ac0302ca811a65f0f"
+        }
+      ],
+      "forbiddenFiles": [
+        "doc/man_docs.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spf13/cobra/commit/746ef07158728502482cea9f880a6f4b21ef29a9",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spf13--cobra-2",
+      "project": "spf13/cobra",
+      "split": "eval",
+      "revision": "10d4b48a79be3d4e89e6c45cb59f4d32a3d2ae19",
+      "fixCommit": "61968e893eee2f27696c2fbc8e34fa5c4afaf7c4",
+      "archiveSha256": "8c195ddcf4cd4b2105cdd0e5796f35d3c27e9640640ea3a6d58bd68e95a022cc",
+      "task": "Fish completion breaks when an earlier argument contains spaces or shell metacharacters.",
+      "category": "cli",
+      "expectedFiles": [
+        "fish_completions.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "fish_completions.go",
+          "start": 54,
+          "end": 58,
+          "sha256": "fb935e3526369206ad58f479604b77dbe5b82c7017feccbb7caa8a5e0bb23c22"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "doc/man_docs.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spf13/cobra/commit/61968e893eee2f27696c2fbc8e34fa5c4afaf7c4",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spf13--cobra-3",
+      "project": "spf13/cobra",
+      "split": "eval",
+      "revision": "5f9c40898e795a9fb0fd5ca83b6e05c3720523d1",
+      "fixCommit": "a97f9fd47b290016526c8af2dac0531fea5cd773",
+      "archiveSha256": "540633c00bdd0941ca85e5b0f88d5ffc0488c28e2c7315a8202f66127bcfdbd1",
+      "task": "A named completion callback type is not interchangeable with the corresponding ordinary function signature.",
+      "category": "types",
+      "expectedFiles": [
+        "completions.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "completions.go",
+          "start": 130,
+          "end": 134,
+          "sha256": "9e442e6edd26a040e6d5b3a87baee32114e2504a883155fe92258a0817dd24ca"
+        }
+      ],
+      "supportingFiles": [
+        "completions_test.go"
+      ],
+      "supportingRanges": [
+        {
+          "path": "completions_test.go",
+          "start": 2886,
+          "end": 2890,
+          "sha256": "1a3ed761bf96acf5796520f30075cd4af867609bb3d88b320eea1fb74989382a"
+        }
+      ],
+      "forbiddenFiles": [
+        "doc/man_docs.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spf13/cobra/commit/a97f9fd47b290016526c8af2dac0531fea5cd773",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spf13--cobra-4",
+      "project": "spf13/cobra",
+      "split": "eval",
+      "revision": "41b26ec8bb59dfba580f722201bf371c4f5703dd",
+      "fixCommit": "4ba5566f5704a9c0d205e1ef3efc4896156d33fa",
+      "archiveSha256": "3cd1c635e045a63fa9c9ddbb6700a92c3293c34ba72e8e2f39346106e5618413",
+      "task": "Bash completion fails under nounset when a file-extension filter is empty.",
+      "category": "cli",
+      "expectedFiles": [
+        "bash_completionsV2.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "bash_completionsV2.go",
+          "start": 145,
+          "end": 149,
+          "sha256": "b6f8bb01ea782d00256ea00dfe513264cd453520f6a308fe084a4f1a301809ab"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "doc/man_docs.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spf13/cobra/commit/4ba5566f5704a9c0d205e1ef3efc4896156d33fa",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spf13--cobra-5",
+      "project": "spf13/cobra",
+      "split": "eval",
+      "revision": "09d5664f34e3f7571560e48ccb74c8904b671e87",
+      "fixCommit": "611e16c322e3b0413a9ba4e489fcd98ef904e406",
+      "archiveSha256": "f097302198b5400129ba4e54961a9652f0e295b0288ecd76a50e616fa63b02b8",
+      "task": "A small command-line application retains unused built-in commands because template handling prevents linker dead-code elimination.",
+      "category": "performance",
+      "expectedFiles": [
+        "cobra.go",
+        "command.go",
+        "completions.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "cobra.go",
+          "start": 178,
+          "end": 182,
+          "sha256": "0ae6eab7521c26dc4c5a27f420349178033936306dd69b6439bc2a5e859680d6"
+        },
+        {
+          "path": "command.go",
+          "start": 313,
+          "end": 317,
+          "sha256": "f150a99558bb0281d87425c1bd73220a7184f5e1cceed54ae013f5262befe736"
+        },
+        {
+          "path": "command.go",
+          "start": 435,
+          "end": 439,
+          "sha256": "b4e20b71fffe21e342c27006efd038ef8b7579615f23f80ce8633cb078935309"
+        },
+        {
+          "path": "command.go",
+          "start": 895,
+          "end": 899,
+          "sha256": "e265c190e9ca3f3f1c39b16932ef24e599a3519a9b075313b346c65e9a49f884"
+        },
+        {
+          "path": "command.go",
+          "start": 1191,
+          "end": 1195,
+          "sha256": "a239fcb6bafd2a6bd848668d508cbd7b8a99b41162e0fd0475d00cfe0bcf8c0b"
+        },
+        {
+          "path": "completions.go",
+          "start": 556,
+          "end": 560,
+          "sha256": "56dc2a580cbcc64d0a54778640b2b00a1d43e5bfb17a5b4d2d2ed52ae0fada57"
+        }
+      ],
+      "supportingFiles": [
+        "cobra_test.go",
+        "command_test.go"
+      ],
+      "supportingRanges": [
+        {
+          "path": "cobra_test.go",
+          "start": 220,
+          "end": 224,
+          "sha256": "4bab0236524c51fa4e178a73ca049377d23d9aad228952014f0c56876f16c9d6"
+        },
+        {
+          "path": "command_test.go",
+          "start": 1020,
+          "end": 1024,
+          "sha256": "0799790e9070c2567978d99b4564c0e74ec413979b899fea7b7039351a3c6c86"
+        },
+        {
+          "path": "command_test.go",
+          "start": 1085,
+          "end": 1089,
+          "sha256": "0ab22dd22c6876e686ff0d0c71faddd3a25c973406eec31296bd66dc70bafcec"
+        }
+      ],
+      "forbiddenFiles": [
+        "doc/man_docs.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spf13/cobra/commit/611e16c322e3b0413a9ba4e489fcd98ef904e406",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "tokio-rs--axum-1",
+      "project": "tokio-rs/axum",
+      "split": "train",
+      "revision": "9f1226db155f4ae15a86a806f2560dbb874a4238",
+      "fixCommit": "a000c300848c0be7ba0f63ebabd5dbe0f6643067",
+      "archiveSha256": "c8d6aa62b749058af3320a118188aa57eac8d905a6c47a83070a87ce7b232ad4",
+      "task": "An HTTP body stream reports byte-size bounds as though they were the number of remaining stream items.",
+      "category": "http",
+      "expectedFiles": [
+        "axum-core/src/body.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "axum-core/src/body.rs",
+          "start": 187,
+          "end": 191,
+          "sha256": "c94e51431a946cd1f063b52d7851c81445dd9690f2aa8e23e7ddf0eaba8518b8"
+        }
+      ],
+      "supportingFiles": [
+        "axum-core/src/body.rs"
+      ],
+      "supportingRanges": [
+        {
+          "path": "axum-core/src/body.rs",
+          "start": 248,
+          "end": 252,
+          "sha256": "97920fbc938749844961f79b18508031262f7ba64696e6722096de3a5fe7e345"
+        }
+      ],
+      "forbiddenFiles": [
+        "axum/src/extract/ws.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/tokio-rs/axum/commit/a000c300848c0be7ba0f63ebabd5dbe0f6643067",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "tokio-rs--axum-2",
+      "project": "tokio-rs/axum",
+      "split": "train",
+      "revision": "bc8d4912435204a4a073cea70355ae0328d263fe",
+      "fixCommit": "09e767e6667b21327f4c259568854a6b5c709bcf",
+      "archiveSha256": "18412f6b19b0da6815656873f2beb8abca5106273eb0029b41b217576c2e42d2",
+      "task": "A failed typed-header extraction repeats the header name in its user-visible rejection message.",
+      "category": "http",
+      "expectedFiles": [
+        "axum-extra/src/typed_header.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "axum-extra/src/typed_header.rs",
+          "start": 196,
+          "end": 200,
+          "sha256": "d06babcb8cc3ff9448e977b3dd72811bd6c1b07c0853087a4ca551238f853655"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "axum/src/extract/ws.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/tokio-rs/axum/commit/09e767e6667b21327f4c259568854a6b5c709bcf",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "tokio-rs--axum-3",
+      "project": "tokio-rs/axum",
+      "split": "train",
+      "revision": "8aae5935791472be6e8aada157d3e7a49a610c23",
+      "fixCommit": "b14732f08cb54bde5b2ba3cfe324af3f6747b568",
+      "archiveSha256": "75af854f30c5dbc639dd52a791029c3f712f0248a2a5071d6adcdd0b0f25afbc",
+      "task": "An optional typed header is decoded even when the request does not contain that header.",
+      "category": "http",
+      "expectedFiles": [
+        "axum-extra/src/typed_header.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "axum-extra/src/typed_header.rs",
+          "start": 91,
+          "end": 95,
+          "sha256": "7ca6ff0acc5320f11ef440b4026076358056988ac43b8b5a09f2250cabd62b31"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "axum/src/extract/ws.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/tokio-rs/axum/commit/b14732f08cb54bde5b2ba3cfe324af3f6747b568",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "tokio-rs--axum-4",
+      "project": "tokio-rs/axum",
+      "split": "train",
+      "revision": "8b30afbfeee457146d29c9c9db47f0ae621a22a8",
+      "fixCommit": "715e9a8950b910dd6bb71aac48ce3633c9359ed0",
+      "archiveSha256": "8a3c432faf3a471b241cf8e91f43594fca76c6b1d2412325c435105c81a75aa2",
+      "task": "A protobuf request body buffering failure loses its original rejection and is reported as a decoding failure.",
+      "category": "api",
+      "expectedFiles": [
+        "axum-extra/src/protobuf.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "axum-extra/src/protobuf.rs",
+          "start": 101,
+          "end": 105,
+          "sha256": "c16403405d2d0fbc9082015096757606f18683862b1c10abfa13cb95c8729081"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "axum/src/extract/ws.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/tokio-rs/axum/commit/715e9a8950b910dd6bb71aac48ce3633c9359ed0",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "tokio-rs--axum-5",
+      "project": "tokio-rs/axum",
+      "split": "train",
+      "revision": "130b421f2695a003dcf55a18d68f112f2b442b20",
+      "fixCommit": "8b30afbfeee457146d29c9c9db47f0ae621a22a8",
+      "archiveSha256": "3218ee2867b7d9ddf3d418fb993f609e261f162cbcfee928db8a4add48d72351",
+      "task": "A multipart response may choose a boundary that already occurs inside one of its parts.",
+      "category": "http",
+      "expectedFiles": [
+        "axum-extra/src/response/multiple.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "axum-extra/src/response/multiple.rs",
+          "start": 35,
+          "end": 39,
+          "sha256": "8737e004cb27965b2f2667bdcb7612c42b30d0ea14a649f5bc010d7e3dc17e0f"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "axum/src/extract/ws.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/tokio-rs/axum/commit/8b30afbfeee457146d29c9c9db47f0ae621a22a8",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "starship--starship-1",
+      "project": "starship/starship",
+      "split": "eval",
+      "revision": "69c1a5714abeb0ee8acf29e95a34de6ef5a5cc27",
+      "fixCommit": "084cdf2b9366adc4df8c2217cbe5f6371e882ece",
+      "archiveSha256": "01fbb2cf15e5d904af6f3fd6eee3ce682bb10923b84e36a4bfd0ff44691ef527",
+      "task": "Compact numeric output rounds up to a thousand units instead of advancing to the next unit suffix.",
+      "category": "formatting",
+      "expectedFiles": [
+        "src/utils/mod.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/utils/mod.rs",
+          "start": 819,
+          "end": 823,
+          "sha256": "631636a97b44d1d67bf3e7c487334d00f5dcc1df8f7436a4c1c21dd07e09e9c8"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/modules/battery.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/starship/starship/commit/084cdf2b9366adc4df8c2217cbe5f6371e882ece",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "starship--starship-2",
+      "project": "starship/starship",
+      "split": "eval",
+      "revision": "0584026a5898575693cb8ef43b9879bb4248ae26",
+      "fixCommit": "69c1a5714abeb0ee8acf29e95a34de6ef5a5cc27",
+      "archiveSha256": "e95ac82acfda49766c8482ceb550e5c128a89ad97c66ac1161cb1bfcef478033",
+      "task": "The Pulumi prompt shows the wrong selected stack when different backends have separate stack selections.",
+      "category": "integration",
+      "expectedFiles": [
+        "src/modules/pulumi.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/modules/pulumi.rs",
+          "start": 131,
+          "end": 135,
+          "sha256": "d85a91c28d0996bc7daa6f8f97d240ed58d69190a0607d615a6bbbfbc53892d6"
+        },
+        {
+          "path": "src/modules/pulumi.rs",
+          "start": 190,
+          "end": 194,
+          "sha256": "c52b076bfb9e9d0607a70ce56341d2dffd4c62f8caa6f56b2a6a3465793ca5c3"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/modules/battery.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/starship/starship/commit/69c1a5714abeb0ee8acf29e95a34de6ef5a5cc27",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "starship--starship-3",
+      "project": "starship/starship",
+      "split": "eval",
+      "revision": "ba04cfb6a425ea42826cb32804df8e88fa06d3db",
+      "fixCommit": "2bc6acf64085a1bf6ee54af8f8d1770bc56263f0",
+      "archiveSha256": "a2a196144b5ac3f65f1754dd71f49e0a9abce43e70fea0693ccf3f00a1e31655",
+      "task": "The directory prompt disappears when a symbolic link points inside a repository subdirectory and repository-root styling is enabled.",
+      "category": "filesystem",
+      "expectedFiles": [
+        "src/modules/directory.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/modules/directory.rs",
+          "start": 111,
+          "end": 115,
+          "sha256": "08e67a90679ace0260ec002138430c1885092d88dc1789fba0593be7210e950e"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/modules/battery.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/starship/starship/commit/2bc6acf64085a1bf6ee54af8f8d1770bc56263f0",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "starship--starship-4",
+      "project": "starship/starship",
+      "split": "eval",
+      "revision": "cc825b00a92492d231a451923a397f5d0f3f6165",
+      "fixCommit": "ba04cfb6a425ea42826cb32804df8e88fa06d3db",
+      "archiveSha256": "58caa0a20498d9e561ddb468bf4e345948fc06b54b684acfdf9e3bd109e1953e",
+      "task": "A Nim project folder listed in folder detection settings is ignored unless it is also listed as a file.",
+      "category": "configuration",
+      "expectedFiles": [
+        "src/modules/nim.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/modules/nim.rs",
+          "start": 13,
+          "end": 17,
+          "sha256": "6c63e31992e3713b84199e119155c6370ef36306d4ce0d35440404a2ef7f0a70"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/modules/battery.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/starship/starship/commit/ba04cfb6a425ea42826cb32804df8e88fa06d3db",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "starship--starship-5",
+      "project": "starship/starship",
+      "split": "eval",
+      "revision": "b372810155c0765055712b2ef8c09936f354f9ca",
+      "fixCommit": "d1f5271d619b95f10d8c8fe335b273c3d859b745",
+      "archiveSha256": "3e6f6441ae9ba11eda95c00a1eef3f5031dc4c78afa5fb90764e52800ca582fe",
+      "task": "The host and user prompt disagree about whether an SSH session exists when only some SSH environment variables are set.",
+      "category": "configuration",
+      "expectedFiles": [
+        "src/modules/hostname.rs",
+        "src/modules/username.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/modules/hostname.rs",
+          "start": 17,
+          "end": 21,
+          "sha256": "92c32351d81e188797d84927d281864193f95e1a5bf89d2b9dd884c34fd292e7"
+        },
+        {
+          "path": "src/modules/hostname.rs",
+          "start": 45,
+          "end": 49,
+          "sha256": "4f2ebbbbb8d5acf94d279e9cd1fd3aa35bb1c1b2413ea07940815323253cd755"
+        },
+        {
+          "path": "src/modules/username.rs",
+          "start": 41,
+          "end": 45,
+          "sha256": "d31216012d184261d692cdebf0f7af3cc1464486b203911dd58dfab3e2b0bf76"
+        },
+        {
+          "path": "src/modules/username.rs",
+          "start": 120,
+          "end": 124,
+          "sha256": "97fae5bd2b0d079362abca2edb5bcd8c94229342d8b673da79be83420706ae91"
+        }
+      ],
+      "supportingFiles": [
+        "src/modules/hostname.rs"
+      ],
+      "supportingRanges": [
+        {
+          "path": "src/modules/hostname.rs",
+          "start": 205,
+          "end": 209,
+          "sha256": "e74f0591e5c6a43ce3e7f8c2be96e0a37f9eafae2a21de1adc8c48ed76a68ad6"
+        }
+      ],
+      "forbiddenFiles": [
+        "src/modules/battery.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/starship/starship/commit/d1f5271d619b95f10d8c8fe335b273c3d859b745",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "sinatra--sinatra-1",
+      "project": "sinatra/sinatra",
+      "split": "train",
+      "revision": "fa99a21461d4f1f5337b9b9d7a38a1b51c8f4e55",
+      "fixCommit": "3fe8c38dc405586f7ad8f2ac748aa53e9c3615bd",
+      "archiveSha256": "0a1df0d5523d10f4f47e6e1dd7780f96373468418bed057a66423b6b8af32b0a",
+      "task": "Checking a large conditional entity-tag header spends excessive CPU time splitting whitespace around delimiters.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/sinatra/base.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/sinatra/base.rb",
+          "start": 712,
+          "end": 716,
+          "sha256": "60734ba1d4fbb6369dfaefc9b65ef2bbbbedde5fb12d49a8add4502020cdb0b1"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "rack-protection/lib/rack/protection/path_traversal.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/sinatra/sinatra/commit/3fe8c38dc405586f7ad8f2ac748aa53e9c3615bd",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "sinatra--sinatra-2",
+      "project": "sinatra/sinatra",
+      "split": "train",
+      "revision": "c4b7c04e6d23ef8e17404d64cc731bece268acea",
+      "fixCommit": "025e8c5eada804b192199bf94c2361ef1c8691fe",
+      "archiveSha256": "13bfa9e7cf10c5d7134a6ae4ca58b0209688a0dab688aa4b493e5dea68e0e252",
+      "task": "A response MIME type with multiple parameters is formatted with invalid separators.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/sinatra/base.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/sinatra/base.rb",
+          "start": 397,
+          "end": 401,
+          "sha256": "0f65b62df49ca32df8ea988af6642cdc87a7b96c130b14a42efc6072044da765"
+        }
+      ],
+      "supportingFiles": [
+        "test/helpers_test.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/helpers_test.rb",
+          "start": 707,
+          "end": 711,
+          "sha256": "916aec8945cc8e5b57903f37d29c98bee74bbe1ec34564b42ff4e1299a3f20ef"
+        }
+      ],
+      "forbiddenFiles": [
+        "rack-protection/lib/rack/protection/path_traversal.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/sinatra/sinatra/commit/025e8c5eada804b192199bf94c2361ef1c8691fe",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "sinatra--sinatra-3",
+      "project": "sinatra/sinatra",
+      "split": "train",
+      "revision": "7b50a1bbb5324838908dfaa00ec53ad322673a29",
+      "fixCommit": "c4b7c04e6d23ef8e17404d64cc731bece268acea",
+      "archiveSha256": "dbd0ca6f7f663357f7f6c5305a827914c8d0284365797d9cb86e53a878b5e342",
+      "task": "Setting a response content-type parameter to an integer causes a type error.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/sinatra/base.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/sinatra/base.rb",
+          "start": 399,
+          "end": 403,
+          "sha256": "f16b4f35c45ad418f03e3c7487143ef2d1f854ccf1c35cc51a5c5f5412739e22"
+        }
+      ],
+      "supportingFiles": [
+        "test/base_test.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/base_test.rb",
+          "start": 179,
+          "end": 183,
+          "sha256": "a857ad62f49f4c869dbeca1fe45f03e02b9463f26147f4aab3072f6238742315"
+        }
+      ],
+      "forbiddenFiles": [
+        "rack-protection/lib/rack/protection/path_traversal.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/sinatra/sinatra/commit/c4b7c04e6d23ef8e17404d64cc731bece268acea",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "sinatra--sinatra-4",
+      "project": "sinatra/sinatra",
+      "split": "train",
+      "revision": "319af3a298cb8278670f285b6c02df0fd084615d",
+      "fixCommit": "973c936319af9132d7ab2f60985e359d0c75c93e",
+      "archiveSha256": "64e01542d4d9b7a95f53730109bad95f01e33fdfe45d05b57d4d5ab66e6cbc02",
+      "task": "Capturing template output and collecting runner output raise frozen-string errors when frozen string literals are enabled.",
+      "category": "compatibility",
+      "expectedFiles": [
+        "sinatra-contrib/lib/sinatra/capture.rb",
+        "sinatra-contrib/lib/sinatra/runner.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "sinatra-contrib/lib/sinatra/capture.rb",
+          "start": 93,
+          "end": 97,
+          "sha256": "03eb81af6585c7ef5677b6e3768abce745d3718030c9e105f7afa046ead17de8"
+        },
+        {
+          "path": "sinatra-contrib/lib/sinatra/runner.rb",
+          "start": 93,
+          "end": 97,
+          "sha256": "2cbc1dadb0aedea7971d0a34a615d81e41897bb5c890352a87a7b3fdcc8382cd"
+        }
+      ],
+      "supportingFiles": [
+        "test/integration_helper.rb",
+        "test/routing_test.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/integration_helper.rb",
+          "start": 47,
+          "end": 51,
+          "sha256": "18a941c20346605d853ea633ad049b85b37a5eee5409a838dc358ceb28f5695d"
+        },
+        {
+          "path": "test/routing_test.rb",
+          "start": 12,
+          "end": 16,
+          "sha256": "63e1032c5a1757beffb11f85cfe0691ad953f83191c96ed62b21f4c38ff7657b"
+        }
+      ],
+      "forbiddenFiles": [
+        "rack-protection/lib/rack/protection/path_traversal.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/sinatra/sinatra/commit/973c936319af9132d7ab2f60985e359d0c75c93e",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "sinatra--sinatra-5",
+      "project": "sinatra/sinatra",
+      "split": "train",
+      "revision": "50b8398dd7bcd5d5c187da51b23a939c5f3de210",
+      "fixCommit": "892cbeb3786f7c2d73e7ff4812aaba07199ddcd3",
+      "archiveSha256": "e98024f95db4e643839cc2ec44cce4d9d41484c0699aeb9e0b7a836cd3e6e9c0",
+      "task": "Building a URI using an integer address raises a type error rather than normalizing the input.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/sinatra/base.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/sinatra/base.rb",
+          "start": 318,
+          "end": 322,
+          "sha256": "77781ea06101b9156d71c70f9e6fead2d1139cb243d0c09af5cd171d187119eb"
+        }
+      ],
+      "supportingFiles": [
+        "test/helpers_test.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/helpers_test.rb",
+          "start": 1847,
+          "end": 1851,
+          "sha256": "6dcfa224855b73d43dfa2234cb4a9731b86d739d3d151f267df901fb3f328211"
+        }
+      ],
+      "forbiddenFiles": [
+        "rack-protection/lib/rack/protection/path_traversal.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/sinatra/sinatra/commit/892cbeb3786f7c2d73e7ff4812aaba07199ddcd3",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "rubocop--rubocop-1",
+      "project": "rubocop/rubocop",
+      "split": "eval",
+      "revision": "8053d208a575c4f3fd7c6d13523d511aacecd379",
+      "fixCommit": "bf0908d66066c88e040cf90973aea05076f6e406",
+      "archiveSha256": "024c5204fb9d2015f96328ce1da3ae0005c0d5203beb8b2e27f0ec883bc19807",
+      "task": "Autocorrecting an empty string inside interpolation produces invalid Ruby for a command-style call with a trailing conditional.",
+      "category": "autocorrect",
+      "expectedFiles": [
+        "lib/rubocop/cop/style/empty_string_inside_interpolation.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/rubocop/cop/style/empty_string_inside_interpolation.rb",
+          "start": 78,
+          "end": 82,
+          "sha256": "a87be059133761c745a69ee7c27a6dd6deb80e8006eed271c12d0f0bdb408fc3"
+        }
+      ],
+      "supportingFiles": [
+        "spec/rubocop/cli/autocorrect_spec.rb",
+        "spec/rubocop/cop/style/empty_string_inside_interpolation_spec.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "spec/rubocop/cli/autocorrect_spec.rb",
+          "start": 381,
+          "end": 385,
+          "sha256": "bed585a49cd5d8c319f3a215dd42f18e45b8b0ea9c17fdf10792c502c7870ec4"
+        },
+        {
+          "path": "spec/rubocop/cop/style/empty_string_inside_interpolation_spec.rb",
+          "start": 173,
+          "end": 177,
+          "sha256": "3df9e359af5b0e631e04e5be8fd81f8b91f23ac90bcdaecd0bfe90908c8b0f23"
+        }
+      ],
+      "forbiddenFiles": [
+        "lib/rubocop/cop/lint/debugger.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/rubocop/rubocop/commit/bf0908d66066c88e040cf90973aea05076f6e406",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "rubocop--rubocop-2",
+      "project": "rubocop/rubocop",
+      "split": "eval",
+      "revision": "8053d208a575c4f3fd7c6d13523d511aacecd379",
+      "fixCommit": "766dc9e49e0b6675ffc8eefa4894bc3ad343bb8d",
+      "archiveSha256": "024c5204fb9d2015f96328ce1da3ae0005c0d5203beb8b2e27f0ec883bc19807",
+      "task": "Replacing a block with a symbol-to-proc shorthand conflicts with trailing-comma autocorrection.",
+      "category": "autocorrect",
+      "expectedFiles": [
+        "lib/rubocop/cop/style/symbol_proc.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 167,
+          "end": 171,
+          "sha256": "8c2d97b06f8fb983ab10590a90c4cf37756ad86c5d4a127c2e6e236a7b70fc2b"
+        }
+      ],
+      "supportingFiles": [
+        "spec/rubocop/cli/autocorrect_spec.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "spec/rubocop/cli/autocorrect_spec.rb",
+          "start": 1967,
+          "end": 1971,
+          "sha256": "b39aa20fc95f106d3776c4606747a72a4f173cce281948f81f56573f31b5a7b0"
+        }
+      ],
+      "forbiddenFiles": [
+        "lib/rubocop/cop/lint/debugger.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/rubocop/rubocop/commit/766dc9e49e0b6675ffc8eefa4894bc3ad343bb8d",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "rubocop--rubocop-3",
+      "project": "rubocop/rubocop",
+      "split": "eval",
+      "revision": "8053d208a575c4f3fd7c6d13523d511aacecd379",
+      "fixCommit": "c0e2365cc0625cd9b30657ba6e66dbf1c57f6e1d",
+      "archiveSha256": "024c5204fb9d2015f96328ce1da3ae0005c0d5203beb8b2e27f0ec883bc19807",
+      "task": "Reordering require statements joins them together when the last statement has no trailing newline.",
+      "category": "autocorrect",
+      "expectedFiles": [
+        "lib/rubocop/cop/style/require_order.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/rubocop/cop/style/require_order.rb",
+          "start": 129,
+          "end": 133,
+          "sha256": "c52913b372bfb666f142d690176660f94b86cfd690fa92624423e2cb9300a346"
+        }
+      ],
+      "supportingFiles": [
+        "spec/rubocop/cop/style/require_order_spec.rb"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "lib/rubocop/cop/lint/debugger.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/rubocop/rubocop/commit/c0e2365cc0625cd9b30657ba6e66dbf1c57f6e1d",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "rubocop--rubocop-4",
+      "project": "rubocop/rubocop",
+      "split": "eval",
+      "revision": "8053d208a575c4f3fd7c6d13523d511aacecd379",
+      "fixCommit": "34548275d07ae865160ac2caa29474438b119185",
+      "archiveSha256": "024c5204fb9d2015f96328ce1da3ae0005c0d5203beb8b2e27f0ec883bc19807",
+      "task": "Renaming a rescued exception variable breaks shorthand hash syntax during autocorrection.",
+      "category": "autocorrect",
+      "expectedFiles": [
+        "lib/rubocop/cop/naming/rescued_exceptions_variable_name.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/rubocop/cop/naming/rescued_exceptions_variable_name.rb",
+          "start": 129,
+          "end": 133,
+          "sha256": "a33e81c86c7ffe576f97384c29fdb3535bc22bfc7befbd36a00e3e27375f77be"
+        }
+      ],
+      "supportingFiles": [
+        "spec/rubocop/cli/autocorrect_spec.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "spec/rubocop/cli/autocorrect_spec.rb",
+          "start": 360,
+          "end": 364,
+          "sha256": "f8a1f9b9aea7d6eddb5c357dbc6a0642dc63a2ae3bb7c16e07028f553d84f5b4"
+        }
+      ],
+      "forbiddenFiles": [
+        "lib/rubocop/cop/lint/debugger.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/rubocop/rubocop/commit/34548275d07ae865160ac2caa29474438b119185",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "rubocop--rubocop-5",
+      "project": "rubocop/rubocop",
+      "split": "eval",
+      "revision": "8053d208a575c4f3fd7c6d13523d511aacecd379",
+      "fixCommit": "a07036b38a95119f14413971e7bf1946f46daac1",
+      "archiveSha256": "024c5204fb9d2015f96328ce1da3ae0005c0d5203beb8b2e27f0ec883bc19807",
+      "task": "An ambiguous-regexp warning incorrectly flags a regular expression used as a hash key in a method argument.",
+      "category": "static-analysis",
+      "expectedFiles": [
+        "lib/rubocop/cop/lint/ambiguous_regexp_literal.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/rubocop/cop/lint/ambiguous_regexp_literal.rb",
+          "start": 56,
+          "end": 60,
+          "sha256": "c192afd85d1c510ec4febb9d2918988a4070c020b93bc73deee6b4c90258f1a3"
+        }
+      ],
+      "supportingFiles": [
+        "spec/rubocop/cop/lint/ambiguous_regexp_literal_spec.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "spec/rubocop/cop/lint/ambiguous_regexp_literal_spec.rb",
+          "start": 27,
+          "end": 31,
+          "sha256": "b6416c1a5d94923821142aceff2438893b0d0f41eaaf78b4120c4fac9e008d97"
+        }
+      ],
+      "forbiddenFiles": [
+        "lib/rubocop/cop/lint/debugger.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/rubocop/rubocop/commit/a07036b38a95119f14413971e7bf1946f46daac1",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "google--gson-1",
+      "project": "google/gson",
+      "split": "train",
+      "revision": "b3f4ca20087f9066de4c340522ff84e0558e1ad1",
+      "fixCommit": "8b4b55051489132190cb8d1c61eb9dc7f5381295",
+      "archiveSha256": "effc0a89ef2b063efc82efba9b31851ee13e89c0c92cba3ff460aff6c043ea55",
+      "task": "Strict JSON parsing accepts a quoted string containing an unpaired UTF-16 surrogate.",
+      "category": "parsing",
+      "expectedFiles": [
+        "gson/src/main/java/com/google/gson/stream/JsonReader.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+          "start": 1229,
+          "end": 1233,
+          "sha256": "4d7df458fac085ba8305dfc2ccc5b17f3fa1c8e2b25a70d06610b2ab36a50906"
+        }
+      ],
+      "supportingFiles": [
+        "gson/src/test/java/com/google/gson/stream/JsonReaderTest.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "gson/src/test/java/com/google/gson/stream/JsonReaderTest.java",
+          "start": 140,
+          "end": 144,
+          "sha256": "c00701d71c676ffa768cf79da02d3f193711f53e97168961fa8da8fa4109a088"
+        }
+      ],
+      "forbiddenFiles": [
+        "gson/src/main/java/com/google/gson/FieldNamingPolicy.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/google/gson/commit/8b4b55051489132190cb8d1c61eb9dc7f5381295",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "google--gson-2",
+      "project": "google/gson",
+      "split": "train",
+      "revision": "119818bc666d3b9f897d6c0ca7546ce28e9bbcac",
+      "fixCommit": "dae37cf0fe12235b76fb09f01118a0a8c8823f42",
+      "archiveSha256": "39efa2a589e8f42931aae6ebacc20dde30dc0f8784a1e5858926a4068902297e",
+      "task": "JSON conversion errors for maps and built-in value adapters omit the document location needed to diagnose invalid input.",
+      "category": "diagnostics",
+      "expectedFiles": [
+        "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java",
+        "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java",
+          "start": 188,
+          "end": 192,
+          "sha256": "4de52158ffb833457d41cbc0f92ddb3487fc38edf421e59d3588cd47f2a098ce"
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/MapTypeAdapterFactory.java",
+          "start": 201,
+          "end": 205,
+          "sha256": "35564c1a619b1c283098f3a752019d0caed0977d4e69a8bf4e6d4b2b41364634"
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+          "start": 384,
+          "end": 388,
+          "sha256": "7588acf5872a0bae918d14b777c53cc03ad61c0ae3d54c6642984be7658d35ca"
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+          "start": 541,
+          "end": 545,
+          "sha256": "17e18e9bb49baf7a8ea11f06057774c838492abd7bd2a502e81ee547ad4297d4"
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+          "start": 705,
+          "end": 709,
+          "sha256": "ae3a1a67987a087de0787df1ce3f8d919fc5f040335e7c18c87bd070eaf80e80"
+        },
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+          "start": 725,
+          "end": 729,
+          "sha256": "07c17e3ee7f7e1507f0dbd87d47d3685cb0518c4f32dd9df28a8225f0f2a6917"
+        }
+      ],
+      "supportingFiles": [
+        "gson/src/test/java/com/google/gson/functional/DefaultTypeAdaptersTest.java",
+        "gson/src/test/java/com/google/gson/functional/JavaUtilConcurrentAtomicTest.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "gson/src/test/java/com/google/gson/functional/DefaultTypeAdaptersTest.java",
+          "start": 158,
+          "end": 162,
+          "sha256": "1b819b53219887ebd9fa08b73676a1b2061d072d88c000c8c984bd8407ecbc66"
+        },
+        {
+          "path": "gson/src/test/java/com/google/gson/functional/DefaultTypeAdaptersTest.java",
+          "start": 190,
+          "end": 194,
+          "sha256": "639cb005158038c61f50a795449606770fb77a1cacac2d48f4bbfd32b17c3474"
+        },
+        {
+          "path": "gson/src/test/java/com/google/gson/functional/JavaUtilConcurrentAtomicTest.java",
+          "start": 122,
+          "end": 126,
+          "sha256": "20af44582404827ab9272b61f49339b708f21a12e10ea4876ded7da9a2eabdce"
+        }
+      ],
+      "forbiddenFiles": [
+        "gson/src/main/java/com/google/gson/FieldNamingPolicy.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/google/gson/commit/dae37cf0fe12235b76fb09f01118a0a8c8823f42",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "google--gson-3",
+      "project": "google/gson",
+      "split": "train",
+      "revision": "961517decce0aa907c285c19d8b93d5c746ecdcb",
+      "fixCommit": "5e277e42786ab6441b7dd6b1a8c34d545d132307",
+      "archiveSha256": "f3ed520c8c2075998a057987db9934ebd35738b666f685a2f177884509f1669e",
+      "task": "Numerically equal JSON primitive values produce different hash codes when represented with different numeric types.",
+      "category": "data-model",
+      "expectedFiles": [
+        "gson/src/main/java/com/google/gson/JsonPrimitive.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "gson/src/main/java/com/google/gson/JsonPrimitive.java",
+          "start": 265,
+          "end": 269,
+          "sha256": "43d358ff9b5c1dc154715866ed21349aed08a28dbd181075c9c380716a8335cf"
+        }
+      ],
+      "supportingFiles": [
+        "gson/src/test/java/com/google/gson/JsonPrimitiveTest.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "gson/src/test/java/com/google/gson/JsonPrimitiveTest.java",
+          "start": 301,
+          "end": 305,
+          "sha256": "5f499a3661ee54c7360bd615cc743c00a50db7b09c50a965f33a00f3e147dea2"
+        }
+      ],
+      "forbiddenFiles": [
+        "gson/src/main/java/com/google/gson/FieldNamingPolicy.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/google/gson/commit/5e277e42786ab6441b7dd6b1a8c34d545d132307",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "google--gson-4",
+      "project": "google/gson",
+      "split": "train",
+      "revision": "e25d4fab7fd54f267c765d975acccddfdddc9cda",
+      "fixCommit": "961517decce0aa907c285c19d8b93d5c746ecdcb",
+      "archiveSha256": "0430fb0cc53a9683211dd877c2842025f44fca2e7416b8065fae454fd99cc0cb",
+      "task": "Serializing and reading back a URI with non-ASCII characters changes its identity.",
+      "category": "serialization",
+      "expectedFiles": [
+        "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "gson/src/main/java/com/google/gson/internal/bind/TypeAdapters.java",
+          "start": 731,
+          "end": 735,
+          "sha256": "e4816e18c8fccca4458ceb35d871072ce1eaab08ababe6176287dcffb01cf8f3"
+        }
+      ],
+      "supportingFiles": [
+        "gson/src/test/java/com/google/gson/functional/DefaultTypeAdaptersTest.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "gson/src/test/java/com/google/gson/functional/DefaultTypeAdaptersTest.java",
+          "start": 185,
+          "end": 189,
+          "sha256": "9a2a27842c4c019f2256be528b345665975dab6408611013460904767950e046"
+        }
+      ],
+      "forbiddenFiles": [
+        "gson/src/main/java/com/google/gson/FieldNamingPolicy.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/google/gson/commit/961517decce0aa907c285c19d8b93d5c746ecdcb",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "google--gson-5",
+      "project": "google/gson",
+      "split": "train",
+      "revision": "ed2397502708ebaba53643e5c3d60e0974d7045f",
+      "fixCommit": "004e7a4949e08b430e3c8996998ee5a17ff9423a",
+      "archiveSha256": "627601b680a48d0c6ac0db938eda1670391828e2c83a5bee75093abf2cb5c363",
+      "task": "A large JSON integer followed by a zero is incorrectly rejected as a malformed number.",
+      "category": "parsing",
+      "expectedFiles": [
+        "gson/src/main/java/com/google/gson/stream/JsonReader.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "gson/src/main/java/com/google/gson/stream/JsonReader.java",
+          "start": 854,
+          "end": 858,
+          "sha256": "c10801b5517905cd86148008e7462df468b62dbea2d650196e20dc3a106de5ce"
+        }
+      ],
+      "supportingFiles": [
+        "gson/src/test/java/com/google/gson/stream/JsonReaderTest.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "gson/src/test/java/com/google/gson/stream/JsonReaderTest.java",
+          "start": 823,
+          "end": 827,
+          "sha256": "332f79fba68f10f30070e1109836e1874f5dc66d4240df0e3f233f3792afa431"
+        }
+      ],
+      "forbiddenFiles": [
+        "gson/src/main/java/com/google/gson/FieldNamingPolicy.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/google/gson/commit/004e7a4949e08b430e3c8996998ee5a17ff9423a",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spring-projects--spring-framework-1",
+      "project": "spring-projects/spring-framework",
+      "split": "eval",
+      "revision": "bcb4fbf31ca15f88697da1281894281ba4d6324d",
+      "fixCommit": "35584e498e249986fbdc50bf16e3bfa88d2f97e2",
+      "archiveSha256": "9485b8b4e2221d6835d0dffa32cf15f7e040eca2171c1a9791217fdf55c6544f",
+      "task": "Truncating text can split a UTF-16 surrogate pair and produce a malformed character.",
+      "category": "formatting",
+      "expectedFiles": [
+        "spring-core/src/main/java/org/springframework/util/StringUtils.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "spring-core/src/main/java/org/springframework/util/StringUtils.java",
+          "start": 1445,
+          "end": 1449,
+          "sha256": "5c8628d948a79780ee3a840daef29705ea826f564c204da34d7388d6a972dcce"
+        }
+      ],
+      "supportingFiles": [
+        "spring-core/src/test/java/org/springframework/util/StringUtilsTests.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "spring-core/src/test/java/org/springframework/util/StringUtilsTests.java",
+          "start": 800,
+          "end": 804,
+          "sha256": "89c968f4530f14099aece6bf1c9e64a20ed8cb47ffd4da259391eca9f0f65b0c"
+        }
+      ],
+      "forbiddenFiles": [
+        "spring-test/src/main/java/org/springframework/test/web/servlet/result/FlashAttributeResultMatchers.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spring-projects/spring-framework/commit/35584e498e249986fbdc50bf16e3bfa88d2f97e2",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spring-projects--spring-framework-2",
+      "project": "spring-projects/spring-framework",
+      "split": "eval",
+      "revision": "2f2008a6e7c6003a104b5a4cf9dce1d7779bb349",
+      "fixCommit": "2b216a4b36a487801dce5bfef43e889478a60f05",
+      "archiveSha256": "3066bd3ebb0972a981f80fb1a7335f1d11a21239ab46c69a2edd3ff47c54cbea",
+      "task": "A case-insensitive map incorrectly declares that contained values and iterator entries cannot be null.",
+      "category": "types",
+      "expectedFiles": [
+        "spring-core/src/main/java/org/springframework/util/LinkedCaseInsensitiveMap.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "spring-core/src/main/java/org/springframework/util/LinkedCaseInsensitiveMap.java",
+          "start": 161,
+          "end": 165,
+          "sha256": "6e24507c35a9818bc07cd1ddebbc99273d8427138cb39663d34926cb929d4618"
+        },
+        {
+          "path": "spring-core/src/main/java/org/springframework/util/LinkedCaseInsensitiveMap.java",
+          "start": 504,
+          "end": 508,
+          "sha256": "d6a18e1ad9e69d23dafe9c15a880ef3caf3fbf015866ae38bcd9eab480c17f19"
+        }
+      ],
+      "supportingFiles": [
+        "spring-core/src/test/java/org/springframework/util/LinkedCaseInsensitiveMapTests.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "spring-core/src/test/java/org/springframework/util/LinkedCaseInsensitiveMapTests.java",
+          "start": 283,
+          "end": 287,
+          "sha256": "1db5814178f56a0103bbe05f3c860f1e0b6a4e6c94da8a9d55b14398354149aa"
+        }
+      ],
+      "forbiddenFiles": [
+        "spring-test/src/main/java/org/springframework/test/web/servlet/result/FlashAttributeResultMatchers.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spring-projects/spring-framework/commit/2b216a4b36a487801dce5bfef43e889478a60f05",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spring-projects--spring-framework-3",
+      "project": "spring-projects/spring-framework",
+      "split": "eval",
+      "revision": "ba0eed5fd14e08ea46475c728f9d7b7b9c027386",
+      "fixCommit": "502813d8451a84f432499b347361f963831b51ca",
+      "archiveSha256": "46014c0e718e1657dc0e01532388e25b70eacc6a1de93afeae1447a70d6ada2a",
+      "task": "Very large HTTP client timeout durations overflow when converted to integer milliseconds.",
+      "category": "http",
+      "expectedFiles": [
+        "spring-web/src/main/java/org/springframework/http/client/ReactorClientHttpRequestFactory.java",
+        "spring-web/src/main/java/org/springframework/http/client/SimpleClientHttpRequestFactory.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "spring-web/src/main/java/org/springframework/http/client/ReactorClientHttpRequestFactory.java",
+          "start": 167,
+          "end": 171,
+          "sha256": "7718224939d8a9f55b90b9b3339fc92997f5a01eb19bdffb01137d73a2cdbbb3"
+        },
+        {
+          "path": "spring-web/src/main/java/org/springframework/http/client/SimpleClientHttpRequestFactory.java",
+          "start": 87,
+          "end": 91,
+          "sha256": "55734a6e9512fa6369372f921424cb7a7b35d052e97fd2e2b0f851957147e2fd"
+        },
+        {
+          "path": "spring-web/src/main/java/org/springframework/http/client/SimpleClientHttpRequestFactory.java",
+          "start": 109,
+          "end": 113,
+          "sha256": "814f92a513cabbf1a7491ba40665893e3a4090f83e7e17d11fba74ac55484c29"
+        }
+      ],
+      "supportingFiles": [
+        "spring-web/src/test/java/org/springframework/http/client/ReactorClientHttpRequestFactoryTests.java",
+        "spring-web/src/test/java/org/springframework/http/client/SimpleClientHttpRequestFactoryTests.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "spring-web/src/test/java/org/springframework/http/client/ReactorClientHttpRequestFactoryTests.java",
+          "start": 97,
+          "end": 101,
+          "sha256": "0f4819c41910f51e2564c88c2529154be154676beab877d69d2e6136d8b03010"
+        },
+        {
+          "path": "spring-web/src/test/java/org/springframework/http/client/SimpleClientHttpRequestFactoryTests.java",
+          "start": 119,
+          "end": 123,
+          "sha256": "883a16789fd5aacb4a2458bfc41bec5ad61e36ed2fd402bb47acc89b63abe1b0"
+        }
+      ],
+      "forbiddenFiles": [
+        "spring-test/src/main/java/org/springframework/test/web/servlet/result/FlashAttributeResultMatchers.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spring-projects/spring-framework/commit/502813d8451a84f432499b347361f963831b51ca",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spring-projects--spring-framework-4",
+      "project": "spring-projects/spring-framework",
+      "split": "eval",
+      "revision": "55dee5768aa5fecd87c5d1834120d44518c6ef43",
+      "fixCommit": "c7233c5132543746c182ce78de109caadd1a7c16",
+      "archiveSha256": "4efd75a836578b6f7ef71732b5b8d13c5a592adc864659391d556e04e3b1cf64",
+      "task": "Autowiring by type registers a dependency for a candidate which is not actually a bean in the container.",
+      "category": "dependency-injection",
+      "expectedFiles": [
+        "spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractAutowireCapableBeanFactory.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractAutowireCapableBeanFactory.java",
+          "start": 1528,
+          "end": 1532,
+          "sha256": "ccd26553462112445c57ea4ec578731b972954e6f8001248ecbbf5f3bd72ce45"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "spring-test/src/main/java/org/springframework/test/web/servlet/result/FlashAttributeResultMatchers.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spring-projects/spring-framework/commit/c7233c5132543746c182ce78de109caadd1a7c16",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    },
+    {
+      "id": "spring-projects--spring-framework-5",
+      "project": "spring-projects/spring-framework",
+      "split": "eval",
+      "revision": "eda597bdb94e62bd1527312d8327f0751319b9f2",
+      "fixCommit": "638c1d55752d324936e04501049fc6e216bb1ac4",
+      "archiveSha256": "e47cdae6d6330100f49f0875513517c696452210b7131884bec9778e96a5ae7b",
+      "task": "The JDK HTTP client handles whitespace around its restricted-header allowlist differently from the JDK itself.",
+      "category": "configuration",
+      "expectedFiles": [
+        "spring-web/src/main/java/org/springframework/http/client/JdkClientHttpRequest.java",
+        "spring-web/src/main/java/org/springframework/http/client/reactive/JdkClientHttpRequest.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "spring-web/src/main/java/org/springframework/http/client/JdkClientHttpRequest.java",
+          "start": 226,
+          "end": 230,
+          "sha256": "12d269ecd9636e3f7544785ea2cbbddffbb7c255f5a699cff232ca60eaaa3679"
+        },
+        {
+          "path": "spring-web/src/main/java/org/springframework/http/client/reactive/JdkClientHttpRequest.java",
+          "start": 192,
+          "end": 196,
+          "sha256": "12d269ecd9636e3f7544785ea2cbbddffbb7c255f5a699cff232ca60eaaa3679"
+        }
+      ],
+      "supportingFiles": [
+        "spring-web/src/test/java/org/springframework/http/client/JdkClientHttpRequestTests.java",
+        "spring-web/src/test/java/org/springframework/http/client/reactive/JdkClientHttpRequestTests.java"
+      ],
+      "supportingRanges": [
+        {
+          "path": "spring-web/src/test/java/org/springframework/http/client/JdkClientHttpRequestTests.java",
+          "start": 102,
+          "end": 106,
+          "sha256": "9eeccff1f9322655bdfde94ae0e7e4cc6337997776b43b6f759da6a70ecafab7"
+        },
+        {
+          "path": "spring-web/src/test/java/org/springframework/http/client/reactive/JdkClientHttpRequestTests.java",
+          "start": 59,
+          "end": 63,
+          "sha256": "9eeccff1f9322655bdfde94ae0e7e4cc6337997776b43b6f759da6a70ecafab7"
+        }
+      ],
+      "forbiddenFiles": [
+        "spring-test/src/main/java/org/springframework/test/web/servlet/result/FlashAttributeResultMatchers.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream patch inspected; critical pre-fix statement/context windows fingerprinted. Not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/spring-projects/spring-framework/commit/638c1d55752d324936e04501049fc6e216bb1ac4",
+        "testAnnotation": "Existing cochanged tests only; newly introduced tests absent from the pre-fix snapshot are not positive labels.",
+        "distractorMethod": "One manually inspected, task-unrelated module is a negative control. Other retrieved files remain unclassified; this is not exhaustive relevance labeling."
+      }
+    }
+  ]
+}

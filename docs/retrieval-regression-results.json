@@ -1,0 +1,127 @@
+{
+  "purpose": "Local calibration replay. These tasks informed the fixes and are not held-out evaluation. Expected-file labels are sparse relevance annotations.",
+  "source": {
+    "repository": "illegalstudio/codejournal",
+    "trackedRevision": "9627d0f5ccb2ca1d439230291f07fbad4aeca7ba",
+    "construction": "Pinned Git archive augmented with four untracked generated assets referenced by the original saved pack. Both binaries used identical captured source hashes. The original checkout and saved pack were not modified.",
+    "generatedAssets": [
+      {
+        "path": "apps/server/public/js/filament/forms/components/file-upload.js",
+        "sha256": "21903ccde5003f085a693148abd1080be41503a466727e87ab5ccc2ab35fbb3f"
+      },
+      {
+        "path": "apps/server/public/js/filament/forms/components/markdown-editor.js",
+        "sha256": "c4e88735319ea207534c93d1afaa83111fe7214b5e177af4c4bd29dda7239313"
+      },
+      {
+        "path": "apps/server/public/js/filament/widgets/components/chart.js",
+        "sha256": "05e6cf4655f5d5e8db40d8bd316fe3ba45cc6b6d0e3a45c65311d74d345c4ee2"
+      },
+      {
+        "path": "apps/server/public/js/filament/widgets/components/stats-overview/stat/chart.js",
+        "sha256": "ece68e1e30812b78cef9dcaa0e8dc7318b92798f05345ccdfbf1e67e12d2a957"
+      }
+    ]
+  },
+  "originalSavedPack": {
+    "slug": "20261015-182809-352994-non-funziona-il-login",
+    "files": 25,
+    "excerptFiles": 3,
+    "tokens": 31995,
+    "sha256": {
+      "ctx.json": "7960505cefc07437c7eedb824aba59a78cb836e48f919fb588f82803ed9b907e",
+      "PACK.md": "c1ed2c72f2c0b4b8241a3764d54fe68fa4300970ff708005e20b40d0fc27950c"
+    }
+  },
+  "binaries": {
+    "before": "Pre-fix native release-profile executable from the earlier implementation work, reporting 0.3.0.",
+    "after": "Corrected working tree, reporting 0.3.1. No new release was published."
+  },
+  "cases": [
+    {
+      "task": "Non funziona il login",
+      "sourceHash": "d6c1ef0934f913b4a43f5fc2405385ddd02460d3cf6c000e52bfa4a9df4b32c0",
+      "before": {
+        "selectedFiles": 25,
+        "excerptFiles": 22,
+        "tokens": 16492,
+        "expectedFileRecall": 0.3333333333333333,
+        "retrievedExpectedFiles": [
+          "apps/cli/src/login.rs",
+          "apps/server/resources/js/pages/Auth/Login.tsx"
+        ],
+        "missedExpectedFiles": [
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/config/auth.php",
+          "apps/server/config/fortify.php",
+          "apps/server/config/session.php"
+        ],
+        "generatedAssetsSelected": [
+          "apps/server/public/js/filament/forms/components/file-upload.js",
+          "apps/server/public/js/filament/forms/components/markdown-editor.js",
+          "apps/server/public/js/filament/widgets/components/chart.js",
+          "apps/server/public/js/filament/widgets/components/stats-overview/stat/chart.js"
+        ]
+      },
+      "after": {
+        "selectedFiles": 25,
+        "excerptFiles": 25,
+        "tokens": 13716,
+        "expectedFileRecall": 0.8333333333333334,
+        "retrievedExpectedFiles": [
+          "apps/cli/src/login.rs",
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/config/auth.php",
+          "apps/server/config/fortify.php",
+          "apps/server/resources/js/pages/Auth/Login.tsx"
+        ],
+        "missedExpectedFiles": [
+          "apps/server/config/session.php"
+        ],
+        "generatedAssetsSelected": []
+      }
+    },
+    {
+      "task": "Login fails at startup",
+      "sourceHash": "d6c1ef0934f913b4a43f5fc2405385ddd02460d3cf6c000e52bfa4a9df4b32c0",
+      "before": {
+        "selectedFiles": 25,
+        "excerptFiles": 24,
+        "tokens": 32000,
+        "expectedFileRecall": 0.3333333333333333,
+        "retrievedExpectedFiles": [
+          "apps/cli/src/login.rs",
+          "apps/server/resources/js/pages/Auth/Login.tsx"
+        ],
+        "missedExpectedFiles": [
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/config/auth.php",
+          "apps/server/config/fortify.php",
+          "apps/server/config/session.php"
+        ],
+        "generatedAssetsSelected": [
+          "apps/server/public/js/filament/forms/components/file-upload.js",
+          "apps/server/public/js/filament/forms/components/markdown-editor.js",
+          "apps/server/public/js/filament/widgets/components/chart.js"
+        ]
+      },
+      "after": {
+        "selectedFiles": 25,
+        "excerptFiles": 25,
+        "tokens": 11837,
+        "expectedFileRecall": 0.6666666666666666,
+        "retrievedExpectedFiles": [
+          "apps/cli/src/login.rs",
+          "apps/server/config/fortify.php",
+          "apps/server/config/session.php",
+          "apps/server/resources/js/pages/Auth/Login.tsx"
+        ],
+        "missedExpectedFiles": [
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/config/auth.php"
+        ],
+        "generatedAssetsSelected": []
+      }
+    }
+  ]
+}

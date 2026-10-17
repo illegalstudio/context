@@ -1,0 +1,1623 @@
+{
+  "purpose": "Local calibration/regression replay of the next precision improvements. The login and permissions cases informed tuning; all five cases are treated as calibration, not held-out quality estimates. Positive labels are sparse. Timings are single local samples and do not establish a speedup.",
+  "generatedAt": "2026-10-16T21:49:39.991684+00:00",
+  "source": {
+    "repository": "illegalstudio/codejournal",
+    "trackedRevision": "9627d0f5ccb2ca1d439230291f07fbad4aeca7ba",
+    "construction": "Pinned Git archive augmented with the same four generated assets as the earlier replay, plus captured ignore settings. Evaluation uses temporary copies. Original saved packs have matching SHA256 hashes before and after validation.",
+    "generatedAssets": [
+      {
+        "path": "apps/server/public/js/filament/forms/components/file-upload.js",
+        "sha256": "21903ccde5003f085a693148abd1080be41503a466727e87ab5ccc2ab35fbb3f"
+      },
+      {
+        "path": "apps/server/public/js/filament/forms/components/markdown-editor.js",
+        "sha256": "c4e88735319ea207534c93d1afaa83111fe7214b5e177af4c4bd29dda7239313"
+      },
+      {
+        "path": "apps/server/public/js/filament/widgets/components/chart.js",
+        "sha256": "05e6cf4655f5d5e8db40d8bd316fe3ba45cc6b6d0e3a45c65311d74d345c4ee2"
+      },
+      {
+        "path": "apps/server/public/js/filament/widgets/components/stats-overview/stat/chart.js",
+        "sha256": "ece68e1e30812b78cef9dcaa0e8dc7318b92798f05345ccdfbf1e67e12d2a957"
+      }
+    ],
+    "ignoreSha256": "0016abecca2db594ad2a88fe3ce9f5db90a0ce26b1a69a6da6608373a68223ca"
+  },
+  "binaries": {
+    "before": {
+      "description": "Development 0.3.1 before the four new precision improvements, with the earlier retrieval and token fixes. Release profile.",
+      "sha256": "1c1e7dd4d7a94fa254ee54e238f30346e62b0d54b5139d994bee0703b7d55954"
+    },
+    "after": {
+      "description": "Working tree 0.3.1 with lexical provenance, typed traversal, scoped runtime dependencies and marginal selection. Release profile. No release was published.",
+      "sha256": "6ab34cf81b63d015c341e8ca0f97230729f4f1ccb55124de5ae5914baa43462a"
+    }
+  },
+  "settings": {
+    "maxFiles": 25,
+    "budgetTokens": 32000,
+    "tokenizer": "approx",
+    "graphDepth": 2
+  },
+  "preservedSavedPacks": {
+    "20261015-182809-352994-non-funziona-il-login": {
+      "ctx.json": "7960505cefc07437c7eedb824aba59a78cb836e48f919fb588f82803ed9b907e",
+      "PACK.md": "c1ed2c72f2c0b4b8241a3764d54fe68fa4300970ff708005e20b40d0fc27950c"
+    },
+    "20261015-205335-080481-non-funziona-il-login": {
+      "ctx.json": "9189d7c0dcb92e4fdfcba97c2ade1d14f5c34b01697a455b8f3ef25565d43b47",
+      "PACK.md": "e526adb4a207383fcee261fe01d9b3ed41bbc06be808a07a2b88410319fc44e5"
+    }
+  },
+  "datasetHash": "24c5abdcaa01614ebdb91b1436fdfbbcd32a5df0b10ffd85b190b49ca7849c7c",
+  "cases": [
+    {
+      "name": "Code Journal ambiguous login (frozen replay)",
+      "task": "Non funziona il login",
+      "expectedFiles": [
+        "apps/server/resources/js/pages/Auth/Login.tsx",
+        "apps/server/app/Providers/FortifyServiceProvider.php",
+        "apps/server/config/fortify.php",
+        "apps/server/config/auth.php",
+        "apps/server/config/session.php",
+        "apps/server/bootstrap/app.php",
+        "apps/cli/src/login.rs"
+      ],
+      "forbiddenFiles": [
+        "apps/server/public/js/filament/widgets/components/chart.js",
+        "apps/server/public/js/filament/widgets/components/stats-overview/stat/chart.js",
+        "apps/server/public/js/filament/forms/components/file-upload.js",
+        "apps/server/public/js/filament/forms/components/markdown-editor.js",
+        "apps/server/app/Billing/Data/ProjectAccessData.php",
+        "apps/server/app/Journal/Data/LiveSessionData.php"
+      ],
+      "sourceHash": "29fc9a5fd153fcaf2da543744285d9eefd753e5d43fe8c32dce405a4de308d7d",
+      "before": {
+        "selectedFiles": [
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/tests/Support/PasswordSessionCase.php",
+          "apps/cli/tests/test_token_access.py",
+          "apps/server/tests/Feature/IdentityAccessTest.php",
+          "apps/server/e2e/password-sessions.spec.ts",
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/server/tests/Feature/AccountDataAccessTest.php",
+          "apps/server/app/Account/Data/ResetPasswordPageData.php",
+          "apps/server/resources/js/pages/Auth/ForgotPassword.tsx",
+          "apps/server/app/Actions/Fortify/ResetUserPassword.php",
+          "apps/server/app/Actions/Fortify/UpdateUserPassword.php",
+          "apps/cli/src/login.rs",
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/app/Models/User.php",
+          "apps/server/resources/js/auth/AuthLayout.tsx",
+          "apps/server/app/Journal/Data/DashboardPageData.php",
+          "apps/server/config/fortify.php",
+          "apps/server/app/Journal/Data/LiveSessionData.php",
+          "apps/server/app/Journal/Data/SessionUserData.php",
+          "apps/server/resources/js/pages/Auth/ResetPassword.tsx",
+          "apps/server/app/Actions/Fortify/PasswordValidationRules.php",
+          "apps/server/app/Journal/Read/PageProps.php",
+          "apps/server/config/auth.php",
+          "docs/security-password-sessions.md",
+          "packages/fixtures/src/fixtures/entries.js"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/config/fortify.php",
+          "apps/server/config/auth.php",
+          "apps/cli/src/login.rs"
+        ],
+        "missedExpectedFiles": [
+          "apps/server/config/session.php",
+          "apps/server/bootstrap/app.php"
+        ],
+        "metrics": {
+          "precision": 0.2,
+          "recall": 0.7142857142857143,
+          "recallAt5": 0.14285714285714285,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": null,
+          "forbiddenMatches": 2,
+          "tokens": 13716,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 4246.010907999999,
+          "selectionMs": 458.57187500000003
+        }
+      },
+      "after": {
+        "selectedFiles": [
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/tests/Support/PasswordSessionCase.php",
+          "apps/server/e2e/password-sessions.spec.ts",
+          "apps/server/resources/js/pages/Auth/ForgotPassword.tsx",
+          "apps/cli/src/login.rs",
+          "apps/server/resources/js/auth/AuthLayout.tsx",
+          "apps/server/tests/Feature/PasswordSessionsTest.php",
+          "apps/server/resources/js/auth/Submit.tsx",
+          "apps/server/resources/js/auth/Field.tsx",
+          "apps/server/config/fortify.php",
+          "apps/cli/src/config.rs",
+          "docs/security-password-sessions.md",
+          "apps/server/config/auth.php",
+          "apps/server/e2e/postgres/support.ts",
+          "apps/server/resources/js/pages/Auth/VerifyEmail.tsx",
+          "apps/cli/src/main.rs",
+          "apps/cli/src/runtime.rs",
+          "apps/server/app/Http/Controllers/Account/AccountDeletionController.php",
+          "apps/server/bootstrap/app.php",
+          "apps/cli/src/api_status.rs",
+          "apps/server/config/session.php",
+          "apps/server/app/Models/User.php",
+          "apps/server/e2e/env.ts",
+          "apps/cli/src/api.rs"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/config/fortify.php",
+          "apps/server/config/auth.php",
+          "apps/server/config/session.php",
+          "apps/server/bootstrap/app.php",
+          "apps/cli/src/login.rs"
+        ],
+        "missedExpectedFiles": [],
+        "metrics": {
+          "precision": 0.28,
+          "recall": 1.0,
+          "recallAt5": 0.2857142857142857,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": null,
+          "forbiddenMatches": 0,
+          "tokens": 14016,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 1680.996245,
+          "selectionMs": 187.450055
+        }
+      }
+    },
+    {
+      "name": "Code Journal English login (frozen replay)",
+      "task": "Login fails at startup",
+      "expectedFiles": [
+        "apps/server/resources/js/pages/Auth/Login.tsx",
+        "apps/server/app/Providers/FortifyServiceProvider.php",
+        "apps/server/config/fortify.php",
+        "apps/server/config/auth.php",
+        "apps/server/config/session.php",
+        "apps/server/bootstrap/app.php",
+        "apps/cli/src/login.rs"
+      ],
+      "forbiddenFiles": [
+        "apps/server/public/js/filament/widgets/components/chart.js",
+        "apps/server/public/js/filament/widgets/components/stats-overview/stat/chart.js",
+        "apps/server/public/js/filament/forms/components/file-upload.js",
+        "apps/server/public/js/filament/forms/components/markdown-editor.js",
+        "apps/server/app/Billing/Data/ProjectAccessData.php",
+        "apps/server/app/Journal/Data/LiveSessionData.php"
+      ],
+      "sourceHash": "29fc9a5fd153fcaf2da543744285d9eefd753e5d43fe8c32dce405a4de308d7d",
+      "before": {
+        "selectedFiles": [
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/tests/Support/PasswordSessionCase.php",
+          "apps/cli/tests/test_token_access.py",
+          "apps/server/tests/Feature/IdentityAccessTest.php",
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/server/tests/Feature/AccountDataAccessTest.php",
+          "apps/server/e2e/password-sessions.spec.ts",
+          "apps/server/app/Account/Data/ResetPasswordPageData.php",
+          "apps/cli/src/main.rs",
+          "apps/server/resources/js/pages/Auth/ForgotPassword.tsx",
+          "apps/server/app/Actions/Fortify/ResetUserPassword.php",
+          "apps/server/app/Actions/Fortify/UpdateUserPassword.php",
+          "apps/cli/src/login.rs",
+          "apps/server/resources/js/auth/AuthLayout.tsx",
+          "apps/server/app/Journal/Data/DashboardPageData.php",
+          "apps/server/resources/js/auth/Field.tsx",
+          "apps/server/app/Journal/Data/LiveSessionData.php",
+          "apps/server/app/Journal/Data/SessionUserData.php",
+          "apps/server/resources/js/journal/data/index.ts",
+          "packages/fixtures/index.js",
+          "apps/server/app/Models/User.php",
+          "apps/server/app/Actions/Fortify/PasswordValidationRules.php",
+          "apps/server/config/fortify.php",
+          "apps/server/config/session.php",
+          "docs/security-password-sessions.md"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/config/fortify.php",
+          "apps/server/config/session.php",
+          "apps/cli/src/login.rs"
+        ],
+        "missedExpectedFiles": [
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/config/auth.php",
+          "apps/server/bootstrap/app.php"
+        ],
+        "metrics": {
+          "precision": 0.16,
+          "recall": 0.5714285714285714,
+          "recallAt5": 0.14285714285714285,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": null,
+          "forbiddenMatches": 2,
+          "tokens": 11837,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 2932.590744,
+          "selectionMs": 128.66263
+        }
+      },
+      "after": {
+        "selectedFiles": [
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/tests/Support/PasswordSessionCase.php",
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/cli/src/login.rs",
+          "apps/server/resources/js/auth/AuthLayout.tsx",
+          "apps/server/resources/js/pages/Auth/ForgotPassword.tsx",
+          "apps/server/tests/Feature/PasswordSessionsTest.php",
+          "apps/server/resources/js/auth/Field.tsx",
+          "apps/server/resources/js/auth/Submit.tsx",
+          "apps/cli/src/main.rs",
+          "apps/server/config/fortify.php",
+          "apps/cli/src/config.rs",
+          "apps/cli/src/api_status.rs",
+          "apps/server/config/auth.php",
+          "apps/server/resources/js/pages/Auth/VerifyEmail.tsx",
+          "apps/cli/src/storage_status.rs",
+          "docs/watch-recovery.md",
+          "apps/server/app/Support/Value.php",
+          "apps/server/bootstrap/app.php",
+          "apps/server/app/Console/Commands/SetupLocalJournalRole.php",
+          "apps/cli/src/api.rs",
+          "apps/server/config/session.php",
+          "apps/server/app/Models/User.php",
+          "apps/server/app/Http/Controllers/Account/AccountDeletionController.php",
+          "apps/cli/src/outbox_flush.rs"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/app/Providers/FortifyServiceProvider.php",
+          "apps/server/config/fortify.php",
+          "apps/server/config/auth.php",
+          "apps/server/config/session.php",
+          "apps/server/bootstrap/app.php",
+          "apps/cli/src/login.rs"
+        ],
+        "missedExpectedFiles": [],
+        "metrics": {
+          "precision": 0.28,
+          "recall": 1.0,
+          "recallAt5": 0.42857142857142855,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": null,
+          "forbiddenMatches": 0,
+          "tokens": 16839,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 1784.3308310000002,
+          "selectionMs": 380.350443
+        }
+      }
+    },
+    {
+      "name": "Code Journal project access permissions",
+      "task": "Project access permissions for locked projects on the Free plan",
+      "expectedFiles": [
+        "apps/server/app/Billing/Data/ProjectAccessData.php",
+        "apps/server/app/Billing/ProjectScope.php"
+      ],
+      "forbiddenFiles": [
+        "apps/server/app/Providers/FortifyServiceProvider.php",
+        "apps/server/resources/js/pages/Auth/Login.tsx"
+      ],
+      "sourceHash": "29fc9a5fd153fcaf2da543744285d9eefd753e5d43fe8c32dce405a4de308d7d",
+      "before": {
+        "selectedFiles": [
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/cli/tests/test_token_access.py",
+          "apps/server/tests/Feature/IdentityAccessTest.php",
+          "apps/cli/tests/test_free_plan.py",
+          "apps/server/tests/Feature/AccountDataAccessTest.php",
+          "apps/server/resources/js/journal/pages/Projects.tsx",
+          "apps/server/tests/Feature/FreePlanDashboardPostgresTest.php",
+          "apps/server/resources/js/journal/pages/Locked.tsx",
+          "packages/fixtures/src/fixtures/projects.js",
+          "apps/server/resources/js/journal/state/plan.ts",
+          "apps/server/resources/js/dashboard/charts/projects.ts",
+          "apps/server/app/Billing/ActiveProject.php",
+          "apps/server/app/Journal/FixtureProjects.php",
+          "apps/server/resources/js/journal/features/live/RecentProjects.tsx",
+          "apps/server/app/Billing/ProjectScope.php",
+          "apps/server/app/Http/Controllers/Api/PlanMutationController.php",
+          "apps/server/resources/js/journal/features/settings/ActiveProject.tsx",
+          "apps/server/app/Http/Controllers/Api/ProjectRulesController.php",
+          "apps/server/app/Journal/Projects/ArchiveSchema.php",
+          "apps/server/app/Http/Controllers/Api/PlanController.php",
+          "apps/server/app/Http/Controllers/Api/PlanDetailController.php",
+          "apps/cli/src/login.rs",
+          "apps/server/config/plans.php",
+          "apps/server/config/fortify.php",
+          "docs/database-schema.md"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/server/app/Billing/ProjectScope.php"
+        ],
+        "missedExpectedFiles": [],
+        "metrics": {
+          "precision": 0.08,
+          "recall": 1.0,
+          "recallAt5": 0.5,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": null,
+          "forbiddenMatches": 0,
+          "tokens": 21054,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 1042.131501,
+          "selectionMs": 135.346736
+        }
+      },
+      "after": {
+        "selectedFiles": [
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/server/tests/Feature/FreePlanDashboardPostgresTest.php",
+          "apps/cli/tests/test_free_plan.py",
+          "apps/server/resources/js/journal/state/plan.ts",
+          "apps/server/tests/Feature/FreePlanApiPostgresTest.php",
+          "apps/server/resources/js/journal/shell/PlanNotice.tsx",
+          "apps/server/app/Billing/ProjectScope.php",
+          "apps/server/resources/js/journal/pages/Locked.tsx",
+          "apps/server/app/Journal/ApiBriefPlan.php",
+          "apps/server/app/Billing/Data/ProjectRefData.php",
+          "apps/server/app/Http/Controllers/Api/PlanMutationController.php",
+          "apps/server/app/Journal/ApiPlan.php",
+          "apps/server/app/Journal/Read/PostgresPages.php",
+          "packages/fixtures/src/fixtures/projects.js",
+          "apps/server/app/Enums/TenantRole.php",
+          "apps/cli/src/setup_agents/files.rs",
+          "apps/server/app/Models/User.php",
+          "apps/server/app/Journal/Read/PageRequest.php",
+          "apps/server/app/Journal/Data/SnapshotData.php",
+          "apps/server/app/Journal/Data/LiveEventData.php",
+          "docs/database-schema.md",
+          "apps/server/app/Journal/Data/LiveData.php",
+          "apps/server/app/Models/Tenant.php",
+          "apps/server/resources/js/journal/ui/PageHeading.tsx",
+          "apps/server/app/Journal/DemoTenantId.php"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/server/app/Billing/ProjectScope.php"
+        ],
+        "missedExpectedFiles": [],
+        "metrics": {
+          "precision": 0.08,
+          "recall": 1.0,
+          "recallAt5": 0.5,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": null,
+          "forbiddenMatches": 0,
+          "tokens": 18475,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 1549.813382,
+          "selectionMs": 188.39495
+        }
+      }
+    },
+    {
+      "name": "Code Journal billing plan limits",
+      "task": "Billing plan limits configuration for maximum projects and history days",
+      "expectedFiles": [
+        "apps/server/app/Billing/PlanLimits.php",
+        "apps/server/config/plans.php"
+      ],
+      "forbiddenFiles": [
+        "apps/server/app/Providers/FortifyServiceProvider.php",
+        "apps/server/resources/js/pages/Auth/Login.tsx"
+      ],
+      "sourceHash": "29fc9a5fd153fcaf2da543744285d9eefd753e5d43fe8c32dce405a4de308d7d",
+      "before": {
+        "selectedFiles": [
+          "apps/server/app/Billing/PlanLimits.php",
+          "apps/server/app/Billing/Data/PlanLimitsData.php",
+          "apps/server/tests/Support/BillingCase.php",
+          "apps/server/app/Billing/Data/BillingPageData.php",
+          "apps/server/app/Billing/ProjectScope.php",
+          "apps/server/app/Billing/Paddle/BillingSchema.php",
+          "apps/server/app/Account/Deletion/DeletionBilling.php",
+          "apps/server/app/Http/Controllers/Billing/BillingController.php",
+          "apps/server/app/Billing/Data/PlanCatalogData.php",
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/server/app/Billing/Data/PlanData.php",
+          "apps/server/resources/js/billing/BillingActions.tsx",
+          "apps/server/app/Billing/TenantPlans.php",
+          "apps/server/app/Billing/ActiveProject.php",
+          "apps/server/app/Billing/Data/ProjectRefData.php",
+          "apps/server/tests/Support/RevisionHistoryPostgresCase.php",
+          "apps/server/app/Billing/Paddle/BillingChanges.php",
+          "apps/server/tests/Feature/BillingPaymentLinkTest.php",
+          "apps/server/tests/Feature/BillingRefreshTest.php",
+          "apps/server/tests/Feature/DeletionBillingSafetyTest.php",
+          "docs/billing.md",
+          "apps/cli/src/plan_history.rs",
+          "apps/server/config/billing.php",
+          "packages/fixtures/src/fixtures/projects.js",
+          "apps/server/config/plans.php"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/server/app/Billing/PlanLimits.php",
+          "apps/server/config/plans.php"
+        ],
+        "missedExpectedFiles": [],
+        "metrics": {
+          "precision": 0.08,
+          "recall": 1.0,
+          "recallAt5": 0.5,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": null,
+          "forbiddenMatches": 0,
+          "tokens": 13669,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 1059.14137,
+          "selectionMs": 145.686225
+        }
+      },
+      "after": {
+        "selectedFiles": [
+          "apps/server/app/Billing/PlanLimits.php",
+          "apps/server/app/Billing/Data/PlanLimitsData.php",
+          "apps/server/app/Billing/ProjectScope.php",
+          "apps/server/app/Billing/Data/PlanCatalogData.php",
+          "apps/server/app/Http/Controllers/Billing/BillingController.php",
+          "apps/server/app/Billing/Data/PlanData.php",
+          "apps/server/app/Billing/Plan.php",
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/server/app/Journal/ApiBriefPlan.php",
+          "apps/server/resources/js/journal/features/settings/PlanComparison.tsx",
+          "apps/server/app/Billing/PlanSource.php",
+          "apps/server/config/plans.php",
+          "apps/server/tests/Feature/TenantPlanTest.php",
+          "apps/server/app/Billing/Data/BillingPageData.php",
+          "apps/cli/src/plan_history.rs",
+          "apps/server/app/Billing/Data/AccountData.php",
+          "apps/server/app/Billing/Entitlements.php",
+          "docs/billing.md",
+          "apps/server/resources/js/pages/Billing/Show.tsx",
+          "apps/server/app/PublicSite/PublicSiteData.php",
+          "apps/server/app/Billing/Paddle/CheckoutTransaction.php",
+          "apps/server/app/Billing/TenantPlans.php",
+          "apps/server/app/Billing/Paddle/ProPrices.php",
+          "apps/server/app/Journal/DashboardView.php",
+          "apps/server/app/Billing/Catalog/CatalogStore.php"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/server/app/Billing/PlanLimits.php",
+          "apps/server/config/plans.php"
+        ],
+        "missedExpectedFiles": [],
+        "metrics": {
+          "precision": 0.08,
+          "recall": 1.0,
+          "recallAt5": 0.5,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": null,
+          "forbiddenMatches": 0,
+          "tokens": 13275,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 1366.873564,
+          "selectionMs": 168.32408600000002
+        }
+      }
+    },
+    {
+      "name": "Code Journal CLI device login",
+      "task": "CLI device login expires while waiting for the access token",
+      "expectedFiles": [
+        "apps/cli/src/login.rs"
+      ],
+      "forbiddenFiles": [
+        "apps/server/config/session.php",
+        "apps/server/bootstrap/app.php"
+      ],
+      "sourceHash": "29fc9a5fd153fcaf2da543744285d9eefd753e5d43fe8c32dce405a4de308d7d",
+      "before": {
+        "selectedFiles": [
+          "apps/server/app/Http/Controllers/Api/DeviceTokenController.php",
+          "apps/cli/tests/test_token_access.py",
+          "apps/server/app/Billing/Data/ProjectAccessData.php",
+          "apps/server/app/Account/Security/DeviceCredentials.php",
+          "apps/server/app/Http/Controllers/Api/DeviceLogoutController.php",
+          "apps/server/tests/Feature/DeviceCredentialRevocationTest.php",
+          "apps/server/tests/Feature/IdentityAccessTest.php",
+          "apps/server/app/Http/Controllers/Api/DeviceRequestController.php",
+          "apps/server/tests/Feature/AccountDataAccessTest.php",
+          "apps/server/app/Http/Controllers/Account/DeviceRevocationController.php",
+          "apps/server/resources/js/pages/Auth/Login.tsx",
+          "apps/server/app/Http/Controllers/DeviceApprovalController.php",
+          "apps/server/tests/Feature/DeviceApiPostgresTest.php",
+          "apps/server/resources/js/settings/DeviceRevocationForm.tsx",
+          "apps/server/app/Http/Middleware/EnsureDeviceTenant.php",
+          "apps/cli/src/login.rs",
+          "apps/server/database/migrations/2026_09_28_000001_create_device_authorizations.php",
+          "apps/server/resources/views/device.blade.php",
+          "apps/server/resources/js/journal/features/live/WaitingBand.tsx",
+          "apps/server/app/Journal/Requests/ExpiredReceipts.php",
+          "apps/server/app/Account/Data/ResetPasswordPageData.php",
+          "apps/server/app/Actions/Fortify/ResetUserPassword.php",
+          "scripts/check-cli-surface.py",
+          "apps/server/config/auth.php",
+          "apps/server/config/session.php"
+        ],
+        "excerptFiles": 25,
+        "retrievedExpectedFiles": [
+          "apps/cli/src/login.rs"
+        ],
+        "missedExpectedFiles": [],
+        "metrics": {
+          "precision": 0.04,
+          "recall": 1.0,
+          "recallAt5": 0.0,
+          "reciprocalRank": 0.0625,
+          "rangeCoverage": null,
+          "forbiddenMatches": 1,
+          "tokens": 13328,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 963.8920760000001,
+          "selectionMs": 110.199982
+        }
+      },
+      "after": {
+        "selectedFiles": [
+          "apps/server/app/Http/Controllers/Api/DeviceTokenController.php",
+          "apps/cli/tests/test_token_access.py",
+          "apps/cli/src/login.rs",
+          "apps/cli/src/config.rs",
+          "apps/cli/tests/test_session_feedback.py",
+          "apps/cli/tests/test_auto_sync_safety.py",
+          "docs/security-password-sessions.md",
+          "apps/cli/src/api_status.rs",
+          "apps/cli/src/api.rs"
+        ],
+        "excerptFiles": 9,
+        "retrievedExpectedFiles": [
+          "apps/cli/src/login.rs"
+        ],
+        "missedExpectedFiles": [],
+        "metrics": {
+          "precision": 0.1111111111111111,
+          "recall": 1.0,
+          "recallAt5": 1.0,
+          "reciprocalRank": 0.3333333333333333,
+          "rangeCoverage": null,
+          "forbiddenMatches": 0,
+          "tokens": 11298,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 1099.786408,
+          "selectionMs": 192.638851
+        }
+      }
+    }
+  ],
+  "beforeSummary": {
+    "precision": 0.11200000000000002,
+    "recall": 0.8571428571428571,
+    "recallAt5": 0.2571428571428571,
+    "reciprocalRank": 0.8125,
+    "rangeCoverage": null,
+    "forbiddenMatches": 5,
+    "tokens": 73604,
+    "usefulLinesPer1000Tokens": null,
+    "indexMs": 2048.7533197999996,
+    "selectionMs": 195.6934896
+  },
+  "afterSummary": {
+    "precision": 0.16622222222222222,
+    "recall": 1.0,
+    "recallAt5": 0.5428571428571429,
+    "reciprocalRank": 0.8666666666666666,
+    "rangeCoverage": null,
+    "forbiddenMatches": 0,
+    "tokens": 73903,
+    "usefulLinesPer1000Tokens": null,
+    "indexMs": 1496.3600860000001,
+    "selectionMs": 223.43167699999998
+  },
+  "comparison": {
+    "precisionDelta": 0.0542222222222222,
+    "recallAt5Delta": 0.2857142857142858,
+    "recallDelta": 0.1428571428571429,
+    "selectionMsDelta": 27.738187399999987,
+    "tokensDelta": 299
+  },
+  "additionalValidation": {
+    "rustTests": 54,
+    "pythonReleaseTests": 46,
+    "minimumRust": "1.90.0 (all targets checked)",
+    "historicalFixture": "tests/fixtures/evaluation-history.json",
+    "historicalSplits": "all",
+    "historicalResult": "Three pinned historical cases pass with recall 1 and recallAt5 1, including the training case for native import resolution.",
+    "excerptLoopRegression": "The previous and new development builds both timed out on overlapping class/method clipping under a 250-token budget. Accepted allocations now require added source lines; a subprocess regression has a 5-second timeout."
+  },
+  "historicalValidation": {
+    "version": "0.3.1",
+    "tokenizer": "approx",
+    "maxFiles": 15,
+    "budgetTokens": 32000,
+    "datasetHash": "a867c9bcbe672e9bba5dc4b1656974a68db9098c5ae124d4b33a23938edd0856",
+    "cases": [
+      {
+        "name": "Historical acronym completion change",
+        "split": "eval",
+        "sourceHash": "d0111a3ec0fa72a4cd51fd12b5cb940ee43ecacaa74080d52275e86ec8546eee",
+        "sourceRevision": "0033a5a951cbbdd1ad1bb325e8f1f80a1744311d",
+        "selectedFiles": [
+          "src/cli/utils/interactive-prompt.ts",
+          "src/storage/Database.ts",
+          "src/core/resolver/KeywordExtractor.ts",
+          "src/core/discovery/CandidateDiscovery.ts",
+          "src/core/resolver/dictionaries/index.ts",
+          "src/core/discovery/ReferenceExtractor.ts",
+          "docs/commands.md",
+          "src/core/resolver/dictionaries/translations/it.ts",
+          "src/core/resolver/RAKEExtractor.ts",
+          "src/core/resolver/dictionaries/en.ts",
+          "src/core/resolver/TFIDFCalculator.ts",
+          "src/core/resolver/Stemmer.ts",
+          "src/cli/utils/logger.ts",
+          "src/core/discovery/DiscoveryLoader.ts",
+          "src/core/indexer/CtxIgnore.ts"
+        ],
+        "ranges": [
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 45,
+            "end": 82
+          },
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 84,
+            "end": 122
+          },
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 124,
+            "end": 163
+          },
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 165,
+            "end": 202
+          },
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 204,
+            "end": 220
+          },
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 222,
+            "end": 264
+          },
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 273,
+            "end": 293
+          },
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 362,
+            "end": 388
+          },
+          {
+            "path": "src/cli/utils/interactive-prompt.ts",
+            "start": 605,
+            "end": 641
+          },
+          {
+            "path": "src/storage/Database.ts",
+            "start": 1,
+            "end": 17
+          },
+          {
+            "path": "src/storage/Database.ts",
+            "start": 24,
+            "end": 38
+          },
+          {
+            "path": "src/storage/Database.ts",
+            "start": 42,
+            "end": 304
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 7,
+            "end": 13
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 15,
+            "end": 20
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 22,
+            "end": 27
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 33,
+            "end": 53
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 101,
+            "end": 107
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 128,
+            "end": 163
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 165,
+            "end": 187
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 189,
+            "end": 269
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 271,
+            "end": 308
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 310,
+            "end": 351
+          },
+          {
+            "path": "src/core/resolver/KeywordExtractor.ts",
+            "start": 353,
+            "end": 385
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 114,
+            "end": 134
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 182,
+            "end": 206
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 234,
+            "end": 266
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 282,
+            "end": 320
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 460,
+            "end": 514
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 516,
+            "end": 557
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 641,
+            "end": 694
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 702,
+            "end": 704
+          },
+          {
+            "path": "src/core/discovery/CandidateDiscovery.ts",
+            "start": 706,
+            "end": 733
+          },
+          {
+            "path": "src/core/resolver/dictionaries/index.ts",
+            "start": 9,
+            "end": 24
+          },
+          {
+            "path": "src/core/resolver/dictionaries/index.ts",
+            "start": 32,
+            "end": 276
+          },
+          {
+            "path": "src/core/discovery/ReferenceExtractor.ts",
+            "start": 18,
+            "end": 288
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 48,
+            "end": 62
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 73,
+            "end": 87
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 94,
+            "end": 120
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 128,
+            "end": 142
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 170,
+            "end": 184
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 188,
+            "end": 202
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 205,
+            "end": 219
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 243,
+            "end": 257
+          },
+          {
+            "path": "docs/commands.md",
+            "start": 261,
+            "end": 275
+          },
+          {
+            "path": "src/core/resolver/dictionaries/translations/it.ts",
+            "start": 17,
+            "end": 31
+          },
+          {
+            "path": "src/core/resolver/dictionaries/translations/it.ts",
+            "start": 232,
+            "end": 238
+          },
+          {
+            "path": "src/core/resolver/RAKEExtractor.ts",
+            "start": 32,
+            "end": 197
+          },
+          {
+            "path": "src/core/resolver/dictionaries/en.ts",
+            "start": 6,
+            "end": 20
+          },
+          {
+            "path": "src/core/resolver/TFIDFCalculator.ts",
+            "start": 19,
+            "end": 178
+          },
+          {
+            "path": "src/core/resolver/Stemmer.ts",
+            "start": 14,
+            "end": 15
+          },
+          {
+            "path": "src/core/resolver/Stemmer.ts",
+            "start": 17,
+            "end": 69
+          },
+          {
+            "path": "src/cli/utils/logger.ts",
+            "start": 1,
+            "end": 40
+          },
+          {
+            "path": "src/core/discovery/DiscoveryLoader.ts",
+            "start": 1,
+            "end": 13
+          },
+          {
+            "path": "src/core/discovery/DiscoveryLoader.ts",
+            "start": 17,
+            "end": 218
+          },
+          {
+            "path": "src/core/indexer/CtxIgnore.ts",
+            "start": 1,
+            "end": 3
+          },
+          {
+            "path": "src/core/indexer/CtxIgnore.ts",
+            "start": 5,
+            "end": 90
+          }
+        ],
+        "metrics": {
+          "precision": 0.06666666666666667,
+          "recall": 1.0,
+          "recallAt5": 1.0,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": 0.9642857142857143,
+          "forbiddenMatches": 0,
+          "tokens": 22608,
+          "usefulLinesPer1000Tokens": 1.194267515923567,
+          "indexMs": 107.626118,
+          "selectionMs": 56.211796
+        }
+      },
+      {
+        "name": "Historical native pack composition",
+        "split": "eval",
+        "sourceHash": "2d4a397a3c991c5af66987891d7348e30096b00323136ff977bc242c32b67c4f",
+        "sourceRevision": "d755358c04a8d8c6cb256d11b6aca2f9958f5d02",
+        "selectedFiles": [
+          "src/pack.rs",
+          "src/model.rs",
+          "src/resolver.rs",
+          "src/database.rs",
+          "src/parser.rs",
+          "tests/test_packages.py",
+          "src/discovery.rs",
+          "tests/regression.rs",
+          "src/indexer.rs",
+          "src/lib.rs",
+          "scripts/pacman_package.py",
+          "docs/how-it-works.md",
+          "src/git.rs",
+          "tests/test_release.py",
+          "src/config.rs"
+        ],
+        "ranges": [
+          {
+            "path": "src/pack.rs",
+            "start": 42,
+            "end": 45
+          },
+          {
+            "path": "src/pack.rs",
+            "start": 81,
+            "end": 98
+          },
+          {
+            "path": "src/pack.rs",
+            "start": 103,
+            "end": 151
+          },
+          {
+            "path": "src/pack.rs",
+            "start": 206,
+            "end": 386
+          },
+          {
+            "path": "src/pack.rs",
+            "start": 397,
+            "end": 422
+          },
+          {
+            "path": "src/pack.rs",
+            "start": 424,
+            "end": 445
+          },
+          {
+            "path": "src/model.rs",
+            "start": 1,
+            "end": 1
+          },
+          {
+            "path": "src/model.rs",
+            "start": 4,
+            "end": 11
+          },
+          {
+            "path": "src/model.rs",
+            "start": 13,
+            "end": 22
+          },
+          {
+            "path": "src/model.rs",
+            "start": 81,
+            "end": 85
+          },
+          {
+            "path": "src/model.rs",
+            "start": 87,
+            "end": 95
+          },
+          {
+            "path": "src/model.rs",
+            "start": 97,
+            "end": 127
+          },
+          {
+            "path": "src/model.rs",
+            "start": 130,
+            "end": 139
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 18,
+            "end": 58
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 60,
+            "end": 83
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 182,
+            "end": 185
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 193,
+            "end": 360
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 412,
+            "end": 433
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 435,
+            "end": 475
+          },
+          {
+            "path": "src/database.rs",
+            "start": 30,
+            "end": 61
+          },
+          {
+            "path": "src/database.rs",
+            "start": 63,
+            "end": 82
+          },
+          {
+            "path": "src/database.rs",
+            "start": 84,
+            "end": 103
+          },
+          {
+            "path": "src/database.rs",
+            "start": 105,
+            "end": 119
+          },
+          {
+            "path": "src/database.rs",
+            "start": 153,
+            "end": 165
+          },
+          {
+            "path": "src/database.rs",
+            "start": 187,
+            "end": 192
+          },
+          {
+            "path": "src/database.rs",
+            "start": 194,
+            "end": 346
+          },
+          {
+            "path": "src/database.rs",
+            "start": 348,
+            "end": 350
+          },
+          {
+            "path": "src/database.rs",
+            "start": 352,
+            "end": 369
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 73,
+            "end": 114
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 120,
+            "end": 232
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 300,
+            "end": 309
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 311,
+            "end": 324
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 326,
+            "end": 446
+          },
+          {
+            "path": "tests/test_packages.py",
+            "start": 1,
+            "end": 140
+          },
+          {
+            "path": "src/discovery.rs",
+            "start": 21,
+            "end": 33
+          },
+          {
+            "path": "src/discovery.rs",
+            "start": 35,
+            "end": 45
+          },
+          {
+            "path": "src/discovery.rs",
+            "start": 62,
+            "end": 73
+          },
+          {
+            "path": "src/discovery.rs",
+            "start": 75,
+            "end": 338
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 33,
+            "end": 40
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 42,
+            "end": 55
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 289,
+            "end": 313
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 416,
+            "end": 469
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 471,
+            "end": 480
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 482,
+            "end": 539
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 541,
+            "end": 619
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 621,
+            "end": 639
+          },
+          {
+            "path": "tests/regression.rs",
+            "start": 662,
+            "end": 694
+          },
+          {
+            "path": "src/indexer.rs",
+            "start": 1,
+            "end": 16
+          },
+          {
+            "path": "src/indexer.rs",
+            "start": 22,
+            "end": 192
+          },
+          {
+            "path": "src/indexer.rs",
+            "start": 194,
+            "end": 238
+          },
+          {
+            "path": "src/indexer.rs",
+            "start": 240,
+            "end": 283
+          },
+          {
+            "path": "src/indexer.rs",
+            "start": 285,
+            "end": 308
+          },
+          {
+            "path": "src/lib.rs",
+            "start": 2,
+            "end": 9
+          },
+          {
+            "path": "scripts/pacman_package.py",
+            "start": 4,
+            "end": 7
+          },
+          {
+            "path": "scripts/pacman_package.py",
+            "start": 19,
+            "end": 22
+          },
+          {
+            "path": "scripts/pacman_package.py",
+            "start": 65,
+            "end": 71
+          },
+          {
+            "path": "scripts/pacman_package.py",
+            "start": 74,
+            "end": 75
+          },
+          {
+            "path": "scripts/pacman_package.py",
+            "start": 78,
+            "end": 117
+          },
+          {
+            "path": "scripts/pacman_package.py",
+            "start": 137,
+            "end": 143
+          },
+          {
+            "path": "docs/how-it-works.md",
+            "start": 1,
+            "end": 41
+          },
+          {
+            "path": "src/git.rs",
+            "start": 1,
+            "end": 22
+          },
+          {
+            "path": "src/git.rs",
+            "start": 30,
+            "end": 71
+          },
+          {
+            "path": "src/git.rs",
+            "start": 73,
+            "end": 188
+          },
+          {
+            "path": "tests/test_release.py",
+            "start": 23,
+            "end": 58
+          },
+          {
+            "path": "tests/test_release.py",
+            "start": 74,
+            "end": 193
+          },
+          {
+            "path": "tests/test_release.py",
+            "start": 196,
+            "end": 300
+          },
+          {
+            "path": "src/config.rs",
+            "start": 1,
+            "end": 17
+          },
+          {
+            "path": "src/config.rs",
+            "start": 20,
+            "end": 30
+          },
+          {
+            "path": "src/config.rs",
+            "start": 55,
+            "end": 62
+          },
+          {
+            "path": "src/config.rs",
+            "start": 64,
+            "end": 71
+          },
+          {
+            "path": "src/config.rs",
+            "start": 73,
+            "end": 84
+          },
+          {
+            "path": "src/config.rs",
+            "start": 86,
+            "end": 100
+          },
+          {
+            "path": "src/config.rs",
+            "start": 102,
+            "end": 130
+          },
+          {
+            "path": "src/config.rs",
+            "start": 132,
+            "end": 168
+          }
+        ],
+        "metrics": {
+          "precision": 0.06666666666666667,
+          "recall": 1.0,
+          "recallAt5": 1.0,
+          "reciprocalRank": 1.0,
+          "rangeCoverage": 1.0,
+          "forbiddenMatches": 0,
+          "tokens": 31996,
+          "usefulLinesPer1000Tokens": 0.8751093886735842,
+          "indexMs": 73.074716,
+          "selectionMs": 46.884528
+        }
+      },
+      {
+        "name": "Historical native import resolution",
+        "split": "train",
+        "sourceHash": "2d4a397a3c991c5af66987891d7348e30096b00323136ff977bc242c32b67c4f",
+        "sourceRevision": "d755358c04a8d8c6cb256d11b6aca2f9958f5d02",
+        "selectedFiles": [
+          "tests/codebases/react-frontend/src/components/UserForm.tsx",
+          "src/parser.rs",
+          "src/database.rs",
+          "src/resolver.rs",
+          "tests/codebases/react-frontend/src/components/Button.tsx",
+          "src/model.rs",
+          "tests/codebases/react-frontend/src/services/api.ts",
+          "src/indexer.rs",
+          "src/discovery.rs",
+          "src/lib.rs",
+          "docs/how-it-works.md",
+          "src/config.rs",
+          "src/git.rs"
+        ],
+        "ranges": [
+          {
+            "path": "tests/codebases/react-frontend/src/components/UserForm.tsx",
+            "start": 1,
+            "end": 14
+          },
+          {
+            "path": "tests/codebases/react-frontend/src/components/UserForm.tsx",
+            "start": 16,
+            "end": 80
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 9,
+            "end": 13
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 134,
+            "end": 261
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 263,
+            "end": 298
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 300,
+            "end": 309
+          },
+          {
+            "path": "src/parser.rs",
+            "start": 326,
+            "end": 446
+          },
+          {
+            "path": "src/database.rs",
+            "start": 30,
+            "end": 61
+          },
+          {
+            "path": "src/database.rs",
+            "start": 63,
+            "end": 82
+          },
+          {
+            "path": "src/database.rs",
+            "start": 105,
+            "end": 119
+          },
+          {
+            "path": "src/database.rs",
+            "start": 121,
+            "end": 134
+          },
+          {
+            "path": "src/database.rs",
+            "start": 136,
+            "end": 151
+          },
+          {
+            "path": "src/database.rs",
+            "start": 153,
+            "end": 165
+          },
+          {
+            "path": "src/database.rs",
+            "start": 167,
+            "end": 185
+          },
+          {
+            "path": "src/database.rs",
+            "start": 194,
+            "end": 346
+          },
+          {
+            "path": "src/database.rs",
+            "start": 352,
+            "end": 369
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 1,
+            "end": 1
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 18,
+            "end": 58
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 193,
+            "end": 360
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 362,
+            "end": 410
+          },
+          {
+            "path": "src/resolver.rs",
+            "start": 435,
+            "end": 475
+          },
+          {
+            "path": "tests/codebases/react-frontend/src/components/Button.tsx",
+            "start": 1,
+            "end": 30
+          },
+          {
+            "path": "src/model.rs",
+            "start": 1,
+            "end": 10
+          },
+          {
+            "path": "src/model.rs",
+            "start": 24,
+            "end": 30
+          },
+          {
+            "path": "src/model.rs",
+            "start": 41,
+            "end": 53
+          },
+          {
+            "path": "src/model.rs",
+            "start": 130,
+            "end": 139
+          },
+          {
+            "path": "tests/codebases/react-frontend/src/services/api.ts",
+            "start": 19,
+            "end": 41
+          },
+          {
+            "path": "src/indexer.rs",
+            "start": 1,
+            "end": 16
+          },
+          {
+            "path": "src/indexer.rs",
+            "start": 22,
+            "end": 192
+          },
+          {
+            "path": "src/discovery.rs",
+            "start": 21,
+            "end": 33
+          },
+          {
+            "path": "src/discovery.rs",
+            "start": 75,
+            "end": 320
+          },
+          {
+            "path": "src/discovery.rs",
+            "start": 502,
+            "end": 542
+          },
+          {
+            "path": "src/lib.rs",
+            "start": 4,
+            "end": 9
+          },
+          {
+            "path": "docs/how-it-works.md",
+            "start": 1,
+            "end": 34
+          },
+          {
+            "path": "docs/how-it-works.md",
+            "start": 36,
+            "end": 41
+          },
+          {
+            "path": "src/config.rs",
+            "start": 1,
+            "end": 10
+          },
+          {
+            "path": "src/git.rs",
+            "start": 1,
+            "end": 10
+          },
+          {
+            "path": "src/git.rs",
+            "start": 73,
+            "end": 188
+          }
+        ],
+        "metrics": {
+          "precision": 0.15384615384615385,
+          "recall": 1.0,
+          "recallAt5": 1.0,
+          "reciprocalRank": 0.5,
+          "rangeCoverage": null,
+          "forbiddenMatches": 0,
+          "tokens": 17397,
+          "usefulLinesPer1000Tokens": null,
+          "indexMs": 68.240234,
+          "selectionMs": 31.545111000000002
+        }
+      }
+    ],
+    "summary": {
+      "precision": 0.09572649572649572,
+      "recall": 1.0,
+      "recallAt5": 1.0,
+      "reciprocalRank": 0.8333333333333334,
+      "rangeCoverage": 0.9821428571428572,
+      "forbiddenMatches": 0,
+      "tokens": 72001,
+      "usefulLinesPer1000Tokens": 1.0346884522985755,
+      "indexMs": 82.98035599999999,
+      "selectionMs": 44.880478333333336
+    }
+  }
+}

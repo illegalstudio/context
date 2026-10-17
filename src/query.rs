@@ -15,6 +15,7 @@ use std::{collections::BTreeMap, path::Path};
 pub struct SearchResult {
     pub query: String,
     pub tokenizer: String,
+    pub query_terms: Vec<crate::terms::QueryTerm>,
     pub hits: Vec<SearchHit>,
 }
 
@@ -32,6 +33,7 @@ pub struct SearchHit {
 pub struct Explanation {
     pub path: String,
     pub task: String,
+    pub query_terms: Vec<crate::terms::QueryTerm>,
     pub indexed: bool,
     pub selected: bool,
     pub status: String,
@@ -39,6 +41,7 @@ pub struct Explanation {
     pub score: f64,
     pub contributions: BTreeMap<String, f64>,
     pub reasons: Vec<String>,
+    pub evidence: Vec<MatchEvidence>,
     pub dependencies: Vec<ImportRelation>,
 }
 
@@ -73,7 +76,7 @@ pub fn search(
         max_files: limit,
         ..Default::default()
     };
-    let resolution = resolver::resolve(root, &options)?;
+    let resolution = resolver::resolve_indexed(root, database, &options)?;
     let candidates =
         discovery::discover(root, database, &resolution, &options, config.graph_depth)?;
     let tokenizer = Tokenizer::new(&config.tokenizer)?;
@@ -110,6 +113,7 @@ pub fn search(
     Ok(SearchResult {
         query: query.into(),
         tokenizer: config.tokenizer.clone(),
+        query_terms: resolution.task.query_terms,
         hits,
     })
 }
@@ -130,9 +134,9 @@ pub fn explain(
         .first()
         .cloned()
         .unwrap_or_else(|| path.trim_start_matches("./").replace('\\', "/"));
-    let resolution = resolver::resolve(root, options)?;
+    let resolution = resolver::resolve_indexed(root, database, options)?;
     let selected = discovery::discover(root, database, &resolution, options, config.graph_depth)?;
-    let all = discovery::discover(
+    let all = discovery::rank(
         root,
         database,
         &resolution,
@@ -155,6 +159,7 @@ pub fn explain(
         .is_ignore();
     Ok(Explanation {
         task: resolution.task.raw,
+        query_terms: resolution.task.query_terms,
         indexed,
         selected: included,
         status: if !indexed {
@@ -163,6 +168,8 @@ pub fn explain(
             "excluded_by_pattern"
         } else if included {
             "selected"
+        } else if ranked.is_some() && selected.len() < options.max_files {
+            "low_marginal_value"
         } else if ranked.is_some() {
             "below_file_limit"
         } else {
@@ -175,6 +182,7 @@ pub fn explain(
             .map(|(_, c)| c.contributions.clone())
             .unwrap_or_default(),
         reasons: ranked.map(|(_, c)| c.reasons.clone()).unwrap_or_default(),
+        evidence: ranked.map(|(_, c)| c.evidence.clone()).unwrap_or_default(),
         dependencies: database
             .imports()?
             .into_iter()

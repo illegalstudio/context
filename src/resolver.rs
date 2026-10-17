@@ -2,101 +2,14 @@ use crate::{config, model::*};
 use anyhow::{Context, Result, bail};
 use chrono::{Duration, NaiveDateTime, Utc};
 use regex::Regex;
-use rust_stemmers::{Algorithm, Stemmer};
 use std::{
-    collections::{BTreeMap, BTreeSet, HashMap},
+    collections::{BTreeMap, BTreeSet},
     fs,
     path::Path,
     sync::OnceLock,
 };
 
-struct Lexicon {
-    translations: HashMap<String, String>,
-    synonyms: HashMap<String, BTreeSet<String>>,
-}
-
-fn lexicon() -> &'static Lexicon {
-    static LEXICON: OnceLock<Lexicon> = OnceLock::new();
-    LEXICON.get_or_init(|| {
-        let english = Stemmer::create(Algorithm::English);
-        let italian = Stemmer::create(Algorithm::Italian);
-        let translations: Vec<(String, String)> =
-            serde_json::from_str(include_str!("../resources/translations-it.json"))
-                .expect("embedded translations");
-        let translations: HashMap<_, _> = translations.into_iter().collect();
-        let mut synonyms: HashMap<String, BTreeSet<String>> = HashMap::new();
-        for (data, is_italian) in [
-            (include_str!("../resources/synonyms-en.json"), false),
-            (include_str!("../resources/synonyms-it.json"), true),
-        ] {
-            let groups: Vec<Vec<String>> = serde_json::from_str(data).expect("embedded synonyms");
-            for group in groups {
-                let stems: BTreeSet<_> = group
-                    .iter()
-                    .map(|word| {
-                        if is_italian {
-                            let stem = italian.stem(word).into_owned();
-                            translations.get(&stem).cloned().unwrap_or(stem)
-                        } else {
-                            english.stem(word).into_owned()
-                        }
-                    })
-                    .collect();
-                for stem in &stems {
-                    synonyms
-                        .entry(stem.clone())
-                        .or_default()
-                        .extend(stems.iter().cloned());
-                }
-            }
-        }
-        Lexicon {
-            translations,
-            synonyms,
-        }
-    })
-}
-
-pub fn words(text: &str) -> Vec<String> {
-    // Split lower-to-upper and acronym-to-word boundaries without allocating a regex per file.
-    let mut separated = String::with_capacity(text.len());
-    let mut chars = text.chars().peekable();
-    let mut previous: Option<char> = None;
-    while let Some(c) = chars.next() {
-        if c.is_uppercase()
-            && previous.is_some_and(|previous| {
-                previous.is_lowercase()
-                    || previous.is_uppercase()
-                        && chars.peek().is_some_and(|next| next.is_lowercase())
-            })
-        {
-            separated.push(' ');
-        }
-        separated.extend(c.to_lowercase());
-        previous = Some(c);
-    }
-    separated
-        .split(|c: char| !c.is_alphanumeric())
-        .filter(|word| word.chars().count() >= 2)
-        .map(str::to_owned)
-        .collect()
-}
-
-pub fn search_terms(text: &str) -> Vec<String> {
-    let lexicon = lexicon();
-    let english = Stemmer::create(Algorithm::English);
-    let italian = Stemmer::create(Algorithm::Italian);
-    let words: BTreeSet<_> = words(text).into_iter().collect();
-    let mut result = BTreeSet::new();
-    for word in words {
-        result.insert(english.stem(&word).into_owned());
-        if let Some(translated) = lexicon.translations.get(italian.stem(&word).as_ref()) {
-            result.insert(translated.clone());
-        }
-        result.insert(word);
-    }
-    result.into_iter().collect()
-}
+pub use crate::terms::{search_terms, words};
 
 fn stopword(word: &str) -> bool {
     matches!(
@@ -191,6 +104,26 @@ pub struct Resolution {
 }
 
 pub fn resolve(root: &Path, options: &PackOptions) -> Result<Resolution> {
+    resolve_with_scopes(root, options, &crate::frameworks::detect(root)?)
+}
+
+pub fn resolve_indexed(
+    root: &Path,
+    database: &crate::database::Database,
+    options: &PackOptions,
+) -> Result<Resolution> {
+    let scopes = match database.framework_scopes()? {
+        Some(scopes) => scopes,
+        None => crate::frameworks::detect(root)?,
+    };
+    resolve_with_scopes(root, options, &scopes)
+}
+
+fn resolve_with_scopes(
+    root: &Path,
+    options: &PackOptions,
+    scopes: &[crate::frameworks::FrameworkScope],
+) -> Result<Resolution> {
     let mut raw = options.task.clone().unwrap_or_default().trim().to_owned();
     if options.task.is_some() && raw.is_empty() {
         bail!("Task description cannot be empty");
@@ -237,16 +170,8 @@ pub fn resolve(root: &Path, options: &PackOptions) -> Result<Resolution> {
         .into_iter()
         .filter(|word| !stopword(word))
         .collect();
-    let mut keywords: BTreeSet<_> =
-        search_terms(&raw_words.iter().cloned().collect::<Vec<_>>().join(" "))
-            .into_iter()
-            .collect();
-    let base = keywords.clone();
-    for word in &base {
-        if let Some(synonyms) = lexicon().synonyms.get(word) {
-            keywords.extend(synonyms.iter().cloned());
-        }
-    }
+    let query_terms = crate::terms::query_terms(&raw_words.iter().cloned().collect::<Vec<_>>());
+    let keywords: BTreeSet<_> = query_terms.iter().map(|term| term.term.clone()).collect();
     let mut files_hint: BTreeSet<String> = file_regex()
         .find_iter(&raw)
         .map(|m| m.as_str().trim_start_matches('@').replace('\\', "/"))
@@ -265,30 +190,58 @@ pub fn resolve(root: &Path, options: &PackOptions) -> Result<Resolution> {
         .filter(|word| {
             word.len() >= 3
                 && !stopword(&word.to_lowercase())
-                && (word.chars().skip(1).any(char::is_uppercase) || word.contains('_'))
+                && (word.chars().skip(1).any(char::is_uppercase)
+                    && word.chars().any(char::is_lowercase)
+                    || word.contains('_'))
         })
         .map(str::to_owned)
         .collect();
     if let Some(symbol) = &options.symbol {
         symbols.insert(symbol.clone());
     }
+    static EXPLICIT: OnceLock<Regex> = OnceLock::new();
+    let explicit = EXPLICIT.get_or_init(|| Regex::new(r"(?:@([\p{L}_][\p{L}\p{N}_]*)\b|`([\p{L}_][\p{L}\p{N}_]*)`|\b([\p{L}_][\p{L}\p{N}_]*)\s*\(\s*\))").unwrap());
+    for capture in explicit.captures_iter(&raw) {
+        if let Some(name) = capture.get(1) {
+            let start = capture.get(0).unwrap().start();
+            if raw[..start]
+                .chars()
+                .next_back()
+                .is_some_and(|c| c.is_alphanumeric() || matches!(c, '_' | '.'))
+                || raw[name.end()..].starts_with(['/', '\\', '.', ':'])
+            {
+                continue;
+            }
+        }
+        if let Some(name) = capture
+            .get(1)
+            .or_else(|| capture.get(2))
+            .or_else(|| capture.get(3))
+        {
+            symbols.insert(name.as_str().into());
+        }
+    }
+    let domains = config::domains_for_scopes(root, false, scopes)?;
     let mut domain_weights = BTreeMap::new();
-    for (_, domain, _) in config::domains(root, false)? {
-        let matches = domain
+    for (_, domain, _) in &domains {
+        let matches: f64 = domain
             .keywords
             .iter()
-            .filter(|keyword| {
-                search_terms(keyword)
+            .map(|keyword| {
+                let terms = search_terms(keyword);
+                query_terms
                     .iter()
-                    .any(|word| keywords.contains(word))
+                    .filter(|term| terms.contains(&term.term))
+                    .map(|term| term.weight)
+                    .fold(0.0, f64::max)
             })
-            .count();
-        if matches > 0 {
-            domain_weights.insert(domain.name, matches as f64);
+            .sum();
+        if matches >= 0.3 {
+            domain_weights.insert(domain.name.clone(), matches);
         }
     }
     for domain in &options.focus {
-        if !config::domains(root, false)?
+        if !domains
             .iter()
             .any(|(_, definition, _)| definition.name == *domain)
         {
@@ -344,6 +297,7 @@ pub fn resolve(root: &Path, options: &PackOptions) -> Result<Resolution> {
             raw: raw.trim().into(),
             raw_words: raw_words.into_iter().collect(),
             keywords: keywords.into_iter().collect(),
+            query_terms,
             files_hint: files_hint.into_iter().collect(),
             symbols: symbols.into_iter().collect(),
             domains: domain_weights.keys().cloned().collect(),

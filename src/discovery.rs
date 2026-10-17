@@ -7,7 +7,7 @@ use crate::{
 use anyhow::Result;
 use ignore::gitignore::GitignoreBuilder;
 use std::{
-    collections::{BTreeMap, BTreeSet, VecDeque},
+    collections::{BTreeMap, BTreeSet},
     path::Path,
 };
 
@@ -17,6 +17,7 @@ struct Score {
     reserved: bool,
     reasons: BTreeSet<String>,
     contributions: BTreeMap<String, f64>,
+    evidence: Vec<MatchEvidence>,
 }
 
 fn add(
@@ -36,7 +37,7 @@ fn add(
 
 pub fn is_test(path: &str) -> bool {
     path.split('/')
-        .any(|s| matches!(s, "test" | "tests" | "spec" | "specs" | "__tests__"))
+        .any(|s| matches!(s, "test" | "tests" | "spec" | "specs" | "__tests__" | "e2e"))
         || path.contains(".test.")
         || path.contains(".spec.")
         || path.contains("_test.")
@@ -47,12 +48,15 @@ pub fn is_test(path: &str) -> bool {
 }
 
 pub fn is_config(path: &str) -> bool {
-    path.starts_with("config/")
+    path.split('/').any(|part| part == "config")
+        || path.ends_with("bootstrap/app.php")
+        || path.ends_with("bootstrap/providers.php")
         || path.contains(".config.")
         || path == ".env.example"
         || matches!(
             path.rsplit('/').next().unwrap_or(""),
             "package.json"
+                | ".env.example"
                 | "composer.json"
                 | "tsconfig.json"
                 | "Cargo.toml"
@@ -74,6 +78,78 @@ pub fn match_file<'a>(hint: &str, paths: impl Iterator<Item = &'a String>) -> Ve
         .collect()
 }
 
+fn matches(
+    text: &str,
+    query: &[crate::terms::QueryTerm],
+) -> BTreeMap<crate::terms::Origin, Vec<crate::terms::QueryTerm>> {
+    use crate::terms::Origin;
+    let literal: BTreeSet<_> = crate::terms::words(text).into_iter().collect();
+    let stems: BTreeSet<_> = search_terms(text).into_iter().collect();
+    let mut best: BTreeMap<&str, &crate::terms::QueryTerm> = BTreeMap::new();
+    for term in query {
+        let found = match term.origin {
+            Origin::Literal => literal.contains(&term.term),
+            Origin::Stem => stems.contains(&term.term),
+            _ => literal.contains(&term.term) || stems.contains(&term.term),
+        };
+        if found
+            && best
+                .get(term.source.as_str())
+                .is_none_or(|old| term.weight > old.weight)
+        {
+            best.insert(&term.source, term);
+        }
+    }
+    let mut groups: BTreeMap<Origin, Vec<crate::terms::QueryTerm>> = BTreeMap::new();
+    for term in best.into_values() {
+        groups.entry(term.origin).or_default().push(term.clone());
+    }
+    groups
+}
+
+fn record(
+    scores: &mut BTreeMap<String, Score>,
+    path: &str,
+    amount: f64,
+    reason: &str,
+    evidence: MatchEvidence,
+) {
+    add(scores, path, amount, reason, false);
+    scores
+        .entry(path.into())
+        .or_default()
+        .evidence
+        .push(evidence);
+}
+
+fn normalize(candidates: &mut [Candidate], highest: f64) {
+    if highest > 0.0 {
+        for candidate in candidates.iter_mut() {
+            candidate.score /= highest;
+            for amount in candidate.contributions.values_mut() {
+                *amount /= highest;
+            }
+        }
+    }
+    candidates.sort_by(|a, b| b.score.total_cmp(&a.score).then(a.path.cmp(&b.path)));
+}
+
+pub fn rank(
+    root: &Path,
+    db: &Database,
+    resolution: &Resolution,
+    options: &PackOptions,
+    graph_depth: usize,
+) -> Result<Vec<Candidate>> {
+    let mut candidates = build(root, db, resolution, options, graph_depth)?;
+    let highest = candidates
+        .iter()
+        .map(|candidate| candidate.score)
+        .fold(0.0, f64::max);
+    normalize(&mut candidates, highest);
+    Ok(candidates)
+}
+
 pub fn discover(
     root: &Path,
     db: &Database,
@@ -81,12 +157,39 @@ pub fn discover(
     options: &PackOptions,
     graph_depth: usize,
 ) -> Result<Vec<Candidate>> {
+    let candidates = build(root, db, resolution, options, graph_depth)?;
+    let scopes = db.framework_scopes()?.unwrap_or_default();
+    let highest = candidates
+        .iter()
+        .map(|candidate| candidate.score)
+        .fold(0.0, f64::max);
+    let mut selected =
+        crate::selection::choose(&candidates, &resolution.task, &scopes, options.max_files);
+    normalize(&mut selected, highest);
+    Ok(selected)
+}
+
+fn build(
+    root: &Path,
+    db: &Database,
+    resolution: &Resolution,
+    options: &PackOptions,
+    graph_depth: usize,
+) -> Result<Vec<Candidate>> {
+    use crate::terms::Origin;
     let files = db.files()?;
     let symbols = db.symbols()?;
-    let imports = db.imports()?;
-    let refs = db.references()?;
-    let git = db.git_signals()?;
+    let generated = db.generated_files()?;
+    let scopes = match db.framework_scopes()? {
+        Some(scopes) => scopes,
+        None => crate::frameworks::detect(root)?,
+    };
     let task = &resolution.task;
+    let query = if task.query_terms.is_empty() {
+        crate::terms::query_terms(&task.raw_words)
+    } else {
+        task.query_terms.clone()
+    };
     let mut scores: BTreeMap<String, Score> = BTreeMap::new();
     let mut exclusions = GitignoreBuilder::new(root);
     for pattern in &options.exclude {
@@ -94,24 +197,13 @@ pub fn discover(
     }
     let exclusions = exclusions.build()?;
     let allowed = |path: &str| {
-        if exclusions
+        !exclusions
             .matched_path_or_any_parents(path, false)
             .is_ignore()
-        {
-            return false;
-        }
-        if !options.include.is_empty() {
-            if is_test(path) && !options.include.iter().any(|s| s == "tests") {
-                return false;
-            }
-            if is_config(path) && !options.include.iter().any(|s| s == "config") {
-                return false;
-            }
-            if path.ends_with(".md") && !options.include.iter().any(|s| s == "docs") {
-                return false;
-            }
-        }
-        true
+            && (options.include.is_empty()
+                || (!is_test(path) || options.include.iter().any(|s| s == "tests"))
+                    && (!is_config(path) || options.include.iter().any(|s| s == "config"))
+                    && (!path.ends_with(".md") || options.include.iter().any(|s| s == "docs")))
     };
     for hint in &task.files_hint {
         for path in match_file(hint, files.keys())
@@ -146,30 +238,31 @@ pub fn discover(
             );
         }
     }
-    let raw_identifiers: BTreeSet<_> = task
-        .raw
-        .split(|c: char| !c.is_alphanumeric() && c != '_')
-        .map(str::to_lowercase)
-        .collect();
-    let hints: BTreeSet<_> = task.symbols.iter().map(|s| s.to_lowercase()).collect();
-    let keyword_set: BTreeSet<_> = task.keywords.iter().cloned().collect();
-    let raw_terms: BTreeSet<_> = task
-        .raw_words
+    let hints: BTreeSet<_> = task
+        .symbols
         .iter()
-        .flat_map(|word| search_terms(word))
+        .map(|name| name.to_lowercase())
         .collect();
     let mut symbol_files: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    let mut term_files: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for symbol in &symbols {
         symbol_files
             .entry(symbol.name.clone())
             .or_default()
             .insert(symbol.file_path.clone());
+        for term in search_terms(&symbol.name) {
+            term_files
+                .entry(term)
+                .or_default()
+                .insert(symbol.file_path.clone());
+        }
+    }
+    let mut symbol_matches: BTreeMap<(String, Origin), (f64, BTreeSet<String>)> = BTreeMap::new();
+    for symbol in &symbols {
         if !allowed(&symbol.file_path) {
             continue;
         }
-        if hints.contains(&symbol.name.to_lowercase())
-            || raw_identifiers.contains(&symbol.name.to_lowercase())
-        {
+        if hints.contains(&symbol.name.to_lowercase()) {
             add(
                 &mut scores,
                 &symbol.file_path,
@@ -177,290 +270,376 @@ pub fn discover(
                 "contains explicitly mentioned symbol (reserved)",
                 true,
             );
-        } else if search_terms(&symbol.name)
-            .iter()
-            .any(|term| raw_terms.contains(term))
-        {
-            add(
-                &mut scores,
-                &symbol.file_path,
-                1.0,
-                "contains matching symbol",
-                false,
-            );
+        }
+        for (origin, terms) in matches(&symbol.name, &query) {
+            let amount: f64 = terms
+                .iter()
+                .map(|term| {
+                    let frequency = term_files.get(&term.term).map_or(0, BTreeSet::len) as f64;
+                    term.weight
+                        * (((files.len() as f64 + 1.0) / (frequency + 1.0)).ln()
+                            / (files.len() as f64 + 1.0).ln()
+                            + 0.1)
+                })
+                .sum();
+            let entry = symbol_matches
+                .entry((symbol.file_path.clone(), origin))
+                .or_default();
+            entry.0 = entry.0.max(amount.min(1.0));
+            entry.1.extend(terms.into_iter().map(|term| term.source));
         }
     }
-    let mut path_terms: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
-    let mut entity_files: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
-    for path in files.keys().filter(|path| allowed(path)) {
-        let terms: BTreeSet<_> = search_terms(path).into_iter().collect();
-        let raw_count = terms.intersection(&raw_terms).count();
-        let name = Path::new(path)
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or(path);
-        let basename_terms: BTreeSet<_> = search_terms(name).into_iter().collect();
-        let basename_count = basename_terms.intersection(&raw_terms).count();
-        let expanded_count = terms.intersection(&keyword_set).count();
-        if raw_count > 0 {
-            add(
-                &mut scores,
-                path,
-                (raw_count as f64).min(4.0) * 1.25 + (basename_count as f64).min(3.0) * 1.5,
-                "path matches task words",
-                false,
-            );
-        } else if expanded_count > 0 {
-            add(
-                &mut scores,
-                path,
-                (expanded_count as f64).min(3.0) * 0.45,
-                "path matches expanded keywords",
-                false,
-            );
-        }
-        for term in &basename_terms {
-            if entity_term(term) {
-                entity_files
-                    .entry(term.clone())
-                    .or_default()
-                    .insert(path.clone());
-            }
-        }
-        path_terms.insert(path.clone(), terms);
+    for ((path, origin), (amount, terms)) in symbol_matches {
+        let reason = match origin {
+            Origin::Literal => "contains matching symbol",
+            Origin::Stem => "symbol matches task stems",
+            Origin::Translation => "symbol matches translated query terms",
+            Origin::Synonym => "symbol matches query synonyms",
+        };
+        record(
+            &mut scores,
+            &path,
+            amount,
+            reason,
+            MatchEvidence {
+                signal: format!("{}_symbol", origin.label()),
+                terms: terms.into_iter().collect(),
+                ..Default::default()
+            },
+        );
     }
-    let search = db.search(&task.keywords, 500)?;
-    for (index, (path, _)) in search.iter().enumerate() {
-        if allowed(path) {
-            add(
-                &mut scores,
-                path,
-                0.6 + 1.5 / (1.0 + index as f64 * 0.08),
-                "contains matching keywords",
-                false,
-            );
-        }
-    }
-    let mut adjacency: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
-    for edge in &imports {
-        adjacency
-            .entry(&edge.source_path)
-            .or_default()
-            .insert(&edge.target_path);
-        adjacency
-            .entry(&edge.target_path)
-            .or_default()
-            .insert(&edge.source_path);
-    }
-    let mut seeds: Vec<_> = scores
-        .iter()
-        .filter(|(_, score)| score.value >= 3.0)
-        .map(|(path, score)| (path.clone(), score.value))
-        .collect();
-    seeds.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
-    seeds.truncate(50);
-    let seed_paths: BTreeSet<_> = seeds.iter().map(|(path, _)| path.clone()).collect();
-    let mut visited = seed_paths.clone();
-    let mut queue: VecDeque<_> = seeds.iter().map(|(path, _)| (path.clone(), 0)).collect();
-    while let Some((path, depth)) = queue.pop_front() {
-        if depth >= graph_depth || visited.len() >= 2000 {
-            continue;
-        }
-        if let Some(neighbors) = adjacency.get(path.as_str()) {
-            for neighbor in neighbors {
-                if visited.len() >= 2000 {
-                    break;
-                }
-                if !allowed(neighbor) {
-                    continue;
-                }
-                if visited.insert((*neighbor).into()) {
-                    add(
-                        &mut scores,
-                        neighbor,
-                        1.2 * 0.6_f64.powi(depth as i32),
-                        &format!("related via imports ({} hops)", depth + 1),
-                        false,
-                    );
-                    queue.push_back(((*neighbor).into(), depth + 1));
-                }
-            }
-        }
-    }
-    // Indexed references avoid reading candidate files again during discovery.
-    for seed in &seed_paths {
-        if let Some(names) = refs.get(seed) {
-            for name in names {
-                if let Some(paths) = symbol_files.get(name) {
-                    for path in paths.iter().filter(|path| allowed(path)) {
-                        if path != seed {
-                            add(
-                                &mut scores,
-                                path,
-                                1.3,
-                                "referenced by a relevant file",
-                                false,
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-    let frameworks = config::detect_frameworks(root)?;
-    for seed in &seed_paths {
-        let seed_name = Path::new(seed)
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or(seed);
-        let entities: BTreeSet<_> = search_terms(seed_name)
-            .into_iter()
-            .filter(|term| entity_term(term))
-            .collect();
-        let mut related = BTreeSet::new();
-        for entity in &entities {
-            if let Some(paths) = entity_files.get(entity) {
-                related.extend(paths.iter().cloned());
-            }
-        }
-        for path in related {
-            if path == *seed || !allowed(&path) {
-                continue;
-            }
-            if is_test(&path) {
-                add(
-                    &mut scores,
-                    &path,
-                    1.6,
-                    "test file for a relevant candidate",
-                    false,
-                );
-            } else if frameworks.iter().any(|s| s == "laravel")
-                || frameworks.iter().any(|s| s == "nodejs")
-            {
-                add(&mut scores, &path, 1.0, "related framework file", false);
-            }
-        }
-        if frameworks.iter().any(|s| s == "statamic") {
-            let components: Vec<_> = seed.split('/').collect();
-            for (index, component) in components.iter().enumerate() {
-                if matches!(*component, "collections" | "taxonomies" | "fieldsets")
-                    && let Some(entity) = components.get(index + 1)
-                {
-                    let entity = entity.trim_end_matches(".yaml");
-                    for path in files
-                        .keys()
-                        .filter(|path| allowed(path) && path.contains(entity))
-                    {
-                        if path != seed {
-                            add(
-                                &mut scores,
-                                path,
-                                1.4,
-                                "related Statamic collection, blueprint or template",
-                                false,
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-    // Find Node entry points for startup tasks even without a literal filename.
-    if task
-        .raw_words
-        .iter()
-        .any(|w| matches!(w.as_str(), "startup" | "server" | "avvio" | "port"))
-    {
-        for path in files.keys().filter(|path| {
-            allowed(path)
-                && matches!(
-                    path.rsplit('/').next().unwrap_or(""),
-                    "index.ts"
-                        | "index.js"
-                        | "main.ts"
-                        | "main.js"
-                        | "server.ts"
-                        | "server.js"
-                        | "main.rs"
-                        | "main.go"
-                )
-        }) {
-            add(
-                &mut scores,
-                path,
-                4.0,
-                "entry point for startup task",
-                false,
-            );
-        }
-    }
-    if !seed_paths.is_empty() {
-        for path in files.keys().filter(|path| allowed(path) && is_config(path)) {
-            let directory = Path::new(path).parent().unwrap_or(Path::new(""));
-            if directory.as_os_str().is_empty()
-                || seed_paths
-                    .iter()
-                    .any(|seed| Path::new(seed).starts_with(directory))
-            {
-                add(
-                    &mut scores,
-                    path,
-                    0.3,
-                    "configuration for relevant files",
-                    false,
-                );
-            }
-        }
-    }
-    let domain_terms: BTreeMap<_, BTreeSet<_>> = config::domains(root, false)?
-        .into_iter()
-        .filter(|(_, domain, _)| task.domains.contains(&domain.name))
-        .map(|(_, domain, _)| {
-            (
+    let definitions = config::domains_for_scopes(root, false, &scopes)?;
+    let mut domain_terms = BTreeMap::new();
+    let mut domain_sources = BTreeMap::new();
+    for (source, domain, _) in definitions {
+        if task.domains.contains(&domain.name) {
+            domain_sources.insert(domain.name.clone(), source);
+            domain_terms.insert(
                 domain.name,
                 search_terms(&domain.keywords.join(" "))
                     .into_iter()
-                    .collect(),
-            )
+                    .collect::<BTreeSet<_>>(),
+            );
+        }
+    }
+    let domain_applies = |domain: &str, path: &str| {
+        domain_sources.get(domain).is_some_and(|source| {
+            matches!(source.as_str(), "core" | "custom")
+                || crate::frameworks::scope_for(&scopes, path)
+                    .is_some_and(|scope| scope.frameworks.contains(source))
         })
+    };
+    let total_weight = task.domain_weights.values().sum::<f64>().max(1.0);
+    let mut path_terms: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    let mut path_frequency: BTreeMap<String, usize> = BTreeMap::new();
+    for path in files.keys().filter(|path| allowed(path)) {
+        let terms: BTreeSet<_> = search_terms(path).into_iter().collect();
+        for term in &terms {
+            *path_frequency.entry(term.clone()).or_default() += 1;
+        }
+        path_terms.insert(path.clone(), terms);
+    }
+    for path in files.keys().filter(|path| allowed(path)) {
+        let basename = Path::new(path)
+            .file_stem()
+            .and_then(|name| name.to_str())
+            .unwrap_or(path);
+        let basename_terms: BTreeSet<_> = crate::terms::words(basename).into_iter().collect();
+        let groups = matches(path, &query);
+        let matched = !groups.is_empty();
+        for (origin, terms) in groups {
+            let amount: f64 = terms
+                .iter()
+                .map(|term| {
+                    let frequency = path_frequency.get(&term.term).copied().unwrap_or(0) as f64;
+                    let rarity = 0.25
+                        + 0.75 * ((files.len() as f64 + 1.0) / (frequency + 1.0)).ln()
+                            / (files.len() as f64 + 1.0).ln();
+                    term.weight
+                        * rarity
+                        * (1.25
+                            + if basename_terms.contains(&term.term) {
+                                1.5
+                            } else {
+                                0.0
+                            })
+                })
+                .sum();
+            let reason = match origin {
+                Origin::Literal => "path matches task words",
+                Origin::Stem => "path matches task stems",
+                Origin::Translation => "path matches translated query terms",
+                Origin::Synonym => "path matches query synonyms",
+            };
+            record(
+                &mut scores,
+                path,
+                amount.min(8.0),
+                reason,
+                MatchEvidence {
+                    signal: format!("{}_path", origin.label()),
+                    terms: terms.into_iter().map(|term| term.source).collect(),
+                    ..Default::default()
+                },
+            );
+        }
+        if !matched {
+            let amount: f64 = domain_terms
+                .iter()
+                .filter(|(domain, _)| domain_applies(domain, path))
+                .map(|(domain, terms)| {
+                    path_terms[path].intersection(terms).count().min(2) as f64
+                        * task.domain_weights.get(domain).copied().unwrap_or(0.0)
+                        / total_weight
+                })
+                .sum();
+            if amount > 0.0 {
+                record(
+                    &mut scores,
+                    path,
+                    amount * 0.45,
+                    "path matches task domains",
+                    MatchEvidence {
+                        signal: "domain".into(),
+                        ..Default::default()
+                    },
+                );
+            }
+        }
+    }
+    for (path, origin, amount) in db.search_with_provenance(&query, 500)? {
+        if allowed(&path) {
+            record(
+                &mut scores,
+                &path,
+                amount,
+                &format!("content matches {} query terms", origin.label()),
+                MatchEvidence {
+                    signal: format!("{}_content", origin.label()),
+                    ..Default::default()
+                },
+            );
+        }
+    }
+    let dependencies = db.dependencies()?;
+    let runtime_sources: BTreeSet<_> = dependencies
+        .iter()
+        .filter(|edge| matches!(edge.kind.as_str(), "runtime" | "config"))
+        .map(|edge| edge.source_path.as_str())
         .collect();
+    let scope_hints = crate::selection::scope_hints(task, &scopes);
+    let highest = scores
+        .values()
+        .map(|score| score.value)
+        .fold(0.0, f64::max)
+        .max(1.0);
+    let mut seeds: Vec<_> = scores
+        .iter()
+        .filter(|(path, score)| {
+            allowed(path)
+                && (!generated.contains(*path) || score.reserved)
+                && (score.reserved
+                    || score.value >= 1.5 && score.value >= highest * 0.35
+                    || score.value >= 0.9 && runtime_sources.contains(path.as_str()))
+                && (score.reserved
+                    || scope_hints.is_empty()
+                    || crate::frameworks::scope_for(&scopes, path)
+                        .is_some_and(|scope| scope_hints.contains(&scope.path)))
+        })
+        .map(|(path, score)| (path.clone(), (score.value / highest).min(1.0)))
+        .collect();
+    seeds.sort_by(|a, b| b.1.total_cmp(&a.1).then(a.0.cmp(&b.0)));
+    seeds.truncate(24);
+    let graph_allowed: BTreeSet<_> = files
+        .keys()
+        .filter(|path| {
+            allowed(path)
+                && (!generated.contains(*path) || scores.get(*path).is_some_and(|s| s.reserved))
+        })
+        .cloned()
+        .collect();
+    for contribution in crate::graph::expand(&dependencies, &seeds, &graph_allowed, graph_depth) {
+        let reason = if contribution.evidence.signal == "outgoing_dependency" {
+            "outgoing typed dependency"
+        } else {
+            "incoming typed dependency"
+        };
+        if contribution.evidence.hops == 1
+            && contribution
+                .evidence
+                .source_path
+                .as_ref()
+                .is_some_and(|source| scores.get(source).is_some_and(|score| score.reserved))
+        {
+            scores
+                .entry(contribution.path.clone())
+                .or_default()
+                .reasons
+                .insert("direct import relationship to an explicit reference".into());
+        }
+        record(
+            &mut scores,
+            &contribution.path,
+            contribution.amount,
+            reason,
+            contribution.evidence,
+        );
+    }
+    if graph_depth > 0 {
+        for contribution in crate::graph::shared_references(
+            &db.references()?,
+            &symbol_files,
+            &seeds,
+            &scopes,
+            &graph_allowed,
+        ) {
+            record(
+                &mut scores,
+                &contribution.path,
+                contribution.amount,
+                "weak lexical symbol reference",
+                contribution.evidence,
+            );
+        }
+    }
+    let mut entity_files: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    for path in files.keys().filter(|path| allowed(path)) {
+        for term in search_terms(
+            Path::new(path)
+                .file_stem()
+                .and_then(|name| name.to_str())
+                .unwrap_or(path),
+        ) {
+            if entity_term(&term) {
+                entity_files.entry(term).or_default().insert(path.clone());
+            }
+        }
+    }
+    for (seed, strength) in &seeds {
+        let scope = crate::frameworks::scope_for(&scopes, seed);
+        let name = Path::new(seed)
+            .file_stem()
+            .and_then(|name| name.to_str())
+            .unwrap_or(seed);
+        for term in search_terms(name)
+            .into_iter()
+            .filter(|term| entity_term(term))
+        {
+            for path in entity_files.get(&term).into_iter().flatten() {
+                if path == seed
+                    || crate::frameworks::scope_for(&scopes, path).map(|scope| &scope.path)
+                        != scope.map(|scope| &scope.path)
+                {
+                    continue;
+                }
+                let amount = 0.35 * strength / (entity_files[&term].len() as f64).sqrt();
+                let reason = if is_test(path) {
+                    "test file for a relevant candidate"
+                } else {
+                    "related framework file"
+                };
+                record(
+                    &mut scores,
+                    path,
+                    amount,
+                    reason,
+                    MatchEvidence {
+                        signal: "filename_association".into(),
+                        source_path: Some(seed.clone()),
+                        ..Default::default()
+                    },
+                );
+            }
+        }
+    }
+    if task
+        .raw_words
+        .iter()
+        .any(|word| matches!(word.as_str(), "startup" | "server" | "avvio" | "port"))
+    {
+        let amount = if task.domains.iter().any(|domain| domain == "auth") {
+            1.0
+        } else {
+            4.0
+        };
+        for path in files.keys().filter(|path| {
+            allowed(path)
+                && matches!(
+                    path.rsplit('/').next(),
+                    Some(
+                        "index.ts"
+                            | "index.js"
+                            | "main.ts"
+                            | "main.js"
+                            | "server.ts"
+                            | "server.js"
+                            | "main.rs"
+                            | "main.go"
+                    )
+                )
+        }) {
+            record(
+                &mut scores,
+                path,
+                amount,
+                "entry point for startup task",
+                MatchEvidence {
+                    signal: "entry_point".into(),
+                    terms: vec!["startup".into()],
+                    ..Default::default()
+                },
+            );
+        }
+    }
+    let git = db.git_signals()?;
     let mut candidates = vec![];
     for (path, mut score) in scores {
         if !files.contains_key(&path) || !allowed(&path) {
             continue;
         }
-        let terms = path_terms.get(&path);
         let mut matched_weight = 0.0;
-        for (domain, domain_terms) in &domain_terms {
-            if terms.is_some_and(|terms| !terms.is_disjoint(domain_terms)) {
-                matched_weight += task.domain_weights.get(domain).copied().unwrap_or(1.0);
+        for (domain, terms) in &domain_terms {
+            if domain_applies(domain, &path)
+                && path_terms
+                    .get(&path)
+                    .is_some_and(|path| !path.is_disjoint(terms))
+            {
+                matched_weight += task.domain_weights.get(domain).copied().unwrap_or(0.0);
                 score.reasons.insert(format!("domain relevant ({domain})"));
             }
         }
-        let total_weight: f64 = task.domain_weights.values().sum();
-        if total_weight > 0.0 {
-            let previous = score.value;
-            score.value *= 1.0 + 0.35 * matched_weight / total_weight;
-            score
-                .contributions
-                .insert("domain boost".into(), score.value - previous);
-        }
-        if let Some(signal) = git.get(&path)
-            && signal.churn_score > 0.5
+        let previous = score.value;
+        score.value *= 1.0 + 0.2 * matched_weight / total_weight;
+        score
+            .contributions
+            .insert("domain boost".into(), score.value - previous);
+        if git
+            .get(&path)
+            .is_some_and(|signal| signal.churn_score > 0.5)
         {
             let previous = score.value;
             score.value *= 1.05;
             score
                 .contributions
                 .insert("git activity boost".into(), score.value - previous);
-            score.reasons.insert("high git activity (hotspot)".into());
+        }
+        if !score.reserved && generated.contains(&path) {
+            let previous = score.value;
+            score.value *= 0.05;
+            score.contributions.insert(
+                "generated or minified asset penalty".into(),
+                score.value - previous,
+            );
+            score
+                .reasons
+                .insert("generated or minified asset (deprioritized)".into());
         }
         candidates.push(Candidate {
             path,
             score: score.value,
             reasons: score.reasons.into_iter().collect(),
             contributions: score.contributions,
+            evidence: score.evidence,
             reserved: score.reserved,
         });
     }
@@ -470,46 +649,6 @@ pub fn discover(
             .then(b.score.total_cmp(&a.score))
             .then(a.path.cmp(&b.path))
     });
-    let max = options.max_files;
-    // Reserve small quotas for relevant tests/configuration without wasting unused slots.
-    let mut selected: BTreeSet<String> = candidates
-        .iter()
-        .filter(|c| c.reserved)
-        .take(max)
-        .map(|c| c.path.clone())
-        .collect();
-    if selected.len() < max && max >= 5 {
-        for (predicate, quota) in [
-            (is_test as fn(&str) -> bool, (max / 5).max(1)),
-            (is_config as fn(&str) -> bool, (max / 10).max(1)),
-        ] {
-            for candidate in candidates
-                .iter()
-                .filter(|c| predicate(&c.path) && c.score >= 1.0)
-                .take(quota)
-            {
-                if selected.len() < max {
-                    selected.insert(candidate.path.clone());
-                }
-            }
-        }
-    }
-    for candidate in &candidates {
-        if selected.len() < max {
-            selected.insert(candidate.path.clone());
-        }
-    }
-    candidates.retain(|c| selected.contains(&c.path));
-    candidates.sort_by(|a, b| b.score.total_cmp(&a.score).then(a.path.cmp(&b.path)));
-    let highest = candidates.iter().map(|c| c.score).fold(0.0, f64::max);
-    for candidate in &mut candidates {
-        if highest > 0.0 {
-            candidate.score /= highest;
-            for value in candidate.contributions.values_mut() {
-                *value /= highest;
-            }
-        }
-    }
     Ok(candidates)
 }
 

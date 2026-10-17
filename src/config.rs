@@ -87,22 +87,18 @@ pub fn load(root: &Path) -> Result<Config> {
 }
 
 pub fn detect_frameworks(root: &Path) -> Result<Vec<String>> {
-    let mut names = vec!["generic".into()];
-    if root.join("package.json").is_file() {
-        names.push("nodejs".into());
-    }
-    let composer: serde_json::Value = read_json(&root.join("composer.json"))?;
-    let requires = &composer["require"];
-    if requires.get("laravel/framework").is_some() || requires.get("statamic/cms").is_some() {
-        names.push("laravel".into());
-    }
-    if requires.get("statamic/cms").is_some() {
-        names.push("statamic".into());
-    }
-    Ok(names)
+    Ok(crate::frameworks::names(&crate::frameworks::detect(root)?))
 }
 
 pub fn domains(root: &Path, include_disabled: bool) -> Result<Vec<(String, Domain, bool)>> {
+    domains_for_scopes(root, include_disabled, &crate::frameworks::detect(root)?)
+}
+
+pub fn domains_for_scopes(
+    root: &Path,
+    include_disabled: bool,
+    scopes: &[crate::frameworks::FrameworkScope],
+) -> Result<Vec<(String, Domain, bool)>> {
     let definitions: Vec<Domain> = serde_json::from_str(include_str!("../resources/domains.json"))?;
     let frameworks: BTreeMap<String, Framework> =
         serde_json::from_str(include_str!("../resources/frameworks.json"))?;
@@ -111,7 +107,7 @@ pub fn domains(root: &Path, include_disabled: bool) -> Result<Vec<(String, Domai
     for domain in definitions {
         result.insert(domain.name.clone(), ("core".into(), domain, true));
     }
-    for name in detect_frameworks(root)? {
+    for name in crate::frameworks::names(scopes) {
         if let Some(framework) = frameworks.get(&name) {
             for domain in &framework.domains {
                 result.insert(domain.name.clone(), (name.clone(), domain.clone(), true));
@@ -137,21 +133,40 @@ pub fn initialize(root: &Path, force: bool) -> Result<()> {
     if force || !config_path.exists() {
         write_json(&config_path, &Config::default())?;
     }
-    let names = detect_frameworks(root)?;
+    let scopes = crate::frameworks::detect(root)?;
+    let names = crate::frameworks::names(&scopes);
     write_json(
         &root.join(".context/project.json"),
-        &serde_json::json!({"detectedAt": chrono::Utc::now(), "activeDiscoveries": names}),
+        &serde_json::json!({"detectedAt": chrono::Utc::now(), "activeDiscoveries": names, "frameworkScopes": scopes}),
     )?;
     let ignore_path = root.join(".ctxignore");
     if force || !ignore_path.exists() {
         let frameworks: BTreeMap<String, Framework> =
             serde_json::from_str(include_str!("../resources/frameworks.json"))?;
         let mut patterns = DEFAULT_IGNORE.to_owned();
-        for name in names {
-            if let Some(f) = frameworks.get(&name) {
-                patterns.push('\n');
-                patterns.push_str(&f.ignore_patterns);
-                patterns.push('\n');
+        if let Some(generic) = frameworks.get("generic") {
+            patterns.push_str(&format!("\n{}\n", generic.ignore_patterns));
+        }
+        for scope in &scopes {
+            for name in &scope.frameworks {
+                if let Some(framework) = frameworks.get(name) {
+                    patterns.push_str(&format!(
+                        "\n# {name} in {}\n",
+                        if scope.path.is_empty() {
+                            "."
+                        } else {
+                            &scope.path
+                        }
+                    ));
+                    for pattern in framework
+                        .ignore_patterns
+                        .lines()
+                        .filter(|line| !line.is_empty() && !line.starts_with('#'))
+                    {
+                        patterns.push_str(&crate::frameworks::scoped_pattern(&scope.path, pattern));
+                        patterns.push('\n');
+                    }
+                }
             }
         }
         fs::write(ignore_path, patterns)?;

@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "protocol": {
+    "description": "Separate domain probes for billing and notifications, frozen before retrieval. New evaluation repositories, sparse agent-reviewed source labels. Does not change the primary 80-task corpus.",
+    "budgets": [
+      8000,
+      16000,
+      32000
+    ],
+    "tokenizer": "o200k_base",
+    "maxFiles": 25,
+    "maxLinesPerFile": 300,
+    "maxFileSize": 1048576,
+    "graphDepth": 2
+  },
+  "projects": [
+    {
+      "id": "solidusio/solidus",
+      "repository": "solidusio/solidus",
+      "url": "https://github.com/solidusio/solidus",
+      "language": "ruby",
+      "framework": "rails-solidus",
+      "kind": "application-monorepo",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "d7df348bc6f0e067f3de64b2fec650b173135f8966401ab106d7d2ed46199a8e",
+          "url": "https://github.com/solidusio/solidus/blob/567b66f5c6ca236eccaffbb1617ce743ca8cacfc/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "id": "pretix/pretix",
+      "repository": "pretix/pretix",
+      "url": "https://github.com/pretix/pretix",
+      "language": "python",
+      "framework": "django-pretix",
+      "kind": "application-monorepo",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "535ba4cda7987d794262f67b0166eaf950d398e7819cd4892644993fd079f75e",
+          "url": "https://github.com/pretix/pretix/blob/fe43862fa473c43b139bc00710aa1fc4a06ef726/LICENSE"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "solidusio--solidus-1",
+      "project": "solidusio/solidus",
+      "split": "eval",
+      "revision": "567b66f5c6ca236eccaffbb1617ce743ca8cacfc",
+      "fixCommit": "7ba71951235e500049a9e30fcdaaf5695270429d",
+      "archiveSha256": "1c63d84505caa016ee466e635c437e455b995ed1322cc68d6649f6aee7898b2c",
+      "task": "Refund availability is wrong for check and test-card payments: pending or fully refunded payments must not offer another credit.",
+      "category": "billing",
+      "expectedFiles": [
+        "core/app/models/spree/payment_method/bogus_credit_card.rb",
+        "core/app/models/spree/payment_method/check.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "core/app/models/spree/payment_method/bogus_credit_card.rb",
+          "start": 82,
+          "end": 84,
+          "sha256": "1a7412baf1089b497b1403ddf3b099c3c009cd81106110236f09432d0d5fcb6e"
+        },
+        {
+          "path": "core/app/models/spree/payment_method/check.rb",
+          "start": 15,
+          "end": 17,
+          "sha256": "a114767d3c385189a6b69a61ef708daaa2cb60e4ffc4f66d763f4c33abc2e6ec"
+        }
+      ],
+      "supportingFiles": [
+        "core/spec/models/spree/payment_method/check_spec.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "core/spec/models/spree/payment_method/check_spec.rb",
+          "start": 75,
+          "end": 78,
+          "sha256": "97c5e0c4a367088df35232d16146d6c9d5485f88877ad79a664af2d93568fda5"
+        }
+      ],
+      "forbiddenFiles": [
+        "core/app/models/spree/shipping_category.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream correction inspected before retrieval. Sparse agent annotations, not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/solidusio/solidus/commit/7ba71951235e500049a9e30fcdaaf5695270429d",
+        "testAnnotation": "Existing directly related payment tests are supporting evidence. Notification fixes do not cochange pre-existing tests; no test labels were invented.",
+        "negativeAnnotation": "Inspected shipping-category associations or iterable batching, unrelated to the reported payment or notification behavior."
+      }
+    },
+    {
+      "id": "solidusio--solidus-2",
+      "project": "solidusio/solidus",
+      "split": "eval",
+      "revision": "c7a6d88d56c1eb1f323e341b93f23f12043b7d8b",
+      "fixCommit": "567b66f5c6ca236eccaffbb1617ce743ca8cacfc",
+      "archiveSha256": "56d4162460886061196f29bbd26e2ea66b325abb7f1dfc4e8b44ef90c64184af",
+      "task": "The administration interface allows a refund to be opened or submitted for a payment that has not reached a refundable state.",
+      "category": "billing",
+      "expectedFiles": [
+        "backend/app/controllers/spree/admin/refunds_controller.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "backend/app/controllers/spree/admin/refunds_controller.rb",
+          "start": 13,
+          "end": 20,
+          "sha256": "b476bec12a58a9fb4777254db4856f5d932773d4a96488dd6e5263f15196168c"
+        },
+        {
+          "path": "backend/app/controllers/spree/admin/refunds_controller.rb",
+          "start": 35,
+          "end": 38,
+          "sha256": "11ef10a2a2d9291df6f3a7064c2c3608e027dffaec496e9dc29b07c185b631ae"
+        }
+      ],
+      "supportingFiles": [
+        "backend/spec/controllers/spree/admin/refunds_controller_spec.rb"
+      ],
+      "supportingRanges": [
+        {
+          "path": "backend/spec/controllers/spree/admin/refunds_controller_spec.rb",
+          "start": 15,
+          "end": 28,
+          "sha256": "381f4ed75a6c30c062a9ab25b0a88a445841da4868bf5fb72715671b6364c347"
+        },
+        {
+          "path": "backend/spec/controllers/spree/admin/refunds_controller_spec.rb",
+          "start": 30,
+          "end": 38,
+          "sha256": "9e99243d0d4570acfd988a273a41834fb7de8be5498ef0628d6c78e1bb44ca94"
+        }
+      ],
+      "forbiddenFiles": [
+        "core/app/models/spree/shipping_category.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream correction inspected before retrieval. Sparse agent annotations, not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/solidusio/solidus/commit/567b66f5c6ca236eccaffbb1617ce743ca8cacfc",
+        "testAnnotation": "Existing directly related payment tests are supporting evidence. Notification fixes do not cochange pre-existing tests; no test labels were invented.",
+        "negativeAnnotation": "Inspected shipping-category associations or iterable batching, unrelated to the reported payment or notification behavior."
+      }
+    },
+    {
+      "id": "pretix--pretix-1",
+      "project": "pretix/pretix",
+      "split": "eval",
+      "revision": "fe43862fa473c43b139bc00710aa1fc4a06ef726",
+      "fixCommit": "ca90b2af0961bdd4de28adc2161408535144433a",
+      "archiveSha256": "a31e741c9c95c85424513a452b62643878f35f79f9dfcb119e8e898751b41ecc",
+      "task": "An event notification email ignores its configured subject prefix and substitutes the organizer name.",
+      "category": "notifications",
+      "expectedFiles": [
+        "src/pretix/base/services/notifications.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/pretix/base/services/notifications.py",
+          "start": 172,
+          "end": 179,
+          "sha256": "3846ec3c8098f383ed328e67bb4ffbac87c111e64f21c4a742449d931de4c801"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/pretix/helpers/iter.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream correction inspected before retrieval. Sparse agent annotations, not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/pretix/pretix/commit/ca90b2af0961bdd4de28adc2161408535144433a",
+        "testAnnotation": "Existing directly related payment tests are supporting evidence. Notification fixes do not cochange pre-existing tests; no test labels were invented.",
+        "negativeAnnotation": "Inspected shipping-category associations or iterable batching, unrelated to the reported payment or notification behavior."
+      }
+    },
+    {
+      "id": "pretix--pretix-2",
+      "project": "pretix/pretix",
+      "split": "eval",
+      "revision": "34dbbdd82f2a190dce2b2e2aa74282d2835b4390",
+      "fixCommit": "15d15f978f967f48d9817aefe39555c3f543b678",
+      "archiveSha256": "09a461206b688917fe94081c473f0db81e0a12bf6d8d0e3cce30fef1f82a492b",
+      "task": "Enabling or disabling notification delivery saves the right preference but writes the opposite action to the account audit log.",
+      "category": "notifications",
+      "expectedFiles": [
+        "src/pretix/control/views/user.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/pretix/control/views/user.py",
+          "start": 706,
+          "end": 716,
+          "sha256": "1f1283bc4861e75428b28e410825e2b0b59c8d5c2b9a9d919af1dc70ac3bd22a"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/pretix/helpers/iter.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source and upstream correction inspected before retrieval. Sparse agent annotations, not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/pretix/pretix/commit/15d15f978f967f48d9817aefe39555c3f543b678",
+        "testAnnotation": "Existing directly related payment tests are supporting evidence. Notification fixes do not cochange pre-existing tests; no test labels were invented.",
+        "negativeAnnotation": "Inspected shipping-category associations or iterable batching, unrelated to the reported payment or notification behavior."
+      }
+    }
+  ]
+}

@@ -523,13 +523,19 @@ impl ProjectMap {
                 }
             }
         }
-        if matches!(request.kind.as_str(), "view" | "blueprint" | "class") {
+        if matches!(
+            request.kind.as_str(),
+            "view" | "blueprint" | "class" | "inertia" | "config" | "runtime"
+        ) {
             let scope = self
                 .composers
                 .iter()
                 .find(|s| inside(&s.directory, source))
                 .map(|s| s.directory.as_str())
                 .unwrap_or("");
+            if matches!(request.kind.as_str(), "config" | "runtime") {
+                return Some(crate::runtime::targets(scope, request, files));
+            }
             if request.kind == "class" {
                 let name = request
                     .module
@@ -550,7 +556,17 @@ impl ProjectMap {
             }
             let name = request.module.replace('.', "/");
             let mut targets = vec![];
-            if request.kind == "view" {
+            if request.kind == "inertia" {
+                let name = request.module.trim_start_matches('/');
+                for directory in ["resources/js/pages", "resources/js/Pages"] {
+                    for extension in ["tsx", "jsx", "vue", "svelte", "ts", "js"] {
+                        let target = join(scope, &format!("{directory}/{name}.{extension}"));
+                        if files.contains(&target) {
+                            targets.push(target);
+                        }
+                    }
+                }
+            } else if request.kind == "view" {
                 for extension in ["blade.php", "antlers.html", "antlers.php", "html"] {
                     let target = join(scope, &format!("resources/views/{name}.{extension}"));
                     if files.contains(&target) {

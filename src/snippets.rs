@@ -6,7 +6,7 @@ use std::{
     path::Path,
 };
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 struct Unit {
     start: usize,
     end: usize,
@@ -55,6 +55,32 @@ fn context_start(lines: &[String], mut start: usize) -> usize {
     start
 }
 
+fn relevance(text: &str, task: &ResolvedTask) -> usize {
+    let lexical: BTreeSet<_> = resolver::search_terms(text).into_iter().collect();
+    if task.query_terms.is_empty() {
+        return task
+            .keywords
+            .iter()
+            .filter(|term| lexical.contains(*term))
+            .count()
+            * 100;
+    }
+    let literal: BTreeSet<_> = resolver::words(text).into_iter().collect();
+    let mut sources = BTreeMap::<&str, usize>::new();
+    for term in &task.query_terms {
+        let present = if term.origin == crate::terms::Origin::Literal {
+            literal.contains(&term.term)
+        } else {
+            lexical.contains(&term.term)
+        };
+        if present {
+            let score = sources.entry(&term.source).or_default();
+            *score = (*score).max((term.weight * 100.0).round() as usize);
+        }
+    }
+    sources.values().sum()
+}
+
 fn units(
     path: &str,
     lines: &[String],
@@ -62,16 +88,9 @@ fn units(
     resolution: &Resolution,
     max_lines: usize,
 ) -> Vec<Unit> {
-    let terms: BTreeSet<_> = resolution.task.keywords.iter().cloned().collect();
     let line_scores: Vec<_> = lines
         .iter()
-        .map(|line| {
-            resolver::search_terms(line)
-                .into_iter()
-                .filter(|term| terms.contains(term))
-                .collect::<BTreeSet<_>>()
-                .len()
-        })
+        .map(|line| relevance(line, &resolution.task))
         .collect();
     let mut anchors = BTreeMap::<usize, f64>::new();
     for entry in &resolution.stacktrace {
@@ -95,10 +114,7 @@ fn units(
             .symbols
             .iter()
             .any(|name| name.eq_ignore_ascii_case(&symbol.name));
-        let name_score = resolver::search_terms(&symbol.name)
-            .iter()
-            .filter(|term| terms.contains(*term))
-            .count();
+        let name_score = relevance(&symbol.name, &resolution.task);
         let body_score: usize = line_scores[start..end].iter().sum();
         let pinned = anchors
             .range(start..end)
@@ -118,8 +134,8 @@ fn units(
             });
         let score = (if explicit { 40.0 } else { 0.0 })
             + pinned
-            + name_score as f64 * 6.0
-            + (body_score as f64).min(8.0)
+            + name_score as f64 / 100.0 * 6.0
+            + (body_score as f64 / 100.0).min(8.0)
             + if symbol.kind == "class" { 0.0 } else { 3.0 };
         let mut unit = Unit {
             start: context_start(lines, start),
@@ -158,7 +174,7 @@ fn units(
                 start: anchor.saturating_sub(5),
                 end: (anchor + 10).min(lines.len()),
                 anchor,
-                score: *score as f64,
+                score: *score as f64 / 100.0,
                 truncated: true,
             });
         }
@@ -262,6 +278,7 @@ fn fit(
 ) -> Option<Vec<Unit>> {
     let fits = |unit: &Unit| {
         let mut selected = source.selected.clone();
+        selected.retain(|old| !(unit.start <= old.start && unit.end >= old.end));
         selected.push(unit.clone());
         let selected = merge(selected);
         let count: usize = selected.iter().map(|u| u.end - u.start).sum();
@@ -349,50 +366,55 @@ pub fn select(
     }
     let available = budget.saturating_sub(tokenizer.count(header));
     let weights: f64 = sources.iter().map(|s| s.weight).sum();
-    // First give every file a relevance-weighted share; then spend unused capacity.
-    for source in &mut sources {
-        let allowance = (available as f64 * source.weight / weights).floor() as usize;
-        for unit in &source.units {
-            if let Some(selected) = fit(
-                source,
-                unit,
-                allowance.saturating_sub(4),
-                max_lines,
-                tokenizer,
-            ) {
-                source.selected = selected;
-                break;
-            }
-        }
-    }
+    // A single source may use the budget; multiple sources each get at most half.
+    let per_file_cap = if sources.len() > 1 {
+        available / 2
+    } else {
+        available
+    };
     let mut text = header.to_owned();
-    for source in &sources {
-        text.push_str(&source_markdown(source, &source.selected));
-    }
-    // BPE boundaries can cross Markdown sections, so enforce the complete prompt count.
-    while tokenizer.count(&text) > budget {
-        let Some(source) = sources.iter_mut().rev().find(|s| !s.selected.is_empty()) else {
-            break;
-        };
-        source.selected.pop();
-        text = header.to_owned();
-        for source in &sources {
-            text.push_str(&source_markdown(source, &source.selected));
-        }
-    }
-    for index in 0..sources.len() {
-        for unit in sources[index].units.clone() {
+    let mut scale = 1usize;
+    loop {
+        let mut progress = false;
+        let mut capped = true;
+        for index in 0..sources.len() {
             let source = &sources[index];
-            if source
-                .selected
-                .iter()
-                .any(|s| s.start <= unit.start && s.end >= unit.end)
-            {
-                continue;
-            }
+            let share = ((available as f64 * source.weight / weights).floor() as usize).max(1);
+            let target = share.saturating_mul(scale).min(per_file_cap);
+            capped &= target == per_file_cap;
             let old = tokenizer.count(&source_markdown(source, &source.selected));
-            let allowance = budget.saturating_sub(tokenizer.count(&text)) + old;
-            if let Some(selected) = fit(source, &unit, allowance, max_lines, tokenizer) {
+            let allowance = target
+                .min(
+                    budget
+                        .saturating_sub(tokenizer.count(&text))
+                        .saturating_add(old),
+                )
+                .saturating_sub(4);
+            for unit in &source.units {
+                if source
+                    .selected
+                    .iter()
+                    .any(|s| s.start <= unit.start && s.end >= unit.end)
+                {
+                    continue;
+                }
+                let Some(selected) = fit(source, unit, allowance, max_lines, tokenizer) else {
+                    continue;
+                };
+                // Overlapping clipped declarations may only change anchor/score metadata.
+                // Progress must add source lines, otherwise rounds can alternate forever.
+                if selected
+                    .iter()
+                    .map(|unit| unit.end - unit.start)
+                    .sum::<usize>()
+                    <= source
+                        .selected
+                        .iter()
+                        .map(|unit| unit.end - unit.start)
+                        .sum::<usize>()
+                {
+                    continue;
+                }
                 let mut trial = header.to_owned();
                 for (j, s) in sources.iter().enumerate() {
                     trial.push_str(&source_markdown(
@@ -403,13 +425,28 @@ pub fn select(
                 if tokenizer.count(&trial) <= budget {
                     sources[index].selected = selected;
                     text = trial;
+                    progress = true;
                 }
+                break;
             }
         }
+        if capped && !progress {
+            break;
+        }
+        scale = scale.saturating_mul(2);
     }
     for source in &sources {
         if source.selected.is_empty() {
-            omitted.insert(source.path.clone(), "token_budget".into());
+            let reason = if source
+                .lines
+                .iter()
+                .any(|line| tokenizer.count(line) > per_file_cap.saturating_sub(4))
+            {
+                "oversized_line"
+            } else {
+                "token_budget"
+            };
+            omitted.insert(source.path.clone(), reason.into());
         }
     }
     Ok(Selection {

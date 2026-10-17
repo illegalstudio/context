@@ -137,7 +137,7 @@
     ]
   },
   "laravel": {
-    "ignorePatterns": "# === Laravel ===\nvendor/\nstorage/app/\nstorage/framework/\nstorage/logs/\nbootstrap/cache/\npublic/build/\npublic/vendor/\npublic/hot\npublic/storage",
+    "ignorePatterns": "# === Laravel ===\nvendor/\nstorage/app/\nstorage/framework/\nstorage/logs/\nbootstrap/cache/\npublic/build/\npublic/vendor/\npublic/hot\npublic/storage\npublic/js/filament/\npublic/css/filament/",
     "domains": [
       {
         "name": "eloquent",
@@ -243,6 +243,19 @@
           "balance",
           "queue",
           "redis"
+        ]
+      },
+      {
+        "name": "fortify",
+        "description": "Laravel Fortify authentication",
+        "keywords": [
+          "fortify",
+          "authentication",
+          "authenticate",
+          "login",
+          "password",
+          "credentials",
+          "two-factor"
         ]
       }
     ]

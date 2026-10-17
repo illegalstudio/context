@@ -1,0 +1,92 @@
+name: Cross-project retrieval benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Frozen corpus to measure
+        type: choice
+        options: [primary, domains]
+        default: primary
+      split:
+        description: Repository split to measure
+        type: choice
+        options: [eval, train, all]
+        default: eval
+
+permissions:
+  contents: read
+
+jobs:
+  select:
+    runs-on: ubuntu-22.04
+    outputs:
+      languages: ${{ steps.corpus.outputs.languages }}
+      manifest: ${{ steps.corpus.outputs.manifest }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - id: corpus
+        env:
+          CORPUS_SUITE: ${{ inputs.suite }}
+          CORPUS_SPLIT: ${{ inputs.split }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          path = 'benchmarks/corpus-domains.json' if os.environ['CORPUS_SUITE'] == 'domains' else 'benchmarks/corpus.json'
+          with open(path) as source:
+              manifest = json.load(source)
+          languages = sorted({p['language'] for p in manifest['projects'] if os.environ['CORPUS_SPLIT'] in ('all', p['split'])})
+          if not languages:
+              raise SystemExit('No repositories match this suite/split. Domain probes use eval or all.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('manifest=' + path + '\nlanguages=' + json.dumps(languages) + '\n')
+          PY
+  corpus:
+    needs: select
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{ fromJSON(needs.select.outputs.languages) }}
+    env:
+      CORPUS_MANIFEST: ${{ needs.select.outputs.manifest }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
+      - name: Build evaluator
+        run: cargo +stable build --release --locked
+      - name: Validate corpus isolation and provenance
+        run: python3 scripts/corpus.py validate --manifest "$CORPUS_MANIFEST"
+      - name: Measure pinned public sources
+        env:
+          CORPUS_SPLIT: ${{ inputs.split }}
+          CORPUS_LANGUAGE: ${{ matrix.language }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: >-
+          python3 scripts/corpus.py run
+          --manifest "$CORPUS_MANIFEST"
+          --split "$CORPUS_SPLIT"
+          --language "$CORPUS_LANGUAGE"
+          --output "corpus-results/$CORPUS_LANGUAGE.json"
+      - name: Publish measurement summary
+        if: always()
+        env:
+          CORPUS_LANGUAGE: ${{ matrix.language }}
+        run: |
+          if test -f "corpus-results/$CORPUS_LANGUAGE.md"; then
+            cat "corpus-results/$CORPUS_LANGUAGE.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: corpus-${{ matrix.language }}
+          path: corpus-results/*
+          if-no-files-found: warn

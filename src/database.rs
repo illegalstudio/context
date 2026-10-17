@@ -11,14 +11,17 @@ use std::{
 pub struct Database {
     pub connection: Connection,
     project: Option<crate::project::ProjectMap>,
+    frameworks: Option<Vec<crate::frameworks::FrameworkScope>>,
 }
 
 pub struct IndexedFile {
     pub metadata: FileMetadata,
     pub content: String,
+    pub terms: String,
     pub symbols: Vec<Symbol>,
     pub imports: Vec<RawImport>,
     pub references: BTreeSet<String>,
+    pub generated: bool,
 }
 
 pub enum FileUpdate {
@@ -36,36 +39,59 @@ impl Database {
         connection.pragma_update(None, "journal_mode", "WAL")?;
         connection.pragma_update(None, "foreign_keys", "ON")?;
         let version: i64 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
-        if version != 5 {
+        if version != 7 {
             // The index is disposable. Source files, settings and packs are preserved.
             connection.execute_batch("BEGIN IMMEDIATE;
                 DROP TABLE IF EXISTS skipped_files; DROP TABLE IF EXISTS files_fts; DROP TABLE IF EXISTS import_requests;
                 DROP TABLE IF EXISTS refs; DROP TABLE IF EXISTS symbols; DROP TABLE IF EXISTS imports;
                 DROP TABLE IF EXISTS git_signals; DROP TABLE IF EXISTS files; DROP TABLE IF EXISTS state;
-                CREATE TABLE files(path TEXT PRIMARY KEY, language TEXT NOT NULL, size INTEGER NOT NULL, mtime INTEGER NOT NULL, hash TEXT NOT NULL);
+                CREATE TABLE files(path TEXT PRIMARY KEY, language TEXT NOT NULL, size INTEGER NOT NULL, mtime INTEGER NOT NULL, hash TEXT NOT NULL, generated INTEGER NOT NULL DEFAULT 0);
                 CREATE TABLE skipped_files(path TEXT PRIMARY KEY, language TEXT NOT NULL, size INTEGER NOT NULL, mtime INTEGER NOT NULL, hash TEXT NOT NULL);
                 CREATE TABLE symbols(file_path TEXT REFERENCES files(path) ON DELETE CASCADE, name TEXT NOT NULL, kind TEXT NOT NULL, start_line INTEGER, end_line INTEGER, signature TEXT);
                 CREATE TABLE import_requests(source_path TEXT REFERENCES files(path) ON DELETE CASCADE, module TEXT, kind TEXT);
-                CREATE TABLE imports(source_path TEXT REFERENCES files(path) ON DELETE CASCADE, target_path TEXT REFERENCES files(path) ON DELETE CASCADE, PRIMARY KEY(source_path,target_path));
+                CREATE TABLE imports(source_path TEXT REFERENCES files(path) ON DELETE CASCADE, target_path TEXT REFERENCES files(path) ON DELETE CASCADE, kind TEXT NOT NULL, PRIMARY KEY(source_path,target_path,kind));
                 CREATE TABLE refs(source_path TEXT REFERENCES files(path) ON DELETE CASCADE, name TEXT, PRIMARY KEY(source_path,name));
                 CREATE TABLE git_signals(path TEXT PRIMARY KEY REFERENCES files(path) ON DELETE CASCADE, last_modified TEXT, commit_count INTEGER, churn_score REAL);
                 CREATE TABLE state(key TEXT PRIMARY KEY, value TEXT NOT NULL);
-                CREATE VIRTUAL TABLE files_fts USING fts5(path UNINDEXED, content, tokenize='unicode61');
+                CREATE VIRTUAL TABLE files_fts USING fts5(path UNINDEXED, content, terms, tokenize='unicode61');
                 CREATE INDEX symbols_name ON symbols(name COLLATE NOCASE);
                 CREATE INDEX symbols_file ON symbols(file_path);
                 CREATE INDEX imports_target ON imports(target_path);
                 CREATE INDEX import_requests_source ON import_requests(source_path);
                 CREATE INDEX refs_name ON refs(name);
-                PRAGMA user_version=5; COMMIT;")?;
+                PRAGMA user_version=7; COMMIT;")?;
         }
         Ok(Self {
             connection,
             project: None,
+            frameworks: None,
         })
     }
 
     pub fn set_project_map(&mut self, project: crate::project::ProjectMap) {
         self.project = Some(project);
+    }
+
+    pub fn set_framework_scopes(&mut self, scopes: Vec<crate::frameworks::FrameworkScope>) {
+        self.frameworks = Some(scopes);
+    }
+
+    pub fn framework_scopes(&self) -> Result<Option<Vec<crate::frameworks::FrameworkScope>>> {
+        if let Some(scopes) = &self.frameworks {
+            return Ok(Some(scopes.clone()));
+        }
+        self.state("framework_scopes")?
+            .map(|value| serde_json::from_str(&value).map_err(Into::into))
+            .transpose()
+    }
+
+    pub fn generated_files(&self) -> Result<BTreeSet<String>> {
+        let mut statement = self
+            .connection
+            .prepare_cached("SELECT path FROM files WHERE generated=1 ORDER BY path")?;
+        Ok(statement
+            .query_map([], |row| row.get(0))?
+            .collect::<rusqlite::Result<_>>()?)
     }
 
     pub fn files(&self) -> Result<BTreeMap<String, FileMetadata>> {
@@ -128,7 +154,7 @@ impl Database {
 
     pub fn imports(&self) -> Result<Vec<ImportRelation>> {
         let mut statement = self.connection.prepare_cached(
-            "SELECT source_path,target_path FROM imports ORDER BY source_path,target_path",
+            "SELECT DISTINCT source_path,target_path FROM imports ORDER BY source_path,target_path",
         )?;
         Ok(statement
             .query_map([], |r| {
@@ -156,6 +182,71 @@ impl Database {
                 ))
             })?
             .collect::<rusqlite::Result<_>>()?)
+    }
+
+    pub fn dependencies(&self) -> Result<Vec<Dependency>> {
+        let mut statement=self.connection.prepare_cached("SELECT source_path,target_path,kind FROM imports ORDER BY source_path,target_path,kind")?;
+        Ok(statement
+            .query_map([], |row| {
+                Ok(Dependency {
+                    source_path: row.get(0)?,
+                    target_path: row.get(1)?,
+                    kind: row.get(2)?,
+                })
+            })?
+            .collect::<rusqlite::Result<_>>()?)
+    }
+
+    pub fn search_with_provenance(
+        &self,
+        terms: &[crate::terms::QueryTerm],
+        limit: usize,
+    ) -> Result<Vec<(String, crate::terms::Origin, f64)>> {
+        use crate::terms::Origin;
+        let mut groups: BTreeMap<(Origin, u32), Vec<&str>> = BTreeMap::new();
+        let mut terms: Vec<_> = terms.iter().filter(|term| !term.term.is_empty()).collect();
+        terms.sort_by(|a, b| {
+            b.weight
+                .total_cmp(&a.weight)
+                .then(a.origin.cmp(&b.origin))
+                .then(a.term.cmp(&b.term))
+        });
+        for term in terms.into_iter().take(64) {
+            groups
+                .entry((term.origin, (term.weight * 10000.0).round() as u32))
+                .or_default()
+                .push(&term.term);
+        }
+        let mut matches: BTreeMap<(String, Origin), f64> = BTreeMap::new();
+        let mut statement=self.connection.prepare_cached("SELECT path FROM files_fts WHERE files_fts MATCH ? ORDER BY bm25(files_fts,0.0,1.0,0.6),path LIMIT ?")?;
+        for ((origin, weight), terms) in groups {
+            let column = match origin {
+                Origin::Literal => "content",
+                Origin::Stem => "terms",
+                _ => "{content terms}",
+            };
+            let query = format!(
+                "{column} : ({})",
+                terms
+                    .iter()
+                    .filter(|term| !term.is_empty())
+                    .map(|term| format!("\"{}\"", term.replace('"', "\"\"")))
+                    .collect::<Vec<_>>()
+                    .join(" OR ")
+            );
+            for (rank, path) in statement
+                .query_map(params![query, limit as i64], |row| row.get::<_, String>(0))?
+                .enumerate()
+            {
+                let amount = weight as f64 / 10000.0 * 1.8 / (1.0 + rank as f64 * 0.04);
+                let score = matches.entry((path?, origin)).or_default();
+                *score = score.max(amount);
+            }
+        }
+        Ok(matches
+            .into_iter()
+            .map(|((path, origin), score)| (path, origin, score))
+            .collect())
     }
 
     pub fn references(&self) -> Result<BTreeMap<String, Vec<String>>> {
@@ -221,7 +312,9 @@ impl Database {
                 removed_count += delete_file.execute([path])?;
                 transaction.execute("DELETE FROM skipped_files WHERE path=?", [path])?;
             }
-            let mut upsert = transaction.prepare_cached("INSERT INTO files VALUES(?,?,?,?,?) ON CONFLICT(path) DO UPDATE SET language=excluded.language,size=excluded.size,mtime=excluded.mtime,hash=excluded.hash")?;
+            let mut upsert = transaction.prepare_cached("INSERT INTO files(path,language,size,mtime,hash) VALUES(?,?,?,?,?) ON CONFLICT(path) DO UPDATE SET language=excluded.language,size=excluded.size,mtime=excluded.mtime,hash=excluded.hash")?;
+            let mut quality_update =
+                transaction.prepare_cached("UPDATE files SET generated=? WHERE path=?")?;
             let mut symbol_insert =
                 transaction.prepare_cached("INSERT INTO symbols VALUES(?,?,?,?,?,?)")?;
             let mut request_insert =
@@ -229,7 +322,7 @@ impl Database {
             let mut reference_insert =
                 transaction.prepare_cached("INSERT OR IGNORE INTO refs VALUES(?,?)")?;
             let mut content_insert =
-                transaction.prepare_cached("INSERT INTO files_fts(rowid,path,content) VALUES((SELECT rowid FROM files WHERE path=?1),?1,?2)")?;
+                transaction.prepare_cached("INSERT INTO files_fts(rowid,path,content,terms) VALUES((SELECT rowid FROM files WHERE path=?1),?1,?2,?3)")?;
             for change in changes {
                 let change = change?;
                 let file = match change {
@@ -270,6 +363,7 @@ impl Database {
                     f.mtime,
                     f.hash
                 ])?;
+                quality_update.execute(params![file.generated, f.path])?;
                 for table in ["symbols", "import_requests", "refs"] {
                     let column = if table == "symbols" {
                         "file_path"
@@ -296,7 +390,7 @@ impl Database {
                     reference_insert.execute(params![f.path, name])?;
                 }
                 delete_fts.execute([&f.path])?;
-                content_insert.execute(params![f.path, file.content])?;
+                content_insert.execute(params![f.path, file.content, file.terms])?;
             }
         }
         let previous_project: Option<String> = transaction
@@ -335,7 +429,7 @@ impl Database {
                 project.prepare_files(&files);
             }
             let mut statement =
-                transaction.prepare_cached("INSERT OR IGNORE INTO imports VALUES(?,?)")?;
+                transaction.prepare_cached("INSERT OR IGNORE INTO imports VALUES(?,?,?)")?;
             for (source, request) in requests {
                 let targets = self
                     .project
@@ -345,7 +439,7 @@ impl Database {
                         crate::parser::resolve_import(&source, &request, &files, aliases)
                     });
                 for target in targets {
-                    statement.execute(params![source, target])?;
+                    statement.execute(params![source, target, request.kind])?;
                 }
             }
         }
@@ -373,12 +467,18 @@ impl Database {
             "INSERT OR REPLACE INTO state VALUES('project_map',?)",
             [&project_key],
         )?;
+        if let Some(scopes) = &self.frameworks {
+            transaction.execute(
+                "INSERT OR REPLACE INTO state VALUES('framework_scopes',?)",
+                [serde_json::to_string(scopes)?],
+            )?;
+        }
         transaction.commit().context("Cannot commit index update")?;
         Ok((updated, removed_count))
     }
 
     pub fn counts(&self) -> Result<(usize, usize, usize)> {
-        Ok(self.connection.query_row("SELECT (SELECT count(*) FROM files),(SELECT count(*) FROM symbols),(SELECT count(*) FROM imports)",[],|row|Ok((row.get::<_,i64>(0)? as usize,row.get::<_,i64>(1)? as usize,row.get::<_,i64>(2)? as usize)))?)
+        Ok(self.connection.query_row("SELECT (SELECT count(*) FROM files),(SELECT count(*) FROM symbols),(SELECT count(*) FROM (SELECT DISTINCT source_path,target_path FROM imports))",[],|row|Ok((row.get::<_,i64>(0)? as usize,row.get::<_,i64>(1)? as usize,row.get::<_,i64>(2)? as usize)))?)
     }
 
     pub fn git_signals(&self) -> Result<BTreeMap<String, GitSignal>> {

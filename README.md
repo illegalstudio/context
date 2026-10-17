@@ -121,7 +121,7 @@ Indexing initializes settings automatically. Every pack refreshes the index befo
 1. **Index:** Traverse the project using `.ctxignore`, skip unchanged files, and parse changed files in parallel. Save metadata, symbols, imports, references and searchable content in SQLite.
 2. **Resolve:** Extract file and symbol hints, English and Italian keywords, conceptual domains, stacktrace locations and Git changes.
 3. **Discover:** Combine path matches, indexed content, symbols, dependency traversal and framework relationships.
-4. **Rank:** Prioritize explicit file and symbol references, explain every selection, and include relevant tests and configuration within the file limit.
+4. **Rank:** Prioritize explicit references and literal matches, follow typed dependencies, and select files that add useful evidence within the file limit.
 5. **Compose:** Write bounded code excerpts, Markdown reports, a JSON manifest and a portable archive.
 
 Selection and graph ordering are deterministic for the same source, task, options and Git state. Pack timestamps and directory names are unique to each invocation.
@@ -149,14 +149,15 @@ Packs are published atomically after all files and the archive have been written
 - **Incremental indexing:** Size and nanosecond modification-time checks avoid reading unchanged sources. BLAKE3 hashes prevent unnecessary parsing after timestamp-only changes. `--verify` hashes every source when metadata cannot be trusted.
 - **Bounded parallel work:** Files are read once per indexing update and processed in batches. SQLite updates use one transaction and reused statements.
 - **Import resolution:** Relative imports, TypeScript .js specifiers, root tsconfig path mappings, Composer PSR-4 mappings, Python modules and Rust module imports.
-- **Framework discovery:** Node.js, Laravel and Statamic relationships and framework-specific task domains.
+- **Framework discovery:** Node.js, Laravel and Statamic domains from root and nested manifests, with exclusions and inferred relationships scoped to each package.
 - **Interactive input:** `@` file and symbol references with Tab completion and acronym matching.
 - **Structural excerpts:** Complete relevant declarations and multiple non-overlapping sections per file, including import context when it fits. Error locations, all changed regions, explicit symbols and task terms guide selection.
-- **Context limits:** Relevance-weighted allocation across files, with an approximate budget or offline `cl100k_base` / `o200k_base` BPE tokenization of the complete prompt. Explicit exclusions also apply to hinted files.
-- **Project relationships:** Inherited and nested TypeScript configs, project references, local package exports, Rust crate roots, Composer namespaces, Laravel views and Statamic templates/blueprints.
+- **Context limits:** Progressive relevance-weighted allocation across files, with per-file ceilings and oversized-line handling. An approximate budget or offline `cl100k_base` / `o200k_base` BPE tokenization measures the complete prompt. Explicit exclusions also apply to hinted files.
+- **Search intent:** Natural-language matches stay separate from explicit symbol references. Common matches and generated/minified assets have less weight; generic tasks retain implementation, configuration and relevant test context.
+- **Project relationships:** Inherited and nested TypeScript configs, project references, local package exports, Rust crate roots, Composer namespaces, Laravel views, Inertia pages and Statamic templates/blueprints.
 - **Agent integration:** Search and numerical ranking explanations through CLI/JSON and an MCP stdio server with tools and saved-pack resources.
 - **Incremental packs:** Update a previous pack with changed/new context, removed files and obsolete relationships while retaining unchanged excerpts through the parent reference.
-- **Quality evaluation:** Labeled datasets, separate training/evaluation splits, historical Git snapshots, file retrieval and line coverage metrics, token costs and baseline comparisons.
+- **Quality evaluation:** Historical tasks from 18 public repositories across eight parsed languages, repository-isolated splits, excerpt coverage, omissions, token costs and a literal-search baseline. See the [cross-project protocol](docs/evaluation.md#cross-project-corpus).
 - **Automation:** JSON output for indexing, packs, listing and domains; `--root` selects the project directory.
 
 ## Commands

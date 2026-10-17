@@ -157,7 +157,7 @@ impl ContextServer {
             anyhow::ensure!(options.task.is_some(),"task is required when creating a new pack");
             options.max_files=limit(args.max_files.unwrap_or_else(||parent.as_ref().map_or(config.max_files,|_|options.max_files)),1000,"max_files")?;
             options.budget_tokens=limit(args.budget_tokens.unwrap_or_else(||parent.as_ref().map_or(config.budget_tokens,|_|options.budget_tokens)),1_000_000,"budget_tokens")?;
-            let resolution=resolver::resolve(root,&options)?;
+            let resolution=resolver::resolve_indexed(root,&database,&options)?;
             let candidates=discovery::discover(root,&database,&resolution,&options,config.graph_depth)?;
             let result=pack::compose_with_options(root,&database,&resolution,&candidates,&config,&options,parent.as_ref().map(|(_,m)|m))?;
             Ok(serde_json::json!({"manifest":result.manifest,"prompt":pack::read_prompt(root,&result.directory)?}))

@@ -127,6 +127,10 @@ fn framework_imports(path: &str, content: &str) -> Vec<RawImport> {
     let patterns = PATTERNS.get_or_init(|| {
         [
             (
+                r#"\b(?:Inertia::render|inertia)\s*\(\s*['"]([^'"]+)['"]"#,
+                "inertia",
+            ),
+            (
                 r#"(?:\bview|View::make|->view)\s*\(\s*['"]([^'"]+)['"]"#,
                 "view",
             ),
@@ -185,6 +189,16 @@ fn text<'a>(node: Node<'_>, content: &'a str) -> &'a str {
 
 fn inspect(node: Node<'_>, path: &str, content: &str, result: &mut Parsed) {
     let kind = node.kind();
+    if language(path) == "php"
+        && matches!(
+            kind,
+            "function_call_expression" | "scoped_call_expression" | "member_call_expression"
+        )
+    {
+        result
+            .imports
+            .extend(crate::runtime::requests(text(node, content)));
+    }
     let symbol_kind = match kind {
         "class_declaration" | "class_definition" | "class" | "struct_item" | "enum_item" => {
             Some("class")

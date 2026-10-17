@@ -150,9 +150,15 @@ pub fn index(
                     parser::parse(&metadata.path, &content, &mut worker.borrow_mut())
                 })?;
                 let terms = resolver::search_terms(&content);
+                let literal: BTreeSet<_> = resolver::words(&content).into_iter().collect();
                 Ok(FileUpdate::Changed(IndexedFile {
+                    generated: crate::quality::generated(&metadata.path, &content),
                     metadata,
-                    content: format!("{content}\n{}", terms.join(" ")),
+                    content: format!(
+                        "{content}\n{}",
+                        literal.into_iter().collect::<Vec<_>>().join(" ")
+                    ),
+                    terms: terms.join(" "),
                     symbols: parsed.symbols,
                     imports: parsed.imports,
                     references: parsed.references,
@@ -180,6 +186,7 @@ pub fn index(
         None
     };
     let aliases = aliases(root)?;
+    database.set_framework_scopes(crate::frameworks::from_paths(root, project_paths.iter())?);
     database.set_project_map(crate::project::ProjectMap::load(
         root,
         project_paths.iter(),
