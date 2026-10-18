@@ -35,10 +35,37 @@ fn features(
     features.insert(format!("role:{role}"));
     let mut matched_terms = BTreeSet::new();
     for evidence in &candidate.evidence {
-        if evidence.signal != "shared_symbol" {
+        if !matches!(evidence.signal.as_str(), "shared_symbol" | "behavior_test") {
             for term in &evidence.terms {
                 features.insert(format!("query:{term}"));
                 matched_terms.insert(term.as_str());
+            }
+        }
+        if let Some(source) = &evidence.source_path
+            && selected.contains(source)
+            && evidence.signal == "behavior_test"
+        {
+            let mut terms: BTreeSet<_> = candidate
+                .evidence
+                .iter()
+                .filter(|own| {
+                    own.signal != "shared_symbol"
+                        && (own.signal.ends_with("_path") || own.signal.ends_with("_symbol"))
+                })
+                .flat_map(|own| own.terms.iter())
+                .collect();
+            if terms.is_empty() {
+                terms.extend(&evidence.terms);
+            }
+            if terms.is_empty() {
+                features.insert(format!("behavior:{source}"));
+            } else {
+                let scope = scope_for(scopes, source).map_or("", |scope| scope.path.as_str());
+                features.extend(
+                    terms
+                        .into_iter()
+                        .map(|term| format!("behavior:{scope}:{term}")),
+                );
             }
         }
         if let Some(source) = &evidence.source_path
@@ -149,10 +176,26 @@ pub fn choose(
                 continue;
             }
             let evidence = features(candidate, scopes, &selected);
+            if test
+                && !testing
+                && candidate
+                    .evidence
+                    .iter()
+                    .any(|evidence| evidence.signal == "behavior_test")
+                && !evidence.difference(&covered).any(|feature| {
+                    ["behavior:", "query:", "scope:", "dependency:", "runtime:"]
+                        .iter()
+                        .any(|prefix| feature.starts_with(prefix))
+                })
+            {
+                continue;
+            }
             let fresh = evidence.difference(&covered).count() as f64;
             let mut novelty = 0.2 + 0.8 * fresh / evidence.len().max(1) as f64;
             if evidence.difference(&covered).any(|feature| {
-                feature.starts_with("dependency:") || feature.starts_with("runtime:")
+                feature.starts_with("dependency:")
+                    || feature.starts_with("runtime:")
+                    || feature.starts_with("behavior:")
             }) {
                 novelty = novelty.max(0.8);
             }

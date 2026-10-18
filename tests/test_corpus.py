@@ -79,6 +79,23 @@ class CorpusTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "length"):
                 corpus_io.check_labels(case, root)
 
+    def test_validation_repositories_are_disjoint_from_both_previous_suites(self):
+        root = Path(__file__).resolve().parents[1]
+        fresh = json.loads((root / "benchmarks/corpus-validation.json").read_text())
+        corpus_io.validate(fresh)
+        previous = self.manifest()["projects"] + json.loads((root / "benchmarks/corpus-domains.json").read_text())["projects"]
+        self.assertTrue({p["repository"].lower() for p in previous}.isdisjoint(p["repository"].lower() for p in fresh["projects"]))
+        self.assertEqual({case["split"] for case in fresh["cases"]}, {"eval"})
+
+    def test_supporting_file_recall_counts_failed_annotated_cases_as_zero(self):
+        rows = [{"status": "ok", "wallMs": 1, "hasSupportingFiles": True, "metrics": {"supportingRecall": 1, "tokens": 1}},
+                {"status": "timeout", "wallMs": 1, "hasSupportingFiles": True},
+                {"status": "ok", "wallMs": 1, "metrics": {"tokens": 1}}]
+        summary = corpus_report.summarize(rows)
+        self.assertEqual(summary["supportingFileCases"], 2)
+        self.assertEqual(summary["supportingRecall"], 0.5)
+        self.assertIsNone(summary["supportingRangeCoverage"])
+
     def archive(self, root, entries):
         path = root / "archive.tar.gz"
         with tarfile.open(path, "w:gz") as archive:

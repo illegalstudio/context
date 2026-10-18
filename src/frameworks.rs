@@ -13,35 +13,15 @@ pub struct FrameworkScope {
     pub frameworks: Vec<String>,
 }
 
-fn dependency_path(path: &str) -> bool {
-    path.split('/').any(|part| {
-        matches!(
-            part,
-            "node_modules"
-                | "vendor"
-                | "target"
-                | ".git"
-                | ".context"
-                | "dist"
-                | "build"
-                | "out"
-                | ".next"
-                | ".venv"
-                | "venv"
-                | "coverage"
-                | ".cache"
-        )
-    })
-}
-
 pub fn from_paths<'a>(
     root: &Path,
     paths: impl IntoIterator<Item = &'a String>,
 ) -> Result<Vec<FrameworkScope>> {
     let mut scopes: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     let canonical_root = root.canonicalize()?;
+    let policy = crate::source::SourcePolicy::new(root)?;
     for path in paths {
-        if dependency_path(path) {
+        if !policy.framework_manifest(Path::new(path)) {
             continue;
         }
         let file = Path::new(path);
@@ -96,31 +76,18 @@ pub fn from_paths<'a>(
 }
 
 pub fn detect(root: &Path) -> Result<Vec<FrameworkScope>> {
+    let policy = crate::source::SourcePolicy::new(root)?;
+    let scan_root = root.to_path_buf();
     let mut walker = WalkBuilder::new(root);
     walker
         .standard_filters(false)
         .follow_links(false)
         .add_custom_ignore_filename(".ctxignore")
-        .filter_entry(|entry| {
+        .filter_entry(move |entry| {
             entry.depth() == 0
-                || !matches!(
-                    entry.file_name().to_str(),
-                    Some(
-                        ".git"
-                            | ".context"
-                            | "node_modules"
-                            | "vendor"
-                            | "target"
-                            | "dist"
-                            | "build"
-                            | "out"
-                            | ".next"
-                            | ".venv"
-                            | "venv"
-                            | "coverage"
-                            | ".cache"
-                    )
-                )
+                || entry.path().strip_prefix(&scan_root).is_ok_and(|path| {
+                    policy.allow(path, entry.file_type().is_some_and(|kind| kind.is_dir()))
+                })
         });
     let mut paths = BTreeSet::new();
     for entry in walker.build() {

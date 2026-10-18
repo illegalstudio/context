@@ -90,10 +90,11 @@ pub fn parse(path: &str, content: &str, parser: &mut Parser) -> Result<Parsed> {
         .set_language(&grammar)
         .context("Incompatible parser grammar")?;
     let tree = parser.parse(content, None).context("Parsing cancelled")?;
+    let language = language(path);
     let mut cursor = tree.walk();
     loop {
         let node = cursor.node();
-        inspect(node, path, content, &mut result);
+        inspect(node, path, language, content, &mut result);
         if cursor.goto_first_child() {
             continue;
         }
@@ -187,9 +188,80 @@ fn text<'a>(node: Node<'_>, content: &'a str) -> &'a str {
     content.get(node.byte_range()).unwrap_or("")
 }
 
-fn inspect(node: Node<'_>, path: &str, content: &str, result: &mut Parsed) {
+fn test_scope(mut node: Node<'_>, language: &str, content: &str) -> bool {
+    loop {
+        if language == "rust" {
+            if node.kind() == "mod_item"
+                && node
+                    .child_by_field_name("name")
+                    .is_some_and(|name| text(name, content) == "tests")
+            {
+                return true;
+            }
+            let mut attribute = node.prev_named_sibling();
+            while let Some(previous) = attribute {
+                if previous.kind() != "attribute_item" {
+                    break;
+                }
+                let value: String = text(previous, content)
+                    .chars()
+                    .filter(|c| !c.is_whitespace())
+                    .collect();
+                let name = value
+                    .trim_start_matches("#[")
+                    .split(['(', ']'])
+                    .next()
+                    .unwrap_or("");
+                if name.rsplit("::").next() == Some("test")
+                    || name == "cfg" && value == "#[cfg(test)]"
+                {
+                    return true;
+                }
+                attribute = previous.prev_named_sibling();
+            }
+        } else if language == "java" {
+            let mut cursor = node.walk();
+            for modifiers in node
+                .named_children(&mut cursor)
+                .filter(|child| child.kind() == "modifiers")
+            {
+                let mut cursor = modifiers.walk();
+                if modifiers.named_children(&mut cursor).any(|annotation| {
+                    matches!(annotation.kind(), "annotation" | "marker_annotation")
+                        && annotation.child_by_field_name("name").is_some_and(|name| {
+                            matches!(
+                                text(name, content).rsplit('.').next(),
+                                Some(
+                                    "Test"
+                                        | "ParameterizedTest"
+                                        | "RepeatedTest"
+                                        | "TestFactory"
+                                        | "Theory"
+                                )
+                            )
+                        })
+                }) {
+                    return true;
+                }
+            }
+        } else if language == "python"
+            && node.kind() == "function_definition"
+            && node
+                .child_by_field_name("name")
+                .is_some_and(|name| text(name, content).starts_with("test_"))
+        {
+            return true;
+        }
+        let Some(parent) = node.parent() else {
+            return false;
+        };
+        node = parent;
+    }
+}
+
+fn inspect(node: Node<'_>, path: &str, language: &str, content: &str, result: &mut Parsed) {
     let kind = node.kind();
-    if language(path) == "php"
+    if language == "php"
         && matches!(
             kind,
             "function_call_expression" | "scoped_call_expression" | "member_call_expression"
@@ -238,11 +310,12 @@ fn inspect(node: Node<'_>, path: &str, content: &str, result: &mut Parsed) {
                 start_line: node.start_position().row + 1,
                 end_line: node.end_position().row + usize::from(node.end_position().column > 0),
                 signature,
+                is_test: crate::quality::is_test_path(path) || test_scope(node, language, content),
             });
         }
     }
     match kind {
-        "import_statement" if matches!(language(path), "typescript" | "javascript") => {
+        "import_statement" if matches!(language, "typescript" | "javascript") => {
             if let Some(source) = node.child_by_field_name("source") {
                 result.imports.push(RawImport {
                     module: text(source, content).trim_matches(['\'', '"']).into(),
@@ -250,7 +323,7 @@ fn inspect(node: Node<'_>, path: &str, content: &str, result: &mut Parsed) {
                 });
             }
         }
-        "call_expression" if matches!(language(path), "typescript" | "javascript") => {
+        "call_expression" if matches!(language, "typescript" | "javascript") => {
             if node
                 .child_by_field_name("function")
                 .is_some_and(|n| matches!(text(n, content), "require" | "import"))
@@ -290,7 +363,7 @@ fn inspect(node: Node<'_>, path: &str, content: &str, result: &mut Parsed) {
                 });
             }
         }
-        "import_statement" if language(path) == "python" => {
+        "import_statement" if language == "python" => {
             let mut c = node.walk();
             for module in node.named_children(&mut c) {
                 let module = module.child_by_field_name("name").unwrap_or(module);
@@ -300,7 +373,7 @@ fn inspect(node: Node<'_>, path: &str, content: &str, result: &mut Parsed) {
                 });
             }
         }
-        "use_declaration" if language(path) == "rust" => {
+        "use_declaration" if language == "rust" => {
             let value = text(node, content)
                 .split_once("use ")
                 .map(|(_, value)| value)
@@ -321,7 +394,7 @@ fn inspect(node: Node<'_>, path: &str, content: &str, result: &mut Parsed) {
                 });
             }
         }
-        "import_spec" | "import_declaration" if matches!(language(path), "go" | "java") => {
+        "import_spec" | "import_declaration" if matches!(language, "go" | "java") => {
             let value = node
                 .child_by_field_name("path")
                 .map(|n| text(n, content))
@@ -333,7 +406,7 @@ fn inspect(node: Node<'_>, path: &str, content: &str, result: &mut Parsed) {
                     .trim_start_matches("import ")
                     .trim_end_matches(';')
                     .into(),
-                kind: language(path).into(),
+                kind: language.into(),
             });
         }
         _ => {}
@@ -474,7 +547,7 @@ pub fn resolve_import(
                 bases.extend(prefixes.into_iter().rev());
             }
         }
-        "java" => bases.push(PathBuf::from(module.replace('.', "/"))),
+        "java" => return crate::java::ImportIndex::new(files).resolve(module),
         "go" => {
             return files
                 .iter()
@@ -510,13 +583,7 @@ pub fn resolve_import(
             variants.push("src/lib.rs".into());
             variants.push("src/main.rs".into());
         }
-        if import.kind == "java" {
-            for file in files {
-                if variants.iter().any(|v| file.ends_with(v)) {
-                    result.insert(file.clone());
-                }
-            }
-        } else if let Some(target) = variants.into_iter().find(|v| files.contains(v)) {
+        if let Some(target) = variants.into_iter().find(|v| files.contains(v)) {
             result.insert(target);
             if import.kind == "rust" {
                 break;

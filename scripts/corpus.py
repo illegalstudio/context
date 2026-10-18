@@ -147,7 +147,8 @@ def main():
                     row = {"id": case["id"], "metadata": metadata, "revision": case["revision"],
                         "archiveSha256": case["archiveSha256"], "method": method, "budgetTokens": budget,
                         "timeoutSeconds": args.timeout,
-                        "hasSupportingRanges": bool(case.get("supportingRanges"))}
+                        "hasSupportingRanges": bool(case.get("supportingRanges")),
+                        "hasSupportingFiles": bool(case.get("supportingFiles"))}
                     if preparation:
                         row.update({"status": "preparation_failed", "error": preparation, "wallMs": 0, "peakRssBytes": None})
                     else:

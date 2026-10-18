@@ -39,7 +39,7 @@ impl Database {
         connection.pragma_update(None, "journal_mode", "WAL")?;
         connection.pragma_update(None, "foreign_keys", "ON")?;
         let version: i64 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
-        if version != 7 {
+        if version != 8 {
             // The index is disposable. Source files, settings and packs are preserved.
             connection.execute_batch("BEGIN IMMEDIATE;
                 DROP TABLE IF EXISTS skipped_files; DROP TABLE IF EXISTS files_fts; DROP TABLE IF EXISTS import_requests;
@@ -47,7 +47,7 @@ impl Database {
                 DROP TABLE IF EXISTS git_signals; DROP TABLE IF EXISTS files; DROP TABLE IF EXISTS state;
                 CREATE TABLE files(path TEXT PRIMARY KEY, language TEXT NOT NULL, size INTEGER NOT NULL, mtime INTEGER NOT NULL, hash TEXT NOT NULL, generated INTEGER NOT NULL DEFAULT 0);
                 CREATE TABLE skipped_files(path TEXT PRIMARY KEY, language TEXT NOT NULL, size INTEGER NOT NULL, mtime INTEGER NOT NULL, hash TEXT NOT NULL);
-                CREATE TABLE symbols(file_path TEXT REFERENCES files(path) ON DELETE CASCADE, name TEXT NOT NULL, kind TEXT NOT NULL, start_line INTEGER, end_line INTEGER, signature TEXT);
+                CREATE TABLE symbols(file_path TEXT REFERENCES files(path) ON DELETE CASCADE, name TEXT NOT NULL, kind TEXT NOT NULL, start_line INTEGER, end_line INTEGER, signature TEXT, is_test INTEGER NOT NULL DEFAULT 0);
                 CREATE TABLE import_requests(source_path TEXT REFERENCES files(path) ON DELETE CASCADE, module TEXT, kind TEXT);
                 CREATE TABLE imports(source_path TEXT REFERENCES files(path) ON DELETE CASCADE, target_path TEXT REFERENCES files(path) ON DELETE CASCADE, kind TEXT NOT NULL, PRIMARY KEY(source_path,target_path,kind));
                 CREATE TABLE refs(source_path TEXT REFERENCES files(path) ON DELETE CASCADE, name TEXT, PRIMARY KEY(source_path,name));
@@ -59,7 +59,7 @@ impl Database {
                 CREATE INDEX imports_target ON imports(target_path);
                 CREATE INDEX import_requests_source ON import_requests(source_path);
                 CREATE INDEX refs_name ON refs(name);
-                PRAGMA user_version=7; COMMIT;")?;
+                PRAGMA user_version=8; COMMIT;")?;
         }
         Ok(Self {
             connection,
@@ -137,7 +137,7 @@ impl Database {
     }
 
     pub fn symbols(&self) -> Result<Vec<Symbol>> {
-        let mut statement = self.connection.prepare_cached("SELECT file_path,name,kind,start_line,end_line,signature FROM symbols ORDER BY file_path,start_line,name")?;
+        let mut statement = self.connection.prepare_cached("SELECT file_path,name,kind,start_line,end_line,signature,is_test FROM symbols ORDER BY file_path,start_line,name")?;
         Ok(statement
             .query_map([], |r| {
                 Ok(Symbol {
@@ -147,6 +147,7 @@ impl Database {
                     start_line: r.get::<_, i64>(3)? as usize,
                     end_line: r.get::<_, i64>(4)? as usize,
                     signature: r.get(5)?,
+                    is_test: r.get(6)?,
                 })
             })?
             .collect::<rusqlite::Result<_>>()?)
@@ -316,7 +317,7 @@ impl Database {
             let mut quality_update =
                 transaction.prepare_cached("UPDATE files SET generated=? WHERE path=?")?;
             let mut symbol_insert =
-                transaction.prepare_cached("INSERT INTO symbols VALUES(?,?,?,?,?,?)")?;
+                transaction.prepare_cached("INSERT INTO symbols VALUES(?,?,?,?,?,?,?)")?;
             let mut request_insert =
                 transaction.prepare_cached("INSERT INTO import_requests VALUES(?,?,?)")?;
             let mut reference_insert =
@@ -380,7 +381,8 @@ impl Database {
                         s.kind,
                         i64::try_from(s.start_line)?,
                         i64::try_from(s.end_line)?,
-                        s.signature
+                        s.signature,
+                        s.is_test
                     ])?;
                 }
                 for r in &file.imports {
@@ -428,16 +430,20 @@ impl Database {
             if let Some(project) = self.project.as_mut() {
                 project.prepare_files(&files);
             }
+            let java = crate::java::ImportIndex::new(&files);
             let mut statement =
                 transaction.prepare_cached("INSERT OR IGNORE INTO imports VALUES(?,?,?)")?;
             for (source, request) in requests {
-                let targets = self
-                    .project
-                    .as_ref()
-                    .and_then(|p| p.resolve(&source, &request, &files))
-                    .unwrap_or_else(|| {
-                        crate::parser::resolve_import(&source, &request, &files, aliases)
-                    });
+                let targets = if request.kind == "java" {
+                    java.resolve(&request.module)
+                } else {
+                    self.project
+                        .as_ref()
+                        .and_then(|p| p.resolve(&source, &request, &files))
+                        .unwrap_or_else(|| {
+                            crate::parser::resolve_import(&source, &request, &files, aliases)
+                        })
+                };
                 for target in targets {
                     statement.execute(params![source, target, request.kind])?;
                 }

@@ -13,8 +13,16 @@ pub struct ProjectMap {
     scopes: Vec<Scope>,
     packages: Vec<Package>,
     composers: Vec<Scope>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub unresolved_tsconfig_extends: Vec<UnresolvedConfig>,
     #[serde(skip)]
     file_names: BTreeMap<String, Vec<String>>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub struct UnresolvedConfig {
+    pub path: String,
+    pub reference: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -83,7 +91,7 @@ fn json(root: &Path, path: &Path) -> Result<Value> {
         .with_context(|| format!("Invalid configuration {}", path.display()))
 }
 
-fn config_path(root: &Path, from: &Path, reference: &str) -> Result<PathBuf> {
+fn config_path(root: &Path, from: &Path, reference: &str) -> Result<Option<PathBuf>> {
     let candidates = if reference.starts_with('.') || Path::new(reference).is_absolute() {
         vec![from.join(reference)]
     } else {
@@ -99,6 +107,20 @@ fn config_path(root: &Path, from: &Path, reference: &str) -> Result<PathBuf> {
         candidates
     };
     for candidate in candidates {
+        let relative = candidate
+            .strip_prefix(root)
+            .context("Project configuration is outside the root")?;
+        let mut depth = 0usize;
+        for component in relative.components() {
+            match component {
+                std::path::Component::ParentDir if depth == 0 => {
+                    bail!("Project configuration is outside the root")
+                }
+                std::path::Component::ParentDir => depth -= 1,
+                std::path::Component::Normal(_) => depth += 1,
+                _ => {}
+            }
+        }
         let mut appended = candidate.as_os_str().to_os_string();
         appended.push(".json");
         for path in [
@@ -107,17 +129,19 @@ fn config_path(root: &Path, from: &Path, reference: &str) -> Result<PathBuf> {
             candidate.join("tsconfig.json"),
         ] {
             if path.is_file() {
-                return Ok(path);
+                return Ok(Some(path));
             }
         }
     }
-    bail!(
-        "Cannot resolve tsconfig extension {reference} from {}",
-        from.display()
-    )
+    Ok(None)
 }
 
-fn tsconfig(root: &Path, path: &Path, stack: &mut BTreeSet<PathBuf>) -> Result<TsOptions> {
+fn tsconfig(
+    root: &Path,
+    path: &Path,
+    stack: &mut BTreeSet<PathBuf>,
+    unresolved: &mut BTreeSet<UnresolvedConfig>,
+) -> Result<TsOptions> {
     let path = path.canonicalize()?;
     if stack.len() >= 32 || !stack.insert(path.clone()) {
         bail!(
@@ -135,7 +159,14 @@ fn tsconfig(root: &Path, path: &Path, stack: &mut BTreeSet<PathBuf>) -> Result<T
         _ => vec![],
     };
     for extension in extensions {
-        let inherited = tsconfig(root, &config_path(root, parent, extension)?, stack)?;
+        let Some(inherited_path) = config_path(root, parent, extension)? else {
+            unresolved.insert(UnresolvedConfig {
+                path: parser::normalize(path.strip_prefix(root)?),
+                reference: extension.to_owned(),
+            });
+            continue;
+        };
+        let inherited = tsconfig(root, &inherited_path, stack, unresolved)?;
         if inherited.base.is_some() {
             options.base = inherited.base;
         }
@@ -213,12 +244,13 @@ impl ProjectMap {
             configs.insert(root.join("tsconfig.json"));
         }
         let mut processed = BTreeSet::new();
+        let mut unresolved = BTreeSet::new();
         while let Some(path) = configs.pop_first() {
             let canonical = path.canonicalize()?;
             if !processed.insert(canonical.clone()) {
                 continue;
             }
-            let options = tsconfig(&root, &canonical, &mut BTreeSet::new())?;
+            let options = tsconfig(&root, &canonical, &mut BTreeSet::new(), &mut unresolved)?;
             let directory = parser::normalize(canonical.parent().unwrap().strip_prefix(&root)?);
             let mut rules = vec![];
             if let Some((origin, paths)) = options.paths {
@@ -256,6 +288,7 @@ impl ProjectMap {
                 configs.insert(target);
             }
         }
+        result.unresolved_tsconfig_extends = unresolved.into_iter().collect();
         for path in paths.iter().filter(|p| {
             matches!(
                 p.rsplit('/').next(),

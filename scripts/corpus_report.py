@@ -14,6 +14,7 @@ def summarize(rows):
         "recall": average("recall"), "excerptRecall": average("excerptRecall"),
         "rangeCoverage": average("rangeCoverage"), "completeContextRate": average("completeContext"),
         "supportingRangeCoverage": optional_mean(rows, "supportingRangeCoverage"),
+        "supportingRecall": optional_mean(rows, "supportingRecall"),
         "judgedPrecision": optional_mean(rows, "judgedPrecision"),
         "unknownFiles": sum(row.get("metrics", {}).get("unknownFiles", 0) for row in rows),
         "forbiddenMatches": sum(row.get("metrics", {}).get("forbiddenMatches", 0) for row in rows),
@@ -22,6 +23,7 @@ def summarize(rows):
         "selectedFiles": sum(len(row.get("selectedFiles", [])) for row in rows),
         "judgedFileFraction": (sum(len(row.get("selectedFiles", []))-row.get("metrics", {}).get("unknownFiles", 0) for row in rows)/max(sum(len(row.get("selectedFiles", [])) for row in rows),1)),
         "supportingAnnotatedCases": sum(bool(row.get("hasSupportingRanges")) for row in rows),
+        "supportingFileCases": sum(bool(row.get("hasSupportingFiles")) for row in rows),
         "judgedCases": sum(row.get("metrics", {}).get("judgedPrecision") is not None for row in rows),
         "forbiddenTokens": sum(row.get("metrics", {}).get("forbiddenTokens", 0) for row in rows),
         "meanWallMs": sum(row["wallMs"] for row in rows) / max(size, 1),
@@ -33,6 +35,8 @@ def summarize(rows):
 def optional_mean(rows, key):
     if key == "supportingRangeCoverage":
         values = [row.get("metrics", {}).get(key, 0) or 0 for row in rows if row.get("hasSupportingRanges")]
+    elif key == "supportingRecall":
+        values = [row.get("metrics", {}).get(key, 0) or 0 for row in rows if row.get("hasSupportingFiles")]
     else:
         values = [row["metrics"][key] for row in rows if row["status"] == "ok" and row["metrics"].get(key) is not None]
     return sum(values) / len(values) if values else None
@@ -50,6 +54,9 @@ def groups(rows):
 
 
 def report(manifest, rows, identity, settings):
+    annotations = {case["id"]: bool(case.get("supportingFiles")) for case in manifest["cases"]}
+    for row in rows:
+        row["hasSupportingFiles"] = annotations.get(row["id"], False)
     runs = {}
     for method in settings["methods"]:
         for budget in settings["budgets"]:
@@ -67,7 +74,7 @@ def report(manifest, rows, identity, settings):
 
 
 def markdown(data):
-    lines = ["# Cross-project retrieval baseline", "", data["interpretation"], "",
+    lines = ["# Cross-project retrieval measurements", "", data["interpretation"], "",
         "| Method | Budget | Cases | Errors | File excerpts | Essential lines | Complete context |", "| --- | ---: | ---: | ---: | ---: | ---: | ---: |"]
     for name, run in data["runs"].items():
         method, budget = name.split(":")
@@ -79,6 +86,14 @@ def markdown(data):
         m = run["summary"]
         supporting = f"{m['supportingRangeCoverage']:.1%}" if m['supportingRangeCoverage'] is not None else 'unavailable'
         lines.append(f"| {method} | {budget} | {m['supportingAnnotatedCases']} | {supporting} | {m['meanTokensPerSuccessfulCase']:.0f} | {m['forbiddenMatches']} | {m['judgedFileFraction']:.1%} |")
+    lines += ["", "Supporting file recall measures selection, separately from coverage of annotated test lines.", "",
+        "| Method | Budget | Supporting file cases | Supporting file recall |",
+        "| --- | ---: | ---: | ---: |"]
+    for name, run in data["runs"].items():
+        method, budget = name.split(":")
+        m = run["summary"]
+        recall = f"{m['supportingRecall']:.1%}" if m['supportingRecall'] is not None else 'unavailable'
+        lines.append(f"| {method} | {budget} | {m['supportingFileCases']} | {recall} |")
     lines += ["", "## Repository splits at 16000 tokens", "", "| Split | Method | Cases | Errors | Essential lines | Complete context |", "| --- | --- | ---: | ---: | ---: | ---: |"]
     for name, run in data["runs"].items():
         method, budget = name.split(":")

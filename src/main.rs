@@ -232,6 +232,12 @@ fn execute(cli: Cli) -> Result<()> {
             if json {
                 println!("{}", serde_json::to_string_pretty(&stats)?);
             } else {
+                for missing in &stats.unresolved_config_extends {
+                    eprintln!(
+                        "Unresolved tsconfig {} in {}; inherited mappings unavailable",
+                        missing.reference, missing.path
+                    );
+                }
                 println!(
                     "Files indexed: {}\nSymbols found: {}\nImport relations: {}\nUpdated: {}, removed: {}\nDuration: {:.3}s",
                     stats.files,

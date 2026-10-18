@@ -1,0 +1,2916 @@
+{
+  "expressjs--express-3": {
+    "reference": {
+      "id": "expressjs--express-3",
+      "metadata": {
+        "language": "javascript",
+        "framework": "express",
+        "kind": "framework",
+        "project": "expressjs/express",
+        "split": "train",
+        "category": "http"
+      },
+      "revision": "59e205a57a04fced6bb7b8ec0b5dec29461a9996",
+      "archiveSha256": "26e1da6ea7551ea7014d5f7ab605466d50284f706101ddad365ad683c98036de",
+      "method": "context",
+      "budgetTokens": 16000,
+      "hasSupportingRanges": true,
+      "wallMs": 1832.0590478833765,
+      "peakRssBytes": 66691072,
+      "name": "expressjs--express-3",
+      "split": "train",
+      "sourceHash": "d81c4b7c8489febc2327a0a52ba00fd5a73cced8fcca6e866734e18abaee6bd7",
+      "sourceRevision": null,
+      "selectedFiles": [
+        "lib/response.js",
+        "test/app.response.js",
+        "lib/utils.js",
+        "test/support/utils.js",
+        "examples/content-negotiation/index.js",
+        "lib/request.js",
+        "test/res.sendFile.js",
+        "test/res.send.js",
+        "test/req.acceptsEncodings.js",
+        "examples/content-negotiation/db.js",
+        "History.md"
+      ],
+      "ranges": [
+        {
+          "path": "lib/response.js",
+          "start": 10,
+          "end": 24
+        },
+        {
+          "path": "lib/response.js",
+          "start": 34,
+          "end": 62
+        },
+        {
+          "path": "lib/response.js",
+          "start": 89,
+          "end": 103
+        },
+        {
+          "path": "lib/response.js",
+          "start": 109,
+          "end": 144
+        },
+        {
+          "path": "lib/response.js",
+          "start": 160,
+          "end": 174
+        },
+        {
+          "path": "lib/response.js",
+          "start": 192,
+          "end": 206
+        },
+        {
+          "path": "lib/response.js",
+          "start": 481,
+          "end": 495
+        },
+        {
+          "path": "lib/response.js",
+          "start": 593,
+          "end": 607
+        },
+        {
+          "path": "lib/response.js",
+          "start": 652,
+          "end": 666
+        },
+        {
+          "path": "lib/response.js",
+          "start": 854,
+          "end": 868
+        },
+        {
+          "path": "lib/response.js",
+          "start": 922,
+          "end": 1011
+        },
+        {
+          "path": "lib/response.js",
+          "start": 1025,
+          "end": 1049
+        },
+        {
+          "path": "test/app.response.js",
+          "start": 3,
+          "end": 17
+        },
+        {
+          "path": "test/app.response.js",
+          "start": 25,
+          "end": 39
+        },
+        {
+          "path": "test/app.response.js",
+          "start": 51,
+          "end": 65
+        },
+        {
+          "path": "test/app.response.js",
+          "start": 79,
+          "end": 93
+        },
+        {
+          "path": "test/app.response.js",
+          "start": 111,
+          "end": 125
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 11,
+          "end": 25
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 30,
+          "end": 55
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 89,
+          "end": 120
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 212,
+          "end": 240
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 249,
+          "end": 257
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 11,
+          "end": 25
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 28,
+          "end": 61
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 63,
+          "end": 73
+        },
+        {
+          "path": "examples/content-negotiation/index.js",
+          "start": 3,
+          "end": 17
+        },
+        {
+          "path": "lib/request.js",
+          "start": 35,
+          "end": 87
+        },
+        {
+          "path": "lib/request.js",
+          "start": 128,
+          "end": 155
+        },
+        {
+          "path": "lib/request.js",
+          "start": 161,
+          "end": 175
+        },
+        {
+          "path": "lib/request.js",
+          "start": 185,
+          "end": 199
+        },
+        {
+          "path": "lib/request.js",
+          "start": 239,
+          "end": 264
+        },
+        {
+          "path": "lib/request.js",
+          "start": 269,
+          "end": 296
+        },
+        {
+          "path": "lib/request.js",
+          "start": 304,
+          "end": 318
+        },
+        {
+          "path": "lib/request.js",
+          "start": 403,
+          "end": 417
+        },
+        {
+          "path": "lib/request.js",
+          "start": 429,
+          "end": 443
+        },
+        {
+          "path": "lib/request.js",
+          "start": 474,
+          "end": 488
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 36,
+          "end": 50
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 52,
+          "end": 66
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 69,
+          "end": 96
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 128,
+          "end": 152
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 253,
+          "end": 267
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 299,
+          "end": 313
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 317,
+          "end": 331
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 389,
+          "end": 403
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 412,
+          "end": 426
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 430,
+          "end": 456
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 504,
+          "end": 518
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 525,
+          "end": 539
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 544,
+          "end": 572
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 576,
+          "end": 590
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 601,
+          "end": 615
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 621,
+          "end": 646
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 32,
+          "end": 46
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 61,
+          "end": 90
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 94,
+          "end": 121
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 124,
+          "end": 164
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 171,
+          "end": 185
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 189,
+          "end": 203
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 210,
+          "end": 211
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 239,
+          "end": 253
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 261,
+          "end": 318
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 402,
+          "end": 416
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 419,
+          "end": 448
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 554,
+          "end": 568
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 575,
+          "end": 595
+        },
+        {
+          "path": "test/req.acceptsEncodings.js",
+          "start": 2,
+          "end": 39
+        },
+        {
+          "path": "examples/content-negotiation/db.js",
+          "start": 1,
+          "end": 9
+        },
+        {
+          "path": "History.md",
+          "start": 11,
+          "end": 35
+        },
+        {
+          "path": "History.md",
+          "start": 59,
+          "end": 73
+        },
+        {
+          "path": "History.md",
+          "start": 91,
+          "end": 105
+        },
+        {
+          "path": "History.md",
+          "start": 110,
+          "end": 124
+        },
+        {
+          "path": "History.md",
+          "start": 137,
+          "end": 163
+        },
+        {
+          "path": "History.md",
+          "start": 180,
+          "end": 206
+        },
+        {
+          "path": "History.md",
+          "start": 215,
+          "end": 229
+        },
+        {
+          "path": "History.md",
+          "start": 233,
+          "end": 247
+        },
+        {
+          "path": "History.md",
+          "start": 258,
+          "end": 258
+        },
+        {
+          "path": "History.md",
+          "start": 355,
+          "end": 369
+        },
+        {
+          "path": "History.md",
+          "start": 451,
+          "end": 475
+        },
+        {
+          "path": "History.md",
+          "start": 548,
+          "end": 562
+        },
+        {
+          "path": "History.md",
+          "start": 795,
+          "end": 809
+        },
+        {
+          "path": "History.md",
+          "start": 929,
+          "end": 943
+        },
+        {
+          "path": "History.md",
+          "start": 952,
+          "end": 981
+        },
+        {
+          "path": "History.md",
+          "start": 1076,
+          "end": 1090
+        },
+        {
+          "path": "History.md",
+          "start": 1148,
+          "end": 1162
+        }
+      ],
+      "metrics": {
+        "precision": 0.09090909090909091,
+        "recall": 1.0,
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "rangeCoverage": 1.0,
+        "forbiddenMatches": 0,
+        "tokens": 14865,
+        "usefulLinesPer1000Tokens": 0.3363605785401951,
+        "indexMs": 292.60347199999995,
+        "selectionMs": 1244.124352,
+        "excerptRecall": 1.0,
+        "completeContext": 1.0,
+        "supportingRecall": 1.0,
+        "supportingRangeCoverage": 1.0,
+        "judgedPrecision": 1.0,
+        "unknownFiles": 9,
+        "forbiddenTokens": 0
+      },
+      "missingFiles": [],
+      "missingRanges": [],
+      "missingSupportingRanges": [],
+      "unknownFiles": [
+        "test/app.response.js",
+        "lib/utils.js",
+        "test/support/utils.js",
+        "examples/content-negotiation/index.js",
+        "lib/request.js",
+        "test/res.sendFile.js",
+        "test/req.acceptsEncodings.js",
+        "examples/content-negotiation/db.js",
+        "History.md"
+      ],
+      "omissions": {},
+      "indexedFiles": 210,
+      "indexedBytes": 710006,
+      "indexedLanguages": {
+        "css": 4,
+        "html": 8,
+        "javascript": 141,
+        "json": 1,
+        "markdown": 4,
+        "unknown": 46,
+        "yaml": 6
+      },
+      "indexedSymbols": 127,
+      "indexedDependencies": 56,
+      "sizeClass": "medium",
+      "status": "ok",
+      "timeoutSeconds": 180
+    },
+    "intermediate": {
+      "id": "expressjs--express-3",
+      "metadata": {
+        "language": "javascript",
+        "framework": "express",
+        "kind": "framework",
+        "project": "expressjs/express",
+        "split": "train",
+        "category": "http"
+      },
+      "revision": "59e205a57a04fced6bb7b8ec0b5dec29461a9996",
+      "archiveSha256": "26e1da6ea7551ea7014d5f7ab605466d50284f706101ddad365ad683c98036de",
+      "method": "context",
+      "budgetTokens": 16000,
+      "timeoutSeconds": 180.0,
+      "hasSupportingRanges": true,
+      "hasSupportingFiles": true,
+      "wallMs": 2882.924522040412,
+      "peakRssBytes": 65912832,
+      "name": "expressjs--express-3",
+      "split": "train",
+      "sourceHash": "d81c4b7c8489febc2327a0a52ba00fd5a73cced8fcca6e866734e18abaee6bd7",
+      "sourceRevision": null,
+      "selectedFiles": [
+        "lib/response.js",
+        "lib/utils.js",
+        "test/support/utils.js",
+        "examples/content-negotiation/index.js",
+        "lib/request.js",
+        "test/acceptance/content-negotiation.js",
+        "test/res.sendFile.js",
+        "test/res.send.js",
+        "test/req.acceptsEncodings.js",
+        "examples/content-negotiation/db.js",
+        "History.md"
+      ],
+      "ranges": [
+        {
+          "path": "lib/response.js",
+          "start": 10,
+          "end": 24
+        },
+        {
+          "path": "lib/response.js",
+          "start": 38,
+          "end": 52
+        },
+        {
+          "path": "lib/response.js",
+          "start": 123,
+          "end": 161
+        },
+        {
+          "path": "lib/response.js",
+          "start": 168,
+          "end": 207
+        },
+        {
+          "path": "lib/response.js",
+          "start": 210,
+          "end": 224
+        },
+        {
+          "path": "lib/response.js",
+          "start": 237,
+          "end": 251
+        },
+        {
+          "path": "lib/response.js",
+          "start": 266,
+          "end": 291
+        },
+        {
+          "path": "lib/response.js",
+          "start": 456,
+          "end": 460
+        },
+        {
+          "path": "lib/response.js",
+          "start": 854,
+          "end": 868
+        },
+        {
+          "path": "lib/response.js",
+          "start": 922,
+          "end": 1011
+        },
+        {
+          "path": "lib/response.js",
+          "start": 1025,
+          "end": 1049
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 11,
+          "end": 25
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 30,
+          "end": 55
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 89,
+          "end": 120
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 212,
+          "end": 240
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 249,
+          "end": 257
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 11,
+          "end": 25
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 28,
+          "end": 61
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 63,
+          "end": 73
+        },
+        {
+          "path": "examples/content-negotiation/index.js",
+          "start": 3,
+          "end": 17
+        },
+        {
+          "path": "lib/request.js",
+          "start": 38,
+          "end": 87
+        },
+        {
+          "path": "lib/request.js",
+          "start": 128,
+          "end": 149
+        },
+        {
+          "path": "lib/request.js",
+          "start": 161,
+          "end": 175
+        },
+        {
+          "path": "lib/request.js",
+          "start": 187,
+          "end": 201
+        },
+        {
+          "path": "lib/request.js",
+          "start": 239,
+          "end": 264
+        },
+        {
+          "path": "lib/request.js",
+          "start": 269,
+          "end": 296
+        },
+        {
+          "path": "lib/request.js",
+          "start": 304,
+          "end": 318
+        },
+        {
+          "path": "lib/request.js",
+          "start": 403,
+          "end": 417
+        },
+        {
+          "path": "lib/request.js",
+          "start": 429,
+          "end": 443
+        },
+        {
+          "path": "lib/request.js",
+          "start": 474,
+          "end": 488
+        },
+        {
+          "path": "test/acceptance/content-negotiation.js",
+          "start": 1,
+          "end": 12
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 36,
+          "end": 50
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 52,
+          "end": 66
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 69,
+          "end": 96
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 128,
+          "end": 152
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 253,
+          "end": 267
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 299,
+          "end": 313
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 317,
+          "end": 331
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 389,
+          "end": 403
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 412,
+          "end": 426
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 430,
+          "end": 456
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 505,
+          "end": 519
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 530,
+          "end": 572
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 576,
+          "end": 590
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 601,
+          "end": 615
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 621,
+          "end": 647
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 32,
+          "end": 46
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 61,
+          "end": 90
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 94,
+          "end": 121
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 124,
+          "end": 164
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 171,
+          "end": 185
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 189,
+          "end": 203
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 206,
+          "end": 220
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 239,
+          "end": 253
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 261,
+          "end": 318
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 402,
+          "end": 416
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 419,
+          "end": 448
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 554,
+          "end": 568
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 578,
+          "end": 585
+        },
+        {
+          "path": "test/req.acceptsEncodings.js",
+          "start": 3,
+          "end": 39
+        },
+        {
+          "path": "examples/content-negotiation/db.js",
+          "start": 1,
+          "end": 9
+        },
+        {
+          "path": "History.md",
+          "start": 355,
+          "end": 369
+        },
+        {
+          "path": "History.md",
+          "start": 451,
+          "end": 465
+        },
+        {
+          "path": "History.md",
+          "start": 469,
+          "end": 483
+        },
+        {
+          "path": "History.md",
+          "start": 695,
+          "end": 709
+        },
+        {
+          "path": "History.md",
+          "start": 714,
+          "end": 740
+        },
+        {
+          "path": "History.md",
+          "start": 795,
+          "end": 809
+        },
+        {
+          "path": "History.md",
+          "start": 814,
+          "end": 828
+        },
+        {
+          "path": "History.md",
+          "start": 929,
+          "end": 943
+        },
+        {
+          "path": "History.md",
+          "start": 953,
+          "end": 981
+        },
+        {
+          "path": "History.md",
+          "start": 1076,
+          "end": 1090
+        },
+        {
+          "path": "History.md",
+          "start": 1198,
+          "end": 1212
+        },
+        {
+          "path": "History.md",
+          "start": 1306,
+          "end": 1320
+        },
+        {
+          "path": "History.md",
+          "start": 1323,
+          "end": 1337
+        },
+        {
+          "path": "History.md",
+          "start": 1533,
+          "end": 1562
+        },
+        {
+          "path": "History.md",
+          "start": 1746,
+          "end": 1764
+        },
+        {
+          "path": "History.md",
+          "start": 1832,
+          "end": 1846
+        },
+        {
+          "path": "History.md",
+          "start": 1916,
+          "end": 1930
+        }
+      ],
+      "metrics": {
+        "precision": 0.09090909090909091,
+        "recall": 1.0,
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "rangeCoverage": 0.4,
+        "forbiddenMatches": 0,
+        "tokens": 14245,
+        "usefulLinesPer1000Tokens": 0.1404001404001404,
+        "indexMs": 592.3529749999999,
+        "selectionMs": 1698.446547,
+        "excerptRecall": 1.0,
+        "completeContext": 0.0,
+        "supportingRecall": 1.0,
+        "supportingRangeCoverage": 0.0,
+        "judgedPrecision": 1.0,
+        "unknownFiles": 9,
+        "forbiddenTokens": 0
+      },
+      "missingFiles": [],
+      "missingRanges": [
+        {
+          "path": "lib/response.js",
+          "start": 165,
+          "end": 167
+        }
+      ],
+      "missingSupportingRanges": [
+        {
+          "path": "test/res.send.js",
+          "start": 593,
+          "end": 595
+        }
+      ],
+      "unknownFiles": [
+        "lib/utils.js",
+        "test/support/utils.js",
+        "examples/content-negotiation/index.js",
+        "lib/request.js",
+        "test/acceptance/content-negotiation.js",
+        "test/res.sendFile.js",
+        "test/req.acceptsEncodings.js",
+        "examples/content-negotiation/db.js",
+        "History.md"
+      ],
+      "omissions": {},
+      "indexedFiles": 210,
+      "indexedBytes": 710006,
+      "indexedLanguages": {
+        "css": 4,
+        "html": 8,
+        "javascript": 141,
+        "json": 1,
+        "markdown": 4,
+        "unknown": 46,
+        "yaml": 6
+      },
+      "indexedSymbols": 127,
+      "indexedDependencies": 56,
+      "sizeClass": "medium",
+      "status": "ok"
+    },
+    "final": {
+      "id": "expressjs--express-3",
+      "metadata": {
+        "language": "javascript",
+        "framework": "express",
+        "kind": "framework",
+        "project": "expressjs/express",
+        "split": "train",
+        "category": "http"
+      },
+      "revision": "59e205a57a04fced6bb7b8ec0b5dec29461a9996",
+      "archiveSha256": "26e1da6ea7551ea7014d5f7ab605466d50284f706101ddad365ad683c98036de",
+      "method": "context",
+      "budgetTokens": 16000,
+      "timeoutSeconds": 180.0,
+      "hasSupportingRanges": true,
+      "hasSupportingFiles": true,
+      "wallMs": 3454.4180808588862,
+      "peakRssBytes": 66379776,
+      "name": "expressjs--express-3",
+      "split": "train",
+      "sourceHash": "d81c4b7c8489febc2327a0a52ba00fd5a73cced8fcca6e866734e18abaee6bd7",
+      "sourceRevision": null,
+      "selectedFiles": [
+        "lib/response.js",
+        "lib/utils.js",
+        "test/support/utils.js",
+        "examples/content-negotiation/index.js",
+        "lib/request.js",
+        "test/acceptance/content-negotiation.js",
+        "test/res.sendFile.js",
+        "test/res.send.js",
+        "test/req.acceptsEncodings.js",
+        "examples/content-negotiation/db.js",
+        "History.md"
+      ],
+      "ranges": [
+        {
+          "path": "lib/response.js",
+          "start": 10,
+          "end": 24
+        },
+        {
+          "path": "lib/response.js",
+          "start": 34,
+          "end": 62
+        },
+        {
+          "path": "lib/response.js",
+          "start": 89,
+          "end": 103
+        },
+        {
+          "path": "lib/response.js",
+          "start": 109,
+          "end": 144
+        },
+        {
+          "path": "lib/response.js",
+          "start": 160,
+          "end": 174
+        },
+        {
+          "path": "lib/response.js",
+          "start": 192,
+          "end": 206
+        },
+        {
+          "path": "lib/response.js",
+          "start": 481,
+          "end": 495
+        },
+        {
+          "path": "lib/response.js",
+          "start": 593,
+          "end": 607
+        },
+        {
+          "path": "lib/response.js",
+          "start": 652,
+          "end": 666
+        },
+        {
+          "path": "lib/response.js",
+          "start": 854,
+          "end": 868
+        },
+        {
+          "path": "lib/response.js",
+          "start": 922,
+          "end": 1011
+        },
+        {
+          "path": "lib/response.js",
+          "start": 1025,
+          "end": 1049
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 11,
+          "end": 25
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 30,
+          "end": 55
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 89,
+          "end": 120
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 212,
+          "end": 240
+        },
+        {
+          "path": "lib/utils.js",
+          "start": 249,
+          "end": 257
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 11,
+          "end": 25
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 28,
+          "end": 61
+        },
+        {
+          "path": "test/support/utils.js",
+          "start": 63,
+          "end": 73
+        },
+        {
+          "path": "examples/content-negotiation/index.js",
+          "start": 3,
+          "end": 17
+        },
+        {
+          "path": "lib/request.js",
+          "start": 35,
+          "end": 87
+        },
+        {
+          "path": "lib/request.js",
+          "start": 128,
+          "end": 155
+        },
+        {
+          "path": "lib/request.js",
+          "start": 161,
+          "end": 175
+        },
+        {
+          "path": "lib/request.js",
+          "start": 185,
+          "end": 199
+        },
+        {
+          "path": "lib/request.js",
+          "start": 239,
+          "end": 264
+        },
+        {
+          "path": "lib/request.js",
+          "start": 269,
+          "end": 296
+        },
+        {
+          "path": "lib/request.js",
+          "start": 304,
+          "end": 318
+        },
+        {
+          "path": "lib/request.js",
+          "start": 403,
+          "end": 417
+        },
+        {
+          "path": "lib/request.js",
+          "start": 429,
+          "end": 443
+        },
+        {
+          "path": "lib/request.js",
+          "start": 474,
+          "end": 488
+        },
+        {
+          "path": "test/acceptance/content-negotiation.js",
+          "start": 1,
+          "end": 12
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 36,
+          "end": 50
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 52,
+          "end": 66
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 69,
+          "end": 96
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 128,
+          "end": 152
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 253,
+          "end": 267
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 299,
+          "end": 313
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 317,
+          "end": 331
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 389,
+          "end": 403
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 412,
+          "end": 426
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 430,
+          "end": 456
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 505,
+          "end": 519
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 530,
+          "end": 572
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 576,
+          "end": 590
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 601,
+          "end": 615
+        },
+        {
+          "path": "test/res.sendFile.js",
+          "start": 621,
+          "end": 647
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 32,
+          "end": 46
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 61,
+          "end": 90
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 94,
+          "end": 121
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 124,
+          "end": 164
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 171,
+          "end": 185
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 189,
+          "end": 203
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 206,
+          "end": 220
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 239,
+          "end": 253
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 261,
+          "end": 318
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 402,
+          "end": 416
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 419,
+          "end": 448
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 554,
+          "end": 568
+        },
+        {
+          "path": "test/res.send.js",
+          "start": 578,
+          "end": 585
+        },
+        {
+          "path": "test/req.acceptsEncodings.js",
+          "start": 3,
+          "end": 39
+        },
+        {
+          "path": "examples/content-negotiation/db.js",
+          "start": 1,
+          "end": 9
+        },
+        {
+          "path": "History.md",
+          "start": 11,
+          "end": 35
+        },
+        {
+          "path": "History.md",
+          "start": 59,
+          "end": 73
+        },
+        {
+          "path": "History.md",
+          "start": 91,
+          "end": 105
+        },
+        {
+          "path": "History.md",
+          "start": 110,
+          "end": 124
+        },
+        {
+          "path": "History.md",
+          "start": 137,
+          "end": 163
+        },
+        {
+          "path": "History.md",
+          "start": 180,
+          "end": 206
+        },
+        {
+          "path": "History.md",
+          "start": 215,
+          "end": 229
+        },
+        {
+          "path": "History.md",
+          "start": 233,
+          "end": 247
+        },
+        {
+          "path": "History.md",
+          "start": 258,
+          "end": 258
+        },
+        {
+          "path": "History.md",
+          "start": 355,
+          "end": 369
+        },
+        {
+          "path": "History.md",
+          "start": 451,
+          "end": 475
+        },
+        {
+          "path": "History.md",
+          "start": 548,
+          "end": 562
+        },
+        {
+          "path": "History.md",
+          "start": 795,
+          "end": 809
+        },
+        {
+          "path": "History.md",
+          "start": 929,
+          "end": 943
+        },
+        {
+          "path": "History.md",
+          "start": 952,
+          "end": 981
+        },
+        {
+          "path": "History.md",
+          "start": 1076,
+          "end": 1090
+        },
+        {
+          "path": "History.md",
+          "start": 1148,
+          "end": 1162
+        }
+      ],
+      "metrics": {
+        "precision": 0.09090909090909091,
+        "recall": 1.0,
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "rangeCoverage": 1.0,
+        "forbiddenMatches": 0,
+        "tokens": 14388,
+        "usefulLinesPer1000Tokens": 0.34751181540172366,
+        "indexMs": 353.83029500000004,
+        "selectionMs": 2721.091955,
+        "excerptRecall": 1.0,
+        "completeContext": 1.0,
+        "supportingRecall": 1.0,
+        "supportingRangeCoverage": 0.0,
+        "judgedPrecision": 1.0,
+        "unknownFiles": 9,
+        "forbiddenTokens": 0
+      },
+      "missingFiles": [],
+      "missingRanges": [],
+      "missingSupportingRanges": [
+        {
+          "path": "test/res.send.js",
+          "start": 593,
+          "end": 595
+        }
+      ],
+      "unknownFiles": [
+        "lib/utils.js",
+        "test/support/utils.js",
+        "examples/content-negotiation/index.js",
+        "lib/request.js",
+        "test/acceptance/content-negotiation.js",
+        "test/res.sendFile.js",
+        "test/req.acceptsEncodings.js",
+        "examples/content-negotiation/db.js",
+        "History.md"
+      ],
+      "omissions": {},
+      "indexedFiles": 210,
+      "indexedBytes": 710006,
+      "indexedLanguages": {
+        "css": 4,
+        "html": 8,
+        "javascript": 141,
+        "json": 1,
+        "markdown": 4,
+        "unknown": 46,
+        "yaml": 6
+      },
+      "indexedSymbols": 127,
+      "indexedDependencies": 56,
+      "sizeClass": "medium",
+      "status": "ok"
+    }
+  },
+  "rubocop--rubocop-2": {
+    "reference": {
+      "id": "rubocop--rubocop-2",
+      "metadata": {
+        "language": "ruby",
+        "framework": "rubocop",
+        "kind": "cli",
+        "project": "rubocop/rubocop",
+        "split": "eval",
+        "category": "autocorrect"
+      },
+      "revision": "8053d208a575c4f3fd7c6d13523d511aacecd379",
+      "archiveSha256": "024c5204fb9d2015f96328ce1da3ae0005c0d5203beb8b2e27f0ec883bc19807",
+      "method": "context",
+      "budgetTokens": 16000,
+      "hasSupportingRanges": true,
+      "wallMs": 6325.8702990133315,
+      "peakRssBytes": 104783872,
+      "name": "rubocop--rubocop-2",
+      "split": "eval",
+      "sourceHash": "3704efce411beb9b9ac6999e37d44182c7ba39214986ae89185a542dc39656ab",
+      "sourceRevision": null,
+      "selectedFiles": [
+        "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+        "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+        "lib/rubocop/cop/style/symbol_proc.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+        "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+        "spec/rubocop/cop/style/symbol_proc_spec.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+        "lib/rubocop/cop/mixin/trailing_comma.rb",
+        "lib/rubocop/cop/layout/space_before_block_braces.rb",
+        "lib/rubocop/cop/layout/multiline_block_layout.rb",
+        "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+        "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+        "lib/rubocop/cop/lint/percent_symbol_array.rb",
+        "lib/rubocop/cop/style/block_delimiters.rb",
+        "lib/rubocop/cop/style/proc.rb",
+        "lib/rubocop/cop/style/single_line_do_end_block.rb",
+        "lib/rubocop/cop/layout/block_alignment.rb",
+        "relnotes/v1.54.1.md",
+        "config/default.yml"
+      ],
+      "ranges": [
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+          "start": 1,
+          "end": 27
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+          "start": 54,
+          "end": 102
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 1,
+          "end": 38
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 48,
+          "end": 85
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 146,
+          "end": 160
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 132,
+          "end": 227
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 244,
+          "end": 255
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 257,
+          "end": 264
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 266,
+          "end": 272
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 274,
+          "end": 277
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 1,
+          "end": 25
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 41,
+          "end": 55
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 76,
+          "end": 90
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 118,
+          "end": 157
+        },
+        {
+          "path": "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+          "start": 1,
+          "end": 15
+        },
+        {
+          "path": "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+          "start": 22,
+          "end": 56
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 1,
+          "end": 26
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 44,
+          "end": 58
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 79,
+          "end": 93
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 111,
+          "end": 134
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 1,
+          "end": 49
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 56,
+          "end": 70
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 233,
+          "end": 247
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 1,
+          "end": 26
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 45,
+          "end": 59
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 81,
+          "end": 95
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 114,
+          "end": 136
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 31,
+          "end": 36
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 38,
+          "end": 42
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 55,
+          "end": 66
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 68,
+          "end": 79
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 150,
+          "end": 162
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 164,
+          "end": 174
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_before_block_braces.rb",
+          "start": 36,
+          "end": 164
+        },
+        {
+          "path": "lib/rubocop/cop/layout/multiline_block_layout.rb",
+          "start": 59,
+          "end": 64
+        },
+        {
+          "path": "lib/rubocop/cop/layout/multiline_block_layout.rb",
+          "start": 66,
+          "end": 76
+        },
+        {
+          "path": "lib/rubocop/cop/layout/multiline_block_layout.rb",
+          "start": 113,
+          "end": 168
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+          "start": 1,
+          "end": 15
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+          "start": 17,
+          "end": 31
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+          "start": 71,
+          "end": 288
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 41,
+          "end": 51
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 102,
+          "end": 106
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 121,
+          "end": 123
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 215,
+          "end": 218
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 228,
+          "end": 244
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 246,
+          "end": 255
+        },
+        {
+          "path": "lib/rubocop/cop/lint/percent_symbol_array.rb",
+          "start": 11,
+          "end": 61
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 202,
+          "end": 211
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 308,
+          "end": 320
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 339,
+          "end": 343
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 345,
+          "end": 347
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 374,
+          "end": 389
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 428,
+          "end": 437
+        },
+        {
+          "path": "lib/rubocop/cop/style/proc.rb",
+          "start": 1,
+          "end": 35
+        },
+        {
+          "path": "lib/rubocop/cop/style/single_line_do_end_block.rb",
+          "start": 1,
+          "end": 15
+        },
+        {
+          "path": "lib/rubocop/cop/style/single_line_do_end_block.rb",
+          "start": 25,
+          "end": 87
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 89,
+          "end": 91
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 102,
+          "end": 110
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 120,
+          "end": 132
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 152,
+          "end": 164
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 175,
+          "end": 181
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 205,
+          "end": 210
+        },
+        {
+          "path": "relnotes/v1.54.1.md",
+          "start": 1,
+          "end": 9
+        },
+        {
+          "path": "config/default.yml",
+          "start": 495,
+          "end": 521
+        },
+        {
+          "path": "config/default.yml",
+          "start": 615,
+          "end": 629
+        },
+        {
+          "path": "config/default.yml",
+          "start": 727,
+          "end": 741
+        },
+        {
+          "path": "config/default.yml",
+          "start": 2669,
+          "end": 2683
+        },
+        {
+          "path": "config/default.yml",
+          "start": 3930,
+          "end": 3944
+        }
+      ],
+      "metrics": {
+        "precision": 0.05,
+        "recall": 1.0,
+        "recallAt5": 1.0,
+        "reciprocalRank": 0.3333333333333333,
+        "rangeCoverage": 1.0,
+        "forbiddenMatches": 0,
+        "tokens": 15987,
+        "usefulLinesPer1000Tokens": 0.3127541127165822,
+        "indexMs": 4531.761073000001,
+        "selectionMs": 1317.918951,
+        "excerptRecall": 1.0,
+        "completeContext": 1.0,
+        "supportingRecall": 0.0,
+        "supportingRangeCoverage": 0.0,
+        "judgedPrecision": 1.0,
+        "unknownFiles": 19,
+        "forbiddenTokens": 0
+      },
+      "missingFiles": [],
+      "missingRanges": [],
+      "missingSupportingRanges": [
+        {
+          "path": "spec/rubocop/cli/autocorrect_spec.rb",
+          "start": 1967,
+          "end": 1971
+        }
+      ],
+      "unknownFiles": [
+        "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+        "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+        "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+        "spec/rubocop/cop/style/symbol_proc_spec.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+        "lib/rubocop/cop/mixin/trailing_comma.rb",
+        "lib/rubocop/cop/layout/space_before_block_braces.rb",
+        "lib/rubocop/cop/layout/multiline_block_layout.rb",
+        "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+        "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+        "lib/rubocop/cop/lint/percent_symbol_array.rb",
+        "lib/rubocop/cop/style/block_delimiters.rb",
+        "lib/rubocop/cop/style/proc.rb",
+        "lib/rubocop/cop/style/single_line_do_end_block.rb",
+        "lib/rubocop/cop/layout/block_alignment.rb",
+        "relnotes/v1.54.1.md",
+        "config/default.yml"
+      ],
+      "omissions": {},
+      "indexedFiles": 2250,
+      "indexedBytes": 15326807,
+      "indexedLanguages": {
+        "html": 1,
+        "markdown": 368,
+        "ruby": 1790,
+        "unknown": 74,
+        "yaml": 17
+      },
+      "indexedSymbols": 9129,
+      "indexedDependencies": 0,
+      "sizeClass": "large",
+      "status": "ok",
+      "timeoutSeconds": 180
+    },
+    "intermediate": {
+      "id": "rubocop--rubocop-2",
+      "metadata": {
+        "language": "ruby",
+        "framework": "rubocop",
+        "kind": "cli",
+        "project": "rubocop/rubocop",
+        "split": "eval",
+        "category": "autocorrect"
+      },
+      "revision": "8053d208a575c4f3fd7c6d13523d511aacecd379",
+      "archiveSha256": "024c5204fb9d2015f96328ce1da3ae0005c0d5203beb8b2e27f0ec883bc19807",
+      "method": "context",
+      "budgetTokens": 16000,
+      "timeoutSeconds": 180.0,
+      "hasSupportingRanges": true,
+      "hasSupportingFiles": true,
+      "wallMs": 22471.32622101344,
+      "peakRssBytes": 104030208,
+      "name": "rubocop--rubocop-2",
+      "split": "eval",
+      "sourceHash": "3704efce411beb9b9ac6999e37d44182c7ba39214986ae89185a542dc39656ab",
+      "sourceRevision": null,
+      "selectedFiles": [
+        "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+        "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+        "lib/rubocop/cop/style/symbol_proc.rb",
+        "spec/rubocop/cop/style/symbol_proc_spec.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+        "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+        "lib/rubocop/cop/mixin/trailing_comma.rb",
+        "spec/rubocop/cop/style/trailing_comma_in_arguments_spec.rb",
+        "spec/rubocop/cop/lint/trailing_comma_in_attribute_declaration_spec.rb",
+        "lib/rubocop/cop/layout/space_before_block_braces.rb",
+        "lib/rubocop/cop/layout/multiline_block_layout.rb",
+        "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+        "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+        "lib/rubocop/cop/lint/percent_symbol_array.rb",
+        "lib/rubocop/cop/style/block_delimiters.rb",
+        "lib/rubocop/cop/style/proc.rb",
+        "spec/rubocop/cop/layout/space_before_block_braces_spec.rb",
+        "lib/rubocop/cop/style/single_line_do_end_block.rb",
+        "lib/rubocop/cop/layout/block_alignment.rb",
+        "relnotes/v1.54.1.md",
+        "config/default.yml"
+      ],
+      "ranges": [
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+          "start": 1,
+          "end": 36
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+          "start": 54,
+          "end": 102
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 1,
+          "end": 38
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 59,
+          "end": 85
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 155,
+          "end": 168
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 172,
+          "end": 190
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 194,
+          "end": 196
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 244,
+          "end": 255
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 257,
+          "end": 264
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 266,
+          "end": 272
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 274,
+          "end": 277
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 1,
+          "end": 12
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 112,
+          "end": 126
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 233,
+          "end": 247
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 261,
+          "end": 275
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 469,
+          "end": 483
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 639,
+          "end": 653
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 1,
+          "end": 25
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 41,
+          "end": 55
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 76,
+          "end": 90
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 118,
+          "end": 157
+        },
+        {
+          "path": "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+          "start": 2,
+          "end": 16
+        },
+        {
+          "path": "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+          "start": 22,
+          "end": 56
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 1,
+          "end": 26
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 44,
+          "end": 58
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 79,
+          "end": 93
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 111,
+          "end": 134
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 1,
+          "end": 26
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 45,
+          "end": 59
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 81,
+          "end": 95
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 114,
+          "end": 136
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 31,
+          "end": 36
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 38,
+          "end": 42
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 55,
+          "end": 66
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 68,
+          "end": 79
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 150,
+          "end": 150
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 164,
+          "end": 174
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_arguments_spec.rb",
+          "start": 1,
+          "end": 49
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_arguments_spec.rb",
+          "start": 667,
+          "end": 681
+        },
+        {
+          "path": "spec/rubocop/cop/lint/trailing_comma_in_attribute_declaration_spec.rb",
+          "start": 1,
+          "end": 12
+        },
+        {
+          "path": "spec/rubocop/cop/lint/trailing_comma_in_attribute_declaration_spec.rb",
+          "start": 22,
+          "end": 36
+        },
+        {
+          "path": "spec/rubocop/cop/lint/trailing_comma_in_attribute_declaration_spec.rb",
+          "start": 41,
+          "end": 55
+        },
+        {
+          "path": "spec/rubocop/cop/lint/trailing_comma_in_attribute_declaration_spec.rb",
+          "start": 60,
+          "end": 74
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_before_block_braces.rb",
+          "start": 47,
+          "end": 80
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_before_block_braces.rb",
+          "start": 137,
+          "end": 142
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_before_block_braces.rb",
+          "start": 153,
+          "end": 155
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_before_block_braces.rb",
+          "start": 157,
+          "end": 159
+        },
+        {
+          "path": "lib/rubocop/cop/layout/multiline_block_layout.rb",
+          "start": 66,
+          "end": 76
+        },
+        {
+          "path": "lib/rubocop/cop/layout/multiline_block_layout.rb",
+          "start": 116,
+          "end": 168
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+          "start": 1,
+          "end": 15
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+          "start": 71,
+          "end": 288
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 41,
+          "end": 51
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 102,
+          "end": 106
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 121,
+          "end": 123
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 228,
+          "end": 244
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 246,
+          "end": 255
+        },
+        {
+          "path": "lib/rubocop/cop/lint/percent_symbol_array.rb",
+          "start": 11,
+          "end": 61
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 202,
+          "end": 211
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 308,
+          "end": 320
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 339,
+          "end": 343
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 345,
+          "end": 347
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 374,
+          "end": 390
+        },
+        {
+          "path": "lib/rubocop/cop/style/proc.rb",
+          "start": 1,
+          "end": 35
+        },
+        {
+          "path": "spec/rubocop/cop/layout/space_before_block_braces_spec.rb",
+          "start": 1,
+          "end": 12
+        },
+        {
+          "path": "spec/rubocop/cop/layout/space_before_block_braces_spec.rb",
+          "start": 32,
+          "end": 46
+        },
+        {
+          "path": "spec/rubocop/cop/layout/space_before_block_braces_spec.rb",
+          "start": 63,
+          "end": 77
+        },
+        {
+          "path": "spec/rubocop/cop/layout/space_before_block_braces_spec.rb",
+          "start": 95,
+          "end": 109
+        },
+        {
+          "path": "spec/rubocop/cop/layout/space_before_block_braces_spec.rb",
+          "start": 162,
+          "end": 176
+        },
+        {
+          "path": "lib/rubocop/cop/style/single_line_do_end_block.rb",
+          "start": 4,
+          "end": 18
+        },
+        {
+          "path": "lib/rubocop/cop/style/single_line_do_end_block.rb",
+          "start": 25,
+          "end": 87
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 89,
+          "end": 91
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 102,
+          "end": 110
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 120,
+          "end": 132
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 152,
+          "end": 164
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 205,
+          "end": 210
+        },
+        {
+          "path": "relnotes/v1.54.1.md",
+          "start": 1,
+          "end": 9
+        },
+        {
+          "path": "config/default.yml",
+          "start": 2669,
+          "end": 2683
+        },
+        {
+          "path": "config/default.yml",
+          "start": 6357,
+          "end": 6360
+        },
+        {
+          "path": "config/default.yml",
+          "start": 6376,
+          "end": 6378
+        },
+        {
+          "path": "config/default.yml",
+          "start": 6388,
+          "end": 6402
+        }
+      ],
+      "metrics": {
+        "precision": 0.043478260869565216,
+        "recall": 1.0,
+        "recallAt5": 1.0,
+        "reciprocalRank": 0.3333333333333333,
+        "rangeCoverage": 0.0,
+        "forbiddenMatches": 0,
+        "tokens": 15996,
+        "usefulLinesPer1000Tokens": 0.0,
+        "indexMs": 19010.083000000002,
+        "selectionMs": 2040.5812110000002,
+        "excerptRecall": 1.0,
+        "completeContext": 0.0,
+        "supportingRecall": 0.0,
+        "supportingRangeCoverage": 0.0,
+        "judgedPrecision": 1.0,
+        "unknownFiles": 22,
+        "forbiddenTokens": 0
+      },
+      "missingFiles": [],
+      "missingRanges": [
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 167,
+          "end": 171
+        }
+      ],
+      "missingSupportingRanges": [
+        {
+          "path": "spec/rubocop/cli/autocorrect_spec.rb",
+          "start": 1967,
+          "end": 1971
+        }
+      ],
+      "unknownFiles": [
+        "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+        "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+        "spec/rubocop/cop/style/symbol_proc_spec.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+        "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+        "lib/rubocop/cop/mixin/trailing_comma.rb",
+        "spec/rubocop/cop/style/trailing_comma_in_arguments_spec.rb",
+        "spec/rubocop/cop/lint/trailing_comma_in_attribute_declaration_spec.rb",
+        "lib/rubocop/cop/layout/space_before_block_braces.rb",
+        "lib/rubocop/cop/layout/multiline_block_layout.rb",
+        "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+        "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+        "lib/rubocop/cop/lint/percent_symbol_array.rb",
+        "lib/rubocop/cop/style/block_delimiters.rb",
+        "lib/rubocop/cop/style/proc.rb",
+        "spec/rubocop/cop/layout/space_before_block_braces_spec.rb",
+        "lib/rubocop/cop/style/single_line_do_end_block.rb",
+        "lib/rubocop/cop/layout/block_alignment.rb",
+        "relnotes/v1.54.1.md",
+        "config/default.yml"
+      ],
+      "omissions": {},
+      "indexedFiles": 2250,
+      "indexedBytes": 15326807,
+      "indexedLanguages": {
+        "html": 1,
+        "markdown": 368,
+        "ruby": 1790,
+        "unknown": 74,
+        "yaml": 17
+      },
+      "indexedSymbols": 9129,
+      "indexedDependencies": 0,
+      "sizeClass": "large",
+      "status": "ok"
+    },
+    "final": {
+      "id": "rubocop--rubocop-2",
+      "metadata": {
+        "language": "ruby",
+        "framework": "rubocop",
+        "kind": "cli",
+        "project": "rubocop/rubocop",
+        "split": "eval",
+        "category": "autocorrect"
+      },
+      "revision": "8053d208a575c4f3fd7c6d13523d511aacecd379",
+      "archiveSha256": "024c5204fb9d2015f96328ce1da3ae0005c0d5203beb8b2e27f0ec883bc19807",
+      "method": "context",
+      "budgetTokens": 16000,
+      "timeoutSeconds": 180.0,
+      "hasSupportingRanges": true,
+      "hasSupportingFiles": true,
+      "wallMs": 15661.264122929424,
+      "peakRssBytes": 105975808,
+      "name": "rubocop--rubocop-2",
+      "split": "eval",
+      "sourceHash": "3704efce411beb9b9ac6999e37d44182c7ba39214986ae89185a542dc39656ab",
+      "sourceRevision": null,
+      "selectedFiles": [
+        "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+        "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+        "lib/rubocop/cop/style/symbol_proc.rb",
+        "spec/rubocop/cop/style/symbol_proc_spec.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+        "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+        "lib/rubocop/cop/mixin/trailing_comma.rb",
+        "lib/rubocop/cop/layout/space_before_block_braces.rb",
+        "lib/rubocop/cop/layout/multiline_block_layout.rb",
+        "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+        "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+        "lib/rubocop/cop/lint/percent_symbol_array.rb",
+        "lib/rubocop/cop/style/block_delimiters.rb",
+        "lib/rubocop/cop/style/proc.rb",
+        "lib/rubocop/cop/style/single_line_do_end_block.rb",
+        "lib/rubocop/cop/layout/block_alignment.rb",
+        "relnotes/v1.54.1.md",
+        "config/default.yml"
+      ],
+      "ranges": [
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+          "start": 1,
+          "end": 27
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+          "start": 54,
+          "end": 102
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 1,
+          "end": 38
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 59,
+          "end": 85
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 95,
+          "end": 109
+        },
+        {
+          "path": "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+          "start": 155,
+          "end": 168
+        },
+        {
+          "path": "lib/rubocop/cop/style/symbol_proc.rb",
+          "start": 132,
+          "end": 289
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 1,
+          "end": 12
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 112,
+          "end": 127
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 233,
+          "end": 247
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 261,
+          "end": 275
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 469,
+          "end": 483
+        },
+        {
+          "path": "spec/rubocop/cop/style/symbol_proc_spec.rb",
+          "start": 639,
+          "end": 653
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 1,
+          "end": 25
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 41,
+          "end": 55
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 76,
+          "end": 90
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+          "start": 118,
+          "end": 157
+        },
+        {
+          "path": "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+          "start": 1,
+          "end": 15
+        },
+        {
+          "path": "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+          "start": 22,
+          "end": 56
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 1,
+          "end": 26
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 44,
+          "end": 58
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 79,
+          "end": 93
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+          "start": 111,
+          "end": 134
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 1,
+          "end": 26
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 45,
+          "end": 59
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 81,
+          "end": 95
+        },
+        {
+          "path": "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+          "start": 114,
+          "end": 136
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 31,
+          "end": 36
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 38,
+          "end": 42
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 55,
+          "end": 66
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 68,
+          "end": 79
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 150,
+          "end": 162
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/trailing_comma.rb",
+          "start": 164,
+          "end": 174
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_before_block_braces.rb",
+          "start": 36,
+          "end": 164
+        },
+        {
+          "path": "lib/rubocop/cop/layout/multiline_block_layout.rb",
+          "start": 59,
+          "end": 64
+        },
+        {
+          "path": "lib/rubocop/cop/layout/multiline_block_layout.rb",
+          "start": 66,
+          "end": 76
+        },
+        {
+          "path": "lib/rubocop/cop/layout/multiline_block_layout.rb",
+          "start": 116,
+          "end": 168
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+          "start": 1,
+          "end": 15
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+          "start": 17,
+          "end": 31
+        },
+        {
+          "path": "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+          "start": 71,
+          "end": 288
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 41,
+          "end": 51
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 102,
+          "end": 106
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 121,
+          "end": 123
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 215,
+          "end": 218
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 228,
+          "end": 244
+        },
+        {
+          "path": "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+          "start": 246,
+          "end": 255
+        },
+        {
+          "path": "lib/rubocop/cop/lint/percent_symbol_array.rb",
+          "start": 11,
+          "end": 61
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 202,
+          "end": 211
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 308,
+          "end": 320
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 339,
+          "end": 343
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 345,
+          "end": 347
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 374,
+          "end": 389
+        },
+        {
+          "path": "lib/rubocop/cop/style/block_delimiters.rb",
+          "start": 428,
+          "end": 437
+        },
+        {
+          "path": "lib/rubocop/cop/style/proc.rb",
+          "start": 1,
+          "end": 35
+        },
+        {
+          "path": "lib/rubocop/cop/style/single_line_do_end_block.rb",
+          "start": 1,
+          "end": 15
+        },
+        {
+          "path": "lib/rubocop/cop/style/single_line_do_end_block.rb",
+          "start": 25,
+          "end": 87
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 89,
+          "end": 91
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 102,
+          "end": 110
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 120,
+          "end": 132
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 152,
+          "end": 164
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 175,
+          "end": 181
+        },
+        {
+          "path": "lib/rubocop/cop/layout/block_alignment.rb",
+          "start": 205,
+          "end": 210
+        },
+        {
+          "path": "relnotes/v1.54.1.md",
+          "start": 1,
+          "end": 9
+        },
+        {
+          "path": "config/default.yml",
+          "start": 2669,
+          "end": 2683
+        },
+        {
+          "path": "config/default.yml",
+          "start": 6288,
+          "end": 6302
+        },
+        {
+          "path": "config/default.yml",
+          "start": 6357,
+          "end": 6360
+        },
+        {
+          "path": "config/default.yml",
+          "start": 6376,
+          "end": 6378
+        },
+        {
+          "path": "config/default.yml",
+          "start": 6388,
+          "end": 6402
+        }
+      ],
+      "metrics": {
+        "precision": 0.05,
+        "recall": 1.0,
+        "recallAt5": 1.0,
+        "reciprocalRank": 0.3333333333333333,
+        "rangeCoverage": 1.0,
+        "forbiddenMatches": 0,
+        "tokens": 15991,
+        "usefulLinesPer1000Tokens": 0.31267588018260273,
+        "indexMs": 11925.960631,
+        "selectionMs": 1295.974891,
+        "excerptRecall": 1.0,
+        "completeContext": 1.0,
+        "supportingRecall": 0.0,
+        "supportingRangeCoverage": 0.0,
+        "judgedPrecision": 1.0,
+        "unknownFiles": 19,
+        "forbiddenTokens": 0
+      },
+      "missingFiles": [],
+      "missingRanges": [],
+      "missingSupportingRanges": [
+        {
+          "path": "spec/rubocop/cli/autocorrect_spec.rb",
+          "start": 1967,
+          "end": 1971
+        }
+      ],
+      "unknownFiles": [
+        "lib/rubocop/cop/style/trailing_comma_in_block_args.rb",
+        "spec/rubocop/cop/style/trailing_comma_in_block_args_spec.rb",
+        "spec/rubocop/cop/style/symbol_proc_spec.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_arguments.rb",
+        "lib/rubocop/cop/lint/trailing_comma_in_attribute_declaration.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_array_literal.rb",
+        "lib/rubocop/cop/style/trailing_comma_in_hash_literal.rb",
+        "lib/rubocop/cop/mixin/trailing_comma.rb",
+        "lib/rubocop/cop/layout/space_before_block_braces.rb",
+        "lib/rubocop/cop/layout/multiline_block_layout.rb",
+        "lib/rubocop/cop/layout/space_inside_block_braces.rb",
+        "lib/rubocop/cop/mixin/hash_shorthand_syntax.rb",
+        "lib/rubocop/cop/lint/percent_symbol_array.rb",
+        "lib/rubocop/cop/style/block_delimiters.rb",
+        "lib/rubocop/cop/style/proc.rb",
+        "lib/rubocop/cop/style/single_line_do_end_block.rb",
+        "lib/rubocop/cop/layout/block_alignment.rb",
+        "relnotes/v1.54.1.md",
+        "config/default.yml"
+      ],
+      "omissions": {},
+      "indexedFiles": 2250,
+      "indexedBytes": 15326807,
+      "indexedLanguages": {
+        "html": 1,
+        "markdown": 368,
+        "ruby": 1790,
+        "unknown": 74,
+        "yaml": 17
+      },
+      "indexedSymbols": 9129,
+      "indexedDependencies": 0,
+      "sizeClass": "large",
+      "status": "ok"
+    }
+  }
+}

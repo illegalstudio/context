@@ -11,10 +11,15 @@ use std::{
     path::{Path, PathBuf},
 };
 
+// Bump when excerpt selection or token allocation semantics change.
+const EXCERPT_STRATEGY_VERSION: u32 = 1;
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Manifest {
     pub version: String,
+    #[serde(default)]
+    pub excerpt_strategy_version: u32,
     pub timestamp: String,
     pub slug: String,
     pub task: ResolvedTask,
@@ -193,7 +198,8 @@ pub fn compose_with_options(
     let mut hashes = BTreeMap::new();
     let mut changes = PackChanges::default();
     let active: Vec<_> = if let Some(parent) = parent {
-        let reset = parent.task.raw != resolution.task.raw
+        let reset = parent.excerpt_strategy_version != EXCERPT_STRATEGY_VERSION
+            || parent.task.raw != resolution.task.raw
             || parent.task.query_terms != resolution.task.query_terms
             || parent.tokenizer != config.tokenizer
             || parent.config.as_ref().is_some_and(|old| {
@@ -293,6 +299,7 @@ pub fn compose_with_options(
     );
     let manifest = Manifest {
         version: env!("CARGO_PKG_VERSION").into(),
+        excerpt_strategy_version: EXCERPT_STRATEGY_VERSION,
         timestamp: now.to_rfc3339(),
         slug: slug.clone(),
         task: resolution.task.clone(),

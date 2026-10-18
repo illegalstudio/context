@@ -168,3 +168,20 @@ context evaluate cases.json --method context --json
 ~~~
 
 Additional metrics include `excerptRecall` (required files with actual code), `completeContext` (all required files have excerpts and all required source lines are included), `supportingRecall`, `supportingRangeCoverage`, `judgedPrecision`, `unknownFiles` and `forbiddenTokens`. Judged file precision uses only required/supporting positives and explicit forbidden negatives. Unknown files are neither positives nor negatives. `forbiddenTokens` measures excerpt Markdown attributable to known negatives; it excludes their contribution to the shared prompt header. Explanations include `missingFiles`, `missingRanges`, `missingSupportingRanges` and required-file omission reasons (`not_indexed`, `not_selected`, `selected_without_excerpt`). Index statistics help distinguish setup/coverage problems from ranking omissions. New report fields are additive; old report inputs remain readable.
+
+## Fresh repository validation
+
+`benchmarks/corpus-validation.json` reserves 18 additional historical tasks on ten repositories absent from both earlier suites. It covers CakePHP, Starlette, Fastify, tRPC, Hugo, Nushell, Hanami Router, Micronaut, System.CommandLine and Vapor. C# and Swift exercise text fallback alongside the eight structural parser languages. All projects belong to `eval` and remain disjoint by repository identity.
+
+The manifest and 41 required source windows were frozen before the cross-project retrieval changes. The baseline and initial candidate use the same pinned archives, labels, 25-file limit, `o200k_base` encoding and 8000/16000/32000-token budgets. The corrected replay covers all 102 tasks at 16000 tokens, with a literal comparison on the 18-task suite and targeted 8000/32000-token checks for the four affected excerpt cases. An unchanged baseline executable was measured before implementation. The first implementation was frozen before validation scores were examined. Its result exposed three excerpt regressions at 16000 tokens and four evaluation failures from absent external TypeScript presets. Those initial measurements are preserved. Subsequent corrections used that evidence, so the final replay is regression data, not an independent validation estimate.
+
+~~~bash
+python3 scripts/corpus.py validate --manifest benchmarks/corpus-validation.json
+python3 scripts/corpus.py run --manifest benchmarks/corpus-validation.json --split eval --output validation-results.json
+~~~
+
+The manual workflow accepts `suite: validation`. Existing primary and domain cases informed the improvements and now serve as regression data, regardless of their original split names. Use new repositories or privately reserved tasks for subsequent tuning cycles.
+
+Supporting-file recall and supporting-line coverage are separate measurements. A cochanged test file can be a supporting label without a defensible pre-fix assertion window; the validation suite therefore has supporting files but no supporting ranges. Missing annotations are reported as unavailable, never as full coverage. Failed annotated cases contribute zero. GitHub archives can omit test sources through `export-ignore`, so label review must verify the actual archive rather than assume every upstream Git path is present.
+
+These remain sparse, agent-reviewed patch-derived labels. They do not establish general relevance precision, exhaustive behavior coverage or success at solving the underlying task. See the [cross-project improvement results](retrieval-improvements.md) for paired outcomes, costs and limitations.

@@ -19,6 +19,12 @@ pub struct Symbol {
     pub start_line: usize,
     pub end_line: usize,
     pub signature: String,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub is_test: bool,
+}
+
+fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
@@ -165,4 +171,6 @@ pub struct IndexStats {
     pub updated: usize,
     pub removed: usize,
     pub duration_ms: u128,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub unresolved_config_extends: Vec<crate::project::UnresolvedConfig>,
 }

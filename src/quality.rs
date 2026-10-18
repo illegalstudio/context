@@ -1,3 +1,22 @@
+pub fn is_test_path(path: &str) -> bool {
+    path.split('/').any(|part| {
+        matches!(
+            part.to_ascii_lowercase().as_str(),
+            "test" | "tests" | "spec" | "specs" | "__tests__" | "e2e"
+        ) || part.ends_with("Tests")
+            || part.ends_with(".Test")
+    }) || path.contains(".test.")
+        || path.contains(".spec.")
+        || path.contains("_test.")
+        || path.contains("_spec.")
+        || std::path::Path::new(path)
+            .file_stem()
+            .and_then(|name| name.to_str())
+            .is_some_and(|name| {
+                name.starts_with("test_") || name.ends_with("Test") || name.ends_with("Tests")
+            })
+}
+
 pub fn generated(path: &str, content: &str) -> bool {
     if path
         .split('/')

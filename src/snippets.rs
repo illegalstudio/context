@@ -13,6 +13,7 @@ struct Unit {
     anchor: usize,
     score: f64,
     truncated: bool,
+    priority: u8,
 }
 
 struct Source {
@@ -21,6 +22,7 @@ struct Source {
     units: Vec<Unit>,
     selected: Vec<Unit>,
     weight: f64,
+    budgeted_test: bool,
 }
 
 pub struct Selection {
@@ -55,18 +57,18 @@ fn context_start(lines: &[String], mut start: usize) -> usize {
     start
 }
 
-fn relevance(text: &str, task: &ResolvedTask) -> usize {
+fn evidence(text: &str, task: &ResolvedTask) -> BTreeMap<String, f64> {
     let lexical: BTreeSet<_> = resolver::search_terms(text).into_iter().collect();
     if task.query_terms.is_empty() {
         return task
             .keywords
             .iter()
             .filter(|term| lexical.contains(*term))
-            .count()
-            * 100;
+            .map(|term| (term.clone(), 1.0))
+            .collect();
     }
     let literal: BTreeSet<_> = resolver::words(text).into_iter().collect();
-    let mut sources = BTreeMap::<&str, usize>::new();
+    let mut sources = BTreeMap::<String, f64>::new();
     for term in &task.query_terms {
         let present = if term.origin == crate::terms::Origin::Literal {
             literal.contains(&term.term)
@@ -74,11 +76,41 @@ fn relevance(text: &str, task: &ResolvedTask) -> usize {
             lexical.contains(&term.term)
         };
         if present {
-            let score = sources.entry(&term.source).or_default();
-            *score = (*score).max((term.weight * 100.0).round() as usize);
+            let score = sources.entry(term.source.clone()).or_default();
+            *score = (*score).max(term.weight);
         }
     }
-    sources.values().sum()
+    sources
+}
+
+fn code_lines(lines: &[String]) -> Vec<bool> {
+    let mut block = false;
+    lines
+        .iter()
+        .map(|line| {
+            let mut text = line.trim();
+            if block {
+                let Some((_, rest)) = text.split_once("*/") else {
+                    return false;
+                };
+                text = rest.trim();
+                block = false;
+            }
+            if text.starts_with("/*") {
+                if let Some((_, rest)) = text.split_once("*/") {
+                    text = rest.trim();
+                } else {
+                    block = true;
+                    return false;
+                }
+            }
+            !text.is_empty()
+                && !["//", "<!--", "*"]
+                    .iter()
+                    .any(|prefix| text.starts_with(prefix))
+                && (!text.starts_with('#') || text.starts_with("#["))
+        })
+        .collect()
 }
 
 fn units(
@@ -88,9 +120,45 @@ fn units(
     resolution: &Resolution,
     max_lines: usize,
 ) -> Vec<Unit> {
-    let line_scores: Vec<_> = lines
+    let active = code_lines(lines);
+    let line_evidence: Vec<_> = lines
         .iter()
-        .map(|line| relevance(line, &resolution.task))
+        .map(|line| evidence(line, &resolution.task))
+        .collect();
+    let symbols: Vec<_> = symbols.iter().filter(|s| s.file_path == path).collect();
+    let production = symbols
+        .iter()
+        .any(|symbol| !symbol.is_test && symbol.kind != "class");
+    let mixed_tests = production && symbols.iter().any(|symbol| symbol.is_test);
+    let structured_data = matches!(
+        Path::new(path)
+            .extension()
+            .and_then(|extension| extension.to_str()),
+        Some("json" | "yaml" | "yml" | "toml" | "ini")
+    );
+    let contextual = mixed_tests
+        || crate::quality::is_test_path(path)
+        || crate::discovery::is_config(path)
+        || structured_data;
+    let reference_scores: Vec<usize> = line_evidence
+        .iter()
+        .map(|terms| {
+            terms
+                .values()
+                .map(|weight| (weight * 100.0).round() as usize)
+                .sum()
+        })
+        .collect();
+    let line_scores: Vec<_> = line_evidence
+        .iter()
+        .enumerate()
+        .map(|(index, terms)| {
+            if contextual {
+                terms.values().sum::<f64>() * if active[index] { 1.0 } else { 0.35 }
+            } else {
+                reference_scores[index] as f64 / 100.0
+            }
+        })
         .collect();
     let mut anchors = BTreeMap::<usize, f64>::new();
     for entry in &resolution.stacktrace {
@@ -106,7 +174,7 @@ fn units(
         }
     }
     let mut result = vec![];
-    for symbol in symbols.iter().filter(|s| s.file_path == path) {
+    for symbol in &symbols {
         let start = symbol.start_line.saturating_sub(1).min(lines.len() - 1);
         let end = symbol.end_line.min(lines.len()).max(start + 1);
         let explicit = resolution
@@ -114,13 +182,26 @@ fn units(
             .symbols
             .iter()
             .any(|name| name.eq_ignore_ascii_case(&symbol.name));
-        let name_score = relevance(&symbol.name, &resolution.task);
-        let body_score: usize = line_scores[start..end].iter().sum();
+        let name_terms = evidence(&symbol.name, &resolution.task);
+        let name_score: f64 = if contextual {
+            name_terms.values().sum()
+        } else {
+            name_terms
+                .values()
+                .map(|weight| (weight * 100.0).round() as usize)
+                .sum::<usize>() as f64
+                / 100.0
+        };
+        let body_score: f64 = if contextual {
+            line_scores[start..end].iter().sum()
+        } else {
+            reference_scores[start..end].iter().sum::<usize>() as f64 / 100.0
+        };
         let pinned = anchors
             .range(start..end)
             .map(|(_, score)| *score)
             .fold(0.0_f64, f64::max);
-        if !explicit && pinned == 0.0 && name_score == 0 && body_score == 0 {
+        if !explicit && pinned == 0.0 && name_score == 0.0 && body_score == 0.0 {
             continue;
         }
         let anchor = anchors
@@ -129,27 +210,105 @@ fn units(
             .map(|(line, _)| *line)
             .unwrap_or_else(|| {
                 (start..end)
-                    .max_by_key(|i| (line_scores[*i], std::cmp::Reverse(*i)))
+                    .max_by(|a, b| line_scores[*a].total_cmp(&line_scores[*b]).then(b.cmp(a)))
                     .unwrap_or(start)
             });
         let score = (if explicit { 40.0 } else { 0.0 })
             + pinned
-            + name_score as f64 / 100.0 * 6.0
-            + (body_score as f64 / 100.0).min(8.0)
+            + name_score * 6.0
+            + body_score.min(8.0)
             + if symbol.kind == "class" { 0.0 } else { 3.0 };
-        let mut unit = Unit {
+        let score = score / (1.0 + (end - start) as f64 / 150.0);
+        let score = score
+            * if mixed_tests
+                && symbol.is_test
+                && !explicit
+                && pinned == 0.0
+                && !resolution
+                    .task
+                    .domains
+                    .iter()
+                    .any(|domain| domain == "testing")
+            {
+                0.35
+            } else {
+                1.0
+            };
+        let unit = Unit {
             start: context_start(lines, start),
             end,
             anchor,
-            score: score / (1.0 + (end - start) as f64 / 150.0),
+            score,
             truncated: false,
+            priority: if explicit {
+                3
+            } else if pinned > 0.0 {
+                2
+            } else if mixed_tests
+                && !symbol.is_test
+                && symbol.kind != "class"
+                && !resolution
+                    .task
+                    .domains
+                    .iter()
+                    .any(|domain| domain == "testing")
+            {
+                1
+            } else {
+                0
+            },
         };
         if unit.end - unit.start > max_lines {
-            unit.start = anchor.saturating_sub(max_lines / 3).max(unit.start);
-            unit.end = (unit.start + max_lines).min(end);
-            unit.truncated = true;
+            let width = (max_lines / 3).max(1);
+            let mut points = vec![anchor];
+            let mut covered: BTreeSet<_> = line_evidence[anchor].keys().collect();
+            let mut ranked: Vec<_> = (start..end)
+                .filter(|line| line_scores[*line] > 0.0)
+                .collect();
+            ranked.sort_by(|a, b| line_scores[*b].total_cmp(&line_scores[*a]).then(a.cmp(b)));
+            for point in ranked {
+                if points.len() == 3 {
+                    break;
+                }
+                if !matches!(symbol.kind.as_str(), "class" | "interface")
+                    && points.iter().all(|old| point.abs_diff(*old) >= width)
+                    && line_evidence[point]
+                        .keys()
+                        .any(|term| !covered.contains(term))
+                {
+                    points.push(point);
+                    covered.extend(line_evidence[point].keys());
+                }
+            }
+            if points.len() == 1 {
+                let start = anchor.saturating_sub(max_lines / 3).max(unit.start);
+                result.push(Unit {
+                    start,
+                    end: (start + max_lines).min(end),
+                    truncated: true,
+                    ..unit
+                });
+                continue;
+            }
+            let width = (max_lines / points.len()).max(1);
+            for point in points {
+                let start = point
+                    .saturating_sub(width / 3)
+                    .max(unit.start)
+                    .min(end.saturating_sub(width));
+                result.push(Unit {
+                    start,
+                    end: (start + width).min(end),
+                    anchor: point,
+                    score: unit.score
+                        * (0.8 + 0.2 * line_scores[point] / line_scores[anchor].max(1.0)),
+                    priority: if point == anchor { unit.priority } else { 0 },
+                    truncated: true,
+                });
+            }
+        } else {
+            result.push(unit);
         }
-        result.push(unit);
     }
     for (anchor, score) in anchors {
         if !result.iter().any(|u| u.start <= anchor && anchor < u.end) {
@@ -159,24 +318,52 @@ fn units(
                 anchor,
                 score,
                 truncated: true,
+                priority: 2,
             });
         }
     }
     // Text matches also anchor templates, configuration and unsupported grammars.
-    for (anchor, score) in line_scores
+    let mut text_matches: Vec<_> = line_scores
         .iter()
         .enumerate()
-        .filter(|(_, s)| **s > 0)
-        .take(128)
-    {
+        .filter(|(_, score)| **score > 0.0)
+        .collect();
+    if contextual {
+        text_matches.sort_by(|a, b| b.1.total_cmp(a.1).then(a.0.cmp(&b.0)));
+    }
+    for (anchor, score) in text_matches.into_iter().take(128) {
         if !result.iter().any(|u| u.start <= anchor && anchor < u.end) {
             result.push(Unit {
                 start: anchor.saturating_sub(5),
                 end: (anchor + 10).min(lines.len()),
                 anchor,
-                score: *score as f64 / 100.0,
+                score: *score,
                 truncated: true,
+                priority: 0,
             });
+        }
+    }
+    if crate::discovery::is_config(path) || structured_data {
+        for (start, line) in lines.iter().enumerate().filter(|(index, _)| active[*index]) {
+            let text = line.trim();
+            if text.contains("=>")
+                || text.contains('=')
+                || text.split_once(':').is_some_and(|(key, _)| {
+                    !key.is_empty()
+                        && key.chars().all(|c| {
+                            c.is_alphanumeric() || matches!(c, '_' | '-' | '\'' | '"' | '.')
+                        })
+                })
+            {
+                result.push(Unit {
+                    start,
+                    end: (start + 3).min(lines.len()),
+                    anchor: start,
+                    score: 0.9 + line_scores[start],
+                    truncated: true,
+                    priority: 0,
+                });
+            }
         }
     }
     if result.is_empty() {
@@ -186,6 +373,7 @@ fn units(
             anchor: 0,
             score: 0.5,
             truncated: lines.len() > max_lines.min(40),
+            priority: 0,
         });
     }
     for (start, line) in lines.iter().enumerate() {
@@ -218,12 +406,14 @@ fn units(
                 anchor: start,
                 score: 0.2,
                 truncated: false,
+                priority: 0,
             });
         }
     }
     result.sort_by(|a, b| {
-        b.score
-            .total_cmp(&a.score)
+        b.priority
+            .cmp(&a.priority)
+            .then(b.score.total_cmp(&a.score))
             .then((a.end - a.start).cmp(&(b.end - b.start)))
             .then(a.start.cmp(&b.start))
     });
@@ -362,10 +552,21 @@ pub fn select(
             units: proposals,
             selected: vec![],
             weight: 0.5 + candidate.score,
+            budgeted_test: crate::quality::is_test_path(&candidate.path)
+                && !candidate.reserved
+                && !resolution
+                    .task
+                    .domains
+                    .iter()
+                    .any(|domain| domain == "testing"),
         });
     }
     let available = budget.saturating_sub(tokenizer.count(header));
     let weights: f64 = sources.iter().map(|s| s.weight).sum();
+    let mut restrict_tests = sources.iter().any(|source| source.budgeted_test)
+        && sources.iter().any(|source| !source.budgeted_test);
+    let test_cap = available / 5;
+    let mut test_tokens = 0usize;
     // A single source may use the budget; multiple sources each get at most half.
     let per_file_cap = if sources.len() > 1 {
         available / 2
@@ -383,12 +584,18 @@ pub fn select(
             let target = share.saturating_mul(scale).min(per_file_cap);
             capped &= target == per_file_cap;
             let old = tokenizer.count(&source_markdown(source, &source.selected));
+            let role_allowance = if restrict_tests && source.budgeted_test {
+                test_cap.saturating_sub(test_tokens.saturating_sub(old))
+            } else {
+                usize::MAX
+            };
             let allowance = target
                 .min(
                     budget
                         .saturating_sub(tokenizer.count(&text))
                         .saturating_add(old),
                 )
+                .min(role_allowance)
                 .saturating_sub(4);
             for unit in &source.units {
                 if source
@@ -423,6 +630,10 @@ pub fn select(
                     ));
                 }
                 if tokenizer.count(&trial) <= budget {
+                    if restrict_tests && source.budgeted_test {
+                        test_tokens = test_tokens.saturating_sub(old)
+                            + tokenizer.count(&source_markdown(source, &selected));
+                    }
                     sources[index].selected = selected;
                     text = trial;
                     progress = true;
@@ -431,6 +642,11 @@ pub fn select(
             }
         }
         if capped && !progress {
+            // Once implementation cannot grow, tests can use the remaining capacity.
+            if restrict_tests {
+                restrict_tests = false;
+                continue;
+            }
             break;
         }
         scale = scale.saturating_mul(2);

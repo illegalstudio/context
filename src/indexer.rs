@@ -30,34 +30,18 @@ pub fn index(
     let skipped = database.skipped_files()?;
     previous.extend(skipped.clone());
     let custom_ignore = root.join(".ctxignore").is_file();
+    let policy = crate::source::SourcePolicy::new(root)?;
+    let scan_root = root.to_path_buf();
     let mut walker = WalkBuilder::new(root);
     walker
         .standard_filters(false)
         .follow_links(false)
         .add_custom_ignore_filename(".ctxignore")
         .filter_entry(move |entry| {
-            let name = entry.file_name().to_string_lossy();
-            if entry.depth() > 0 && matches!(name.as_ref(), ".git" | ".context") {
-                return false;
-            }
-            if !custom_ignore
-                && entry.depth() > 0
-                && matches!(
-                    name.as_ref(),
-                    "node_modules"
-                        | "vendor"
-                        | "target"
-                        | ".venv"
-                        | "venv"
-                        | "__pycache__"
-                        | "dist"
-                        | "build"
-                        | "coverage"
-                )
-            {
-                return false;
-            }
-            true
+            entry.depth() == 0
+                || entry.path().strip_prefix(&scan_root).is_ok_and(|path| {
+                    policy.allow(path, entry.file_type().is_some_and(|kind| kind.is_dir()))
+                })
         });
     let mut current = BTreeMap::new();
     let mut project_paths = BTreeSet::new();
@@ -187,10 +171,9 @@ pub fn index(
     };
     let aliases = aliases(root)?;
     database.set_framework_scopes(crate::frameworks::from_paths(root, project_paths.iter())?);
-    database.set_project_map(crate::project::ProjectMap::load(
-        root,
-        project_paths.iter(),
-    )?);
+    let project = crate::project::ProjectMap::load(root, project_paths.iter())?;
+    let unresolved_config_extends = project.unresolved_tsconfig_extends.clone();
+    database.set_project_map(project);
     let (updated, removed) = database.update(
         changes,
         &removed,
@@ -206,6 +189,7 @@ pub fn index(
         updated,
         removed,
         duration_ms: start.elapsed().as_millis(),
+        unresolved_config_extends,
     })
 }
 

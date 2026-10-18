@@ -169,6 +169,14 @@ pub fn initialize(root: &Path, force: bool) -> Result<()> {
                 }
             }
         }
+        let exceptions = crate::source::repository_exceptions(root)?;
+        if !exceptions.is_empty() {
+            patterns.push_str("\n# Repository source exceptions in dependency directories\n");
+            for pattern in exceptions {
+                patterns.push_str(&pattern);
+                patterns.push('\n');
+            }
+        }
         fs::write(ignore_path, patterns)?;
     }
     let gitignore = root.join(".gitignore");

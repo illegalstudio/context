@@ -36,15 +36,7 @@ fn add(
 }
 
 pub fn is_test(path: &str) -> bool {
-    path.split('/')
-        .any(|s| matches!(s, "test" | "tests" | "spec" | "specs" | "__tests__" | "e2e"))
-        || path.contains(".test.")
-        || path.contains(".spec.")
-        || path.contains("_test.")
-        || Path::new(path)
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .is_some_and(|s| s.ends_with("Test") || s.starts_with("test_"))
+    crate::quality::is_test_path(path)
 }
 
 pub fn is_config(path: &str) -> bool {
@@ -486,6 +478,49 @@ fn build(
         );
     }
     if graph_depth > 0 {
+        for mut contribution in
+            crate::behavior::related(&seeds, &graph_allowed, &dependencies, &scopes)
+        {
+            contribution.evidence.terms = contribution
+                .evidence
+                .source_path
+                .as_ref()
+                .and_then(|source| scores.get(source))
+                .into_iter()
+                .flat_map(|score| &score.evidence)
+                .filter(|evidence| {
+                    evidence.signal != "shared_symbol"
+                        && (evidence.signal.ends_with("_path")
+                            || evidence.signal.ends_with("_symbol"))
+                })
+                .flat_map(|evidence| evidence.terms.iter().cloned())
+                .collect::<BTreeSet<_>>()
+                .into_iter()
+                .collect();
+            let implementation = contribution
+                .evidence
+                .source_path
+                .as_ref()
+                .and_then(|source| scores.get(source))
+                .map_or(0.0, |score| score.value);
+            let existing = scores
+                .get(&contribution.path)
+                .map_or(0.0, |score| score.value);
+            let amount = if task.domains.iter().any(|domain| domain == "testing") {
+                contribution.amount
+            } else {
+                contribution
+                    .amount
+                    .min((implementation * 0.9 - existing).max(0.0))
+            };
+            record(
+                &mut scores,
+                &contribution.path,
+                amount,
+                "direct behavior test for a relevant implementation",
+                contribution.evidence,
+            );
+        }
         for contribution in crate::graph::shared_references(
             &db.references()?,
             &symbol_files,

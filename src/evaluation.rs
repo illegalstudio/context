@@ -77,6 +77,8 @@ pub struct CaseReport {
     pub indexed_symbols: usize,
     #[serde(default)]
     pub indexed_dependencies: usize,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub unresolved_config_extends: Vec<crate::project::UnresolvedConfig>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -122,7 +124,8 @@ fn matches(path: &str, expected: &str) -> bool {
 }
 
 fn copy_project(source: &Path, target: &Path) -> Result<()> {
-    let custom = source.join(".ctxignore").is_file();
+    let policy = crate::source::SourcePolicy::new(source)?;
+    let scan_root = source.to_path_buf();
     let mut walker = ignore::WalkBuilder::new(source);
     walker
         .standard_filters(false)
@@ -130,20 +133,9 @@ fn copy_project(source: &Path, target: &Path) -> Result<()> {
         .add_custom_ignore_filename(".ctxignore")
         .filter_entry(move |entry| {
             entry.depth() == 0
-                || !matches!(entry.file_name().to_str(), Some(".git" | ".context"))
-                    && (custom
-                        || !matches!(
-                            entry.file_name().to_str(),
-                            Some(
-                                "node_modules"
-                                    | "vendor"
-                                    | "target"
-                                    | "dist"
-                                    | "build"
-                                    | ".venv"
-                                    | "venv"
-                            )
-                        ))
+                || entry.path().strip_prefix(&scan_root).is_ok_and(|path| {
+                    policy.allow(path, entry.file_type().is_some_and(|kind| kind.is_dir()))
+                })
         });
     for entry in walker.build() {
         let entry = entry?;
@@ -288,7 +280,7 @@ pub fn evaluate_method(
         scoring::validate_annotations(case, &root)?;
         let mut database = Database::open(&root)?;
         let started = Instant::now();
-        indexer::index(&root, &mut database, config, false)?;
+        let index_stats = indexer::index(&root, &mut database, config, false)?;
         let files = database.files()?;
         let source_hash = blake3::hash(&serde_json::to_vec(&(
             files
@@ -409,6 +401,7 @@ pub fn evaluate_method(
             forbidden_tokens: details.forbidden_tokens,
         };
         reports.push(CaseReport {
+            unresolved_config_extends: index_stats.unresolved_config_extends,
             name: case.name.clone(),
             split: case.split.clone(),
             source_hash,

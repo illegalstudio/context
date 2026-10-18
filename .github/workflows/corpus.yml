@@ -6,7 +6,7 @@ on:
       suite:
         description: Frozen corpus to measure
         type: choice
-        options: [primary, domains]
+        options: [primary, domains, validation]
         default: primary
       split:
         description: Repository split to measure
@@ -34,7 +34,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import json, os
-          path = 'benchmarks/corpus-domains.json' if os.environ['CORPUS_SUITE'] == 'domains' else 'benchmarks/corpus.json'
+          path = {'primary': 'benchmarks/corpus.json', 'domains': 'benchmarks/corpus-domains.json', 'validation': 'benchmarks/corpus-validation.json'}[os.environ['CORPUS_SUITE']]
           with open(path) as source:
               manifest = json.load(source)
           languages = sorted({p['language'] for p in manifest['projects'] if os.environ['CORPUS_SPLIT'] in ('all', p['split'])})

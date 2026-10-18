@@ -1,0 +1,930 @@
+{
+  "version": 1,
+  "protocol": {
+    "description": "Fresh repository-level evaluation reserved before retrieval changes following the original 18-repository baseline. Includes eight structural parser languages plus C# and Swift text fallback. Agent-reviewed sparse annotations, not independent/exhaustive ground truth.",
+    "budgets": [
+      8000,
+      16000,
+      32000
+    ],
+    "tokenizer": "o200k_base",
+    "maxFiles": 25,
+    "maxLinesPerFile": 300,
+    "maxFileSize": 1048576,
+    "graphDepth": 2
+  },
+  "projects": [
+    {
+      "id": "cakephp/cakephp",
+      "repository": "cakephp/cakephp",
+      "url": "https://github.com/cakephp/cakephp",
+      "language": "php",
+      "framework": "cakephp",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "05475ebc442ca4a62740ef82d3bb6e202783aea34779f8ea901c2ebd8f501623",
+          "url": "https://github.com/cakephp/cakephp/blob/f7a4e8ec6b3be4673397ebb4c29769ab68e5f94f/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "encode/starlette",
+      "repository": "encode/starlette",
+      "url": "https://github.com/encode/starlette",
+      "language": "python",
+      "framework": "starlette",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "dcb95677a02240243187e964f941847d19b17821cf99e5afae684fab328c19bf",
+          "url": "https://github.com/encode/starlette/blob/4ac5302dd465e8ca952b89daacf1bb8a5f571cf2/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "id": "fastify/fastify",
+      "repository": "fastify/fastify",
+      "url": "https://github.com/fastify/fastify",
+      "language": "javascript",
+      "framework": "fastify",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "23c91863859171455a536380991b4160fee4e19e2d8dc353ecf7143cc4e53ca2",
+          "url": "https://github.com/fastify/fastify/blob/9e9f61a6bf092bbd3cf8d10b792432aa8be085af/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "trpc/trpc",
+      "repository": "trpc/trpc",
+      "url": "https://github.com/trpc/trpc",
+      "language": "typescript",
+      "framework": "trpc",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "e714dd84c8fa242600844b05d317a31003423723178c1f1603dbfad1bc68d906",
+          "url": "https://github.com/trpc/trpc/blob/fcc6bca0ece2762e393e6d8c8527bbaa17a878d2/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "gohugoio/hugo",
+      "repository": "gohugoio/hugo",
+      "url": "https://github.com/gohugoio/hugo",
+      "language": "go",
+      "framework": "hugo",
+      "kind": "cli",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "url": "https://github.com/gohugoio/hugo/blob/683a877f0cce4f20f1563f6a67a304dd96341a93/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "nushell/nushell",
+      "repository": "nushell/nushell",
+      "url": "https://github.com/nushell/nushell",
+      "language": "rust",
+      "framework": "nushell",
+      "kind": "cli",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "ff5dcaaba6140ec57cafdd4f707cd0d329e727477cf7d5b9ba7a244ec2678b79",
+          "url": "https://github.com/nushell/nushell/blob/cf0c9a7734f11c376ec78e8547f01810e3b00490/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "hanami/router",
+      "repository": "hanami/router",
+      "url": "https://github.com/hanami/router",
+      "language": "ruby",
+      "framework": "hanami",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "54a857c06187cbafe6811cdcb1a533835d4564bc40af12fbea576850ce507e65",
+          "url": "https://github.com/hanami/router/blob/43b4a1e40e1632fb325ba97095ea18944c7e0ecd/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "micronaut-projects/micronaut-core",
+      "repository": "micronaut-projects/micronaut-core",
+      "url": "https://github.com/micronaut-projects/micronaut-core",
+      "language": "java",
+      "framework": "micronaut",
+      "kind": "framework-monorepo",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "c98ecc8ef79e7a1a14a0767e3321b681dd25f9307625724f2b299f5e75e99520",
+          "url": "https://github.com/micronaut-projects/micronaut-core/blob/efb4accf6a925832093d1a8a695b4c0d11ee629d/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "dotnet/command-line-api",
+      "repository": "dotnet/command-line-api",
+      "url": "https://github.com/dotnet/command-line-api",
+      "language": "csharp",
+      "framework": "dotnet-cli",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "58fd5ebf25d75b5bb5f4cd407a9fef3befd3641e1af90a1d0716618e6430fc19",
+          "url": "https://github.com/dotnet/command-line-api/blob/857b4c3eee18f878c1782771b5b961ac66cd8906/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "id": "vapor/vapor",
+      "repository": "vapor/vapor",
+      "url": "https://github.com/vapor/vapor",
+      "language": "swift",
+      "framework": "vapor",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "eca7cc8beb0840e78a7007e9df1530132c1940d890006bbf0b51bdff089d927d",
+          "url": "https://github.com/vapor/vapor/blob/78324ded747529bc36e30ae4134816d3cc593c4d/LICENSE"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "cakephp--cakephp-1",
+      "project": "cakephp/cakephp",
+      "split": "eval",
+      "revision": "f7a4e8ec6b3be4673397ebb4c29769ab68e5f94f",
+      "fixCommit": "67e1d5398a85f60cf6341f2d7ba6faddc5436c64",
+      "archiveSha256": "93eab45559e029e46b08307cd1c2aff867e4a6e996cf9e904c13ae600ac56d23",
+      "task": "SQL identifiers inside distinct expressions lose quoting or become quoted twice when the same query is compiled again.",
+      "category": "database",
+      "expectedFiles": [
+        "src/Database/IdentifierQuoter.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/Database/IdentifierQuoter.php",
+          "start": 83,
+          "end": 87,
+          "sha256": "b524a9761db2ed9290449051486e634ac136c6fb85580ba58f7eef670d3bd437"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/Utility/Inflector.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/cakephp/cakephp/commit/67e1d5398a85f60cf6341f2d7ba6faddc5436c64",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "cakephp--cakephp-2",
+      "project": "cakephp/cakephp",
+      "split": "eval",
+      "revision": "1bd6469a8f536beeb5bfa3b857306efefb96be63",
+      "fixCommit": "f06b94897f798d3edd414b1f3369728f49ff5a81",
+      "archiveSha256": "a78467754d2740e0f42171b96ab7c4da3bb171982ff4bdba011dd5e631fcd08b",
+      "task": "Extracting an element with numeric key zero from nested data returns the whole structure instead of the requested value.",
+      "category": "data",
+      "expectedFiles": [
+        "src/Utility/Hash.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/Utility/Hash.php",
+          "start": 124,
+          "end": 128,
+          "sha256": "707f67d88380ab2a32ddda30ef58bcdb8879afd97062c31bf9472ff8bba1653c"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/Utility/Inflector.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/cakephp/cakephp/commit/f06b94897f798d3edd414b1f3369728f49ff5a81",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "encode--starlette-1",
+      "project": "encode/starlette",
+      "split": "eval",
+      "revision": "4ac5302dd465e8ca952b89daacf1bb8a5f571cf2",
+      "fixCommit": "bc833498bbcb1d0acc8dc328a037d28f08e0dc4b",
+      "archiveSha256": "80365cc3ec6c94ed6a1dfbdbaaa3d071ab110fd6ab2a90de90bef2c94caefedd",
+      "task": "A conditional request for a static resource sends a body when the cache validator is an unconditional wildcard.",
+      "category": "http",
+      "expectedFiles": [
+        "starlette/staticfiles.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "starlette/staticfiles.py",
+          "start": 211,
+          "end": 215,
+          "sha256": "1ac737d88dd3a31d1176721a657c8f5ed74dce82209aba9708c7867ea5f8235b"
+        }
+      ],
+      "supportingFiles": [
+        "tests/test_staticfiles.py"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "starlette/formparsers.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/encode/starlette/commit/bc833498bbcb1d0acc8dc328a037d28f08e0dc4b",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "encode--starlette-2",
+      "project": "encode/starlette",
+      "split": "eval",
+      "revision": "0fcaff1d1e1d16a702a06b40d20092cc9d84d4a3",
+      "fixCommit": "b4c1d181612ca0738177cff1134237cc1ffd408e",
+      "archiveSha256": "98b5f3e48363bb30e2636f1e4e10e26c8f66f69a9e74a50390b6881c2e310ec0",
+      "task": "An empty text frame is rejected by the WebSocket message decoder instead of reaching the application as an empty message.",
+      "category": "websocket",
+      "expectedFiles": [
+        "starlette/endpoints.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "starlette/endpoints.py",
+          "start": 91,
+          "end": 95,
+          "sha256": "6a791082b83d4d1e48c9ac59ba535cb67fd5966a198f7496d49e984fa5173c86"
+        },
+        {
+          "path": "starlette/endpoints.py",
+          "start": 115,
+          "end": 119,
+          "sha256": "642bce25079898a6d5dcf55572df6af84506b908fcd920f6a49693d62edd09ae"
+        }
+      ],
+      "supportingFiles": [
+        "tests/test_endpoints.py"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "starlette/formparsers.py"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/encode/starlette/commit/b4c1d181612ca0738177cff1134237cc1ffd408e",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "fastify--fastify-1",
+      "project": "fastify/fastify",
+      "split": "eval",
+      "revision": "9e9f61a6bf092bbd3cf8d10b792432aa8be085af",
+      "fixCommit": "37df44a421817e7bb048fce834bf691abb0999d6",
+      "archiveSha256": "ce72d2d8b68d1259ae445fa369563f80a96e177efd03f29e0b472a43eddc1dba",
+      "task": "A synchronous exception from a custom request-body parser escapes the normal error response handling.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/content-type-parser.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/content-type-parser.js",
+          "start": 223,
+          "end": 227,
+          "sha256": "f9857371c8a54bdfc8a572060e500956ffd8e133e58a013ab715937090dacdf3"
+        },
+        {
+          "path": "lib/content-type-parser.js",
+          "start": 318,
+          "end": 322,
+          "sha256": "3274fbca62d858b7ff869e94f4d7f723e34961c07b061dae8583252454497f02"
+        }
+      ],
+      "supportingFiles": [
+        "test/content-parser.test.js"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "lib/req-id-gen-factory.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/fastify/fastify/commit/37df44a421817e7bb048fce834bf691abb0999d6",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "fastify--fastify-2",
+      "project": "fastify/fastify",
+      "split": "eval",
+      "revision": "f736849a10a9b2ca57fb09437feb8294cda76234",
+      "fixCommit": "9e9f61a6bf092bbd3cf8d10b792432aa8be085af",
+      "archiveSha256": "ac770335d482c7cf501b2c0c77d00f0b65dab310afa049366bfacfdf5eb000ba",
+      "task": "Errors carrying out-of-range or non-numeric HTTP status values produce invalid responses instead of falling back to an internal server error.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/error-handler.js",
+        "lib/error-status.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/error-handler.js",
+          "start": 135,
+          "end": 139,
+          "sha256": "d2623bfbdb35d08ffbbbd768b253cb1b6f0ad54e003de0da0ea2bce34f6537d7"
+        },
+        {
+          "path": "lib/error-status.js",
+          "start": 7,
+          "end": 11,
+          "sha256": "b109d5a833cbf9f00dba9e723b6ff739d38e00ad03e6d5e030ab3e8116545b69"
+        }
+      ],
+      "supportingFiles": [
+        "test/diagnostics-channel/error-status.test.js",
+        "test/reply-error.test.js"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "lib/req-id-gen-factory.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/fastify/fastify/commit/9e9f61a6bf092bbd3cf8d10b792432aa8be085af",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "trpc--trpc-1",
+      "project": "trpc/trpc",
+      "split": "eval",
+      "revision": "fcc6bca0ece2762e393e6d8c8527bbaa17a878d2",
+      "fixCommit": "8b649ad874a8fe97c73962d4617912231b975736",
+      "archiveSha256": "3c8ac0c259aaec633655efaa8975de2482eeb747a3c8769c48feefdcff2f79d2",
+      "task": "A batched streaming response hangs when the connection closes before all promised values arrive.",
+      "category": "streaming",
+      "expectedFiles": [
+        "packages/server/src/unstable-core-do-not-import/stream/jsonl.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/server/src/unstable-core-do-not-import/stream/jsonl.ts",
+          "start": 549,
+          "end": 553,
+          "sha256": "687144d2ec116899a31127d8c7220b39a0446e6ef32dd4d094e982b6ee132819"
+        },
+        {
+          "path": "packages/server/src/unstable-core-do-not-import/stream/jsonl.ts",
+          "start": 564,
+          "end": 568,
+          "sha256": "bbdc2b5aa483cfdff768b4cecd2515f71ffd283d04a32aab1b5e9cca9902c142"
+        }
+      ],
+      "supportingFiles": [
+        "packages/server/src/unstable-core-do-not-import/stream/jsonl.test.ts"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "packages/react-query/src/internals/getQueryKey.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/trpc/trpc/commit/8b649ad874a8fe97c73962d4617912231b975736",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "trpc--trpc-2",
+      "project": "trpc/trpc",
+      "split": "eval",
+      "revision": "6408c54ba9bea7b18c39be3a7abd79c8841a2333",
+      "fixCommit": "6a118b0be9bc9ba4a899c545edbcfdacfc504fad",
+      "archiveSha256": "0ea7ff6ebbf098d2435ed6b6ca2f473fb204c01f5309e0154bd0ce9c634be75c",
+      "task": "A procedure lookup loads an unrelated lazy router when two route prefixes share the same initial characters.",
+      "category": "routing",
+      "expectedFiles": [
+        "packages/server/src/unstable-core-do-not-import/router.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/server/src/unstable-core-do-not-import/router.ts",
+          "start": 379,
+          "end": 383,
+          "sha256": "9c039e78a9d7337a2ea4b588ed45e5c86a3470fdb1215f5d9081e76720870c4a"
+        }
+      ],
+      "supportingFiles": [
+        "packages/server/src/unstable-core-do-not-import/router.test.ts"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "packages/react-query/src/internals/getQueryKey.ts"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/trpc/trpc/commit/6a118b0be9bc9ba4a899c545edbcfdacfc504fad",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "gohugoio--hugo-1",
+      "project": "gohugoio/hugo",
+      "split": "eval",
+      "revision": "683a877f0cce4f20f1563f6a67a304dd96341a93",
+      "fixCommit": "85fb23f1c23a0acc9c9094dc033c19ec2c0d2a2b",
+      "archiveSha256": "abb580fff508fe9303058f54c4a452802ff4405deb381a6d122e5acdd737883c",
+      "task": "A large number of page-render failures makes the site build hang instead of finishing with errors.",
+      "category": "rendering",
+      "expectedFiles": [
+        "hugolib/site_render.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "hugolib/site_render.go",
+          "start": 95,
+          "end": 99,
+          "sha256": "d65b7ce817bed9de248ca8416960bc4cb8c8ce70e15efb11771ee8d0a3acaa0c"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "resources/images/smartcrop.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/gohugoio/hugo/commit/85fb23f1c23a0acc9c9094dc033c19ec2c0d2a2b",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "gohugoio--hugo-2",
+      "project": "gohugoio/hugo",
+      "split": "eval",
+      "revision": "09fa49be210071f44326252a436d9e1169820d78",
+      "fixCommit": "07b9fba11ba4e781ee87ecca56e78bde5775950c",
+      "archiveSha256": "dac14ab48262869d6da5de3b96806841e0c3b339d65e135c392802d82a603762",
+      "task": "Cleaning the output directory fails when the configured static-file directory does not exist.",
+      "category": "filesystem",
+      "expectedFiles": [
+        "commands/commandeer.go",
+        "commands/hugobuilder.go"
+      ],
+      "expectedRanges": [
+        {
+          "path": "commands/commandeer.go",
+          "start": 610,
+          "end": 614,
+          "sha256": "767f47a1d1a6b303b0b89e419a9c9c366dd1d3fe88fa0ad9f4d03911b4f4fda7"
+        },
+        {
+          "path": "commands/hugobuilder.go",
+          "start": 479,
+          "end": 483,
+          "sha256": "e3d93b66a10e1a8b8bf11e96d5e00ed16a4bc9b73339feb054b71d7918d0247b"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "resources/images/smartcrop.go"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/gohugoio/hugo/commit/07b9fba11ba4e781ee87ecca56e78bde5775950c",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "nushell--nushell-1",
+      "project": "nushell/nushell",
+      "split": "eval",
+      "revision": "cf0c9a7734f11c376ec78e8547f01810e3b00490",
+      "fixCommit": "2529074fc8c1c434d9102013b21b6e1942b4e873",
+      "archiveSha256": "f751893c85986eb9db5a9df71e2653b389c6637f09a80f0e29113f5a1fbb9901",
+      "task": "Converting extreme integer, floating-point and duration values to text can overflow or produce inaccurate representations.",
+      "category": "conversion",
+      "expectedFiles": [
+        "crates/nu-command/src/conversions/into/string.rs",
+        "crates/nu-protocol/src/value/duration.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "crates/nu-command/src/conversions/into/string.rs",
+          "start": 236,
+          "end": 240,
+          "sha256": "ffb9eaabc6a030ae33216528a0a490f3538006a6b08c8a82d07e54448ae19257"
+        },
+        {
+          "path": "crates/nu-command/src/conversions/into/string.rs",
+          "start": 282,
+          "end": 286,
+          "sha256": "7ae2fede0e0ff289852d4746f36f93d707195b716f568d7e9e570b9e706bb5ee"
+        },
+        {
+          "path": "crates/nu-command/src/conversions/into/string.rs",
+          "start": 301,
+          "end": 305,
+          "sha256": "ad500ad93c6759ddd0de4a49b3bb208ba132a526a13de58b174f28f68399f253"
+        },
+        {
+          "path": "crates/nu-command/src/conversions/into/string.rs",
+          "start": 385,
+          "end": 389,
+          "sha256": "23a75993826b951387d04c6cafe256830d87a63fb3949abedcf7b7325ad2a2b0"
+        },
+        {
+          "path": "crates/nu-protocol/src/value/duration.rs",
+          "start": 68,
+          "end": 72,
+          "sha256": "95d1f5c0fe5d934b67c714ccf76010fd88cfe5ac82f3b203b33da6562aa8df3f"
+        }
+      ],
+      "supportingFiles": [
+        "crates/nu-command/tests/commands/into_duration.rs",
+        "crates/nu-command/tests/commands/str_/into_string.rs"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "crates/nu-command/src/platform/term/term_size.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/nushell/nushell/commit/2529074fc8c1c434d9102013b21b6e1942b4e873",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "nushell--nushell-2",
+      "project": "nushell/nushell",
+      "split": "eval",
+      "revision": "b862a8121bb681527cb70bbc94d16bf7b800b31a",
+      "fixCommit": "b1bf5c4739a98bda700ed20975dc2375dfe3405f",
+      "archiveSha256": "044161a20712caf81a5fc169801a1f769967a892c6a75a3ba6128b8bac84d3fe",
+      "task": "A bare column name after a boolean conjunction in a row-filter condition is treated as a string instead of reading that column.",
+      "category": "parsing",
+      "expectedFiles": [
+        "crates/nu-parser/src/parse_expressions.rs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "crates/nu-parser/src/parse_expressions.rs",
+          "start": 1489,
+          "end": 1493,
+          "sha256": "9737cfe7a4e2f382e5d94e40d377e961de8c8fdabeaa0b5f2b3c0eb2d15ec1eb"
+        },
+        {
+          "path": "crates/nu-parser/src/parse_expressions.rs",
+          "start": 1525,
+          "end": 1529,
+          "sha256": "dab0f973b92db194b506903adda6be8db0514f38449a9e889db7cd741374edce"
+        }
+      ],
+      "supportingFiles": [
+        "crates/nu-command/tests/commands/where_.rs"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "crates/nu-command/src/platform/term/term_size.rs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/nushell/nushell/commit/b1bf5c4739a98bda700ed20975dc2375dfe3405f",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "hanami--router-1",
+      "project": "hanami/router",
+      "split": "eval",
+      "revision": "43b4a1e40e1632fb325ba97095ea18944c7e0ecd",
+      "fixCommit": "32265594d2563fa44be38221d03c3e19d96dbbc6",
+      "archiveSha256": "7565700d6d4a8521470b9295ed067799ffe728b987213ce6ee10b6a8e22a6f33",
+      "task": "Reading request parameters consumes a JSON or other non-form body before the application can read the raw payload.",
+      "category": "http",
+      "expectedFiles": [
+        "lib/hanami/router.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/hanami/router.rb",
+          "start": 114,
+          "end": 118,
+          "sha256": "75bdd637200502e62d6cd204f686d1384e0dd483797d949735f2f799bb60e379"
+        },
+        {
+          "path": "lib/hanami/router.rb",
+          "start": 685,
+          "end": 689,
+          "sha256": "c88b2d8351e4ee70ccd687c1e86aba943c87ae5138d2b2f98827565b6d57c2a9"
+        },
+        {
+          "path": "lib/hanami/router.rb",
+          "start": 1037,
+          "end": 1041,
+          "sha256": "0bea939320bba243801fb01a910cad223cea61cd66054f6cf77ec74568106c88"
+        },
+        {
+          "path": "lib/hanami/router.rb",
+          "start": 1043,
+          "end": 1046,
+          "sha256": "42f70fee1a8f0de3f754e17cab354c91d623ae9a65b211da09289153d700639f"
+        }
+      ],
+      "supportingFiles": [
+        "spec/integration/hanami/router/params_spec.rb"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "lib/hanami/router/inspector.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/hanami/router/commit/32265594d2563fa44be38221d03c3e19d96dbbc6",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "hanami--router-2",
+      "project": "hanami/router",
+      "split": "eval",
+      "revision": "dc6bbc2e4aba6c72fe15ad3e6d2fde4e0a694df6",
+      "fixCommit": "9fd499a585ac4a81f33b131fced6c8816bbb33fa",
+      "archiveSha256": "6b904ae04eefbb1a2013ca5fed849792c34d6d99e9698dfa05dcc9f5464cd59a",
+      "task": "An application mounted below a variable path prefix receives the wrong script base path, so generated links lose the resolved prefix.",
+      "category": "routing",
+      "expectedFiles": [
+        "lib/hanami/router/mounted_path.rb"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/hanami/router/mounted_path.rb",
+          "start": 15,
+          "end": 19,
+          "sha256": "baf0be18bc0b573ce70c2693473a2a00079e583d9d3f81fcc9660dfa83d82475"
+        }
+      ],
+      "supportingFiles": [
+        "spec/unit/hanami/router/mounted_path_spec.rb"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "lib/hanami/router/inspector.rb"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/hanami/router/commit/9fd499a585ac4a81f33b131fced6c8816bbb33fa",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "micronaut-projects--micronaut-core-1",
+      "project": "micronaut-projects/micronaut-core",
+      "split": "eval",
+      "revision": "efb4accf6a925832093d1a8a695b4c0d11ee629d",
+      "fixCommit": "011ab8a5d0ee3dc8c055e797b2e6abe0d1c2b00c",
+      "archiveSha256": "9960b68c7fa23c180b74fb712d545c5d1a60d6fdf06cef7f4100458d33dd8095",
+      "task": "Text request bodies are decoded using response charset preferences, corrupting non-ASCII input.",
+      "category": "http",
+      "expectedFiles": [
+        "http/src/main/java/io/micronaut/http/body/StringBodyReader.java",
+        "http/src/main/java/io/micronaut/http/body/TextPlainObjectBodyReader.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "http/src/main/java/io/micronaut/http/body/StringBodyReader.java",
+          "start": 57,
+          "end": 61,
+          "sha256": "244be34df8ed358dd9e6af34f0401cd1f61c76474d98a986aded5f67a5d2e1ff"
+        },
+        {
+          "path": "http/src/main/java/io/micronaut/http/body/StringBodyReader.java",
+          "start": 71,
+          "end": 75,
+          "sha256": "5d284f32344964ab841ab352c00a48cf1e66ea744433ad65f4a2f22a16206c5a"
+        },
+        {
+          "path": "http/src/main/java/io/micronaut/http/body/TextPlainObjectBodyReader.java",
+          "start": 70,
+          "end": 74,
+          "sha256": "5dc0d05ba1802363f94f9eb559d84812ebf5ef7b542c76de176e0ea589bf2cdd"
+        },
+        {
+          "path": "http/src/main/java/io/micronaut/http/body/TextPlainObjectBodyReader.java",
+          "start": 79,
+          "end": 83,
+          "sha256": "bea6d481e9518020871d1e7f981591eb27827d047ede266e5571cec883453b3c"
+        },
+        {
+          "path": "http/src/main/java/io/micronaut/http/body/TextPlainObjectBodyReader.java",
+          "start": 93,
+          "end": 97,
+          "sha256": "1e91b014978b079266e2286ba5ac08469ce256a24d05e87ee9672128f925058f"
+        },
+        {
+          "path": "http/src/main/java/io/micronaut/http/body/StringBodyReader.java",
+          "start": 83,
+          "end": 87,
+          "sha256": "0d4f552148a00894dedcfd81f2fe4172273c4d8805a6e9ae4ed26ffe7582219d"
+        },
+        {
+          "path": "http/src/main/java/io/micronaut/http/body/TextPlainObjectBodyReader.java",
+          "start": 97,
+          "end": 101,
+          "sha256": "0d4f552148a00894dedcfd81f2fe4172273c4d8805a6e9ae4ed26ffe7582219d"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "http/src/main/java/io/micronaut/http/cookie/SameSite.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/micronaut-projects/micronaut-core/commit/011ab8a5d0ee3dc8c055e797b2e6abe0d1c2b00c",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "micronaut-projects--micronaut-core-2",
+      "project": "micronaut-projects/micronaut-core",
+      "split": "eval",
+      "revision": "1af22f98ac8c0c8dd0dc919e2c892a6a2dcf1eb7",
+      "fixCommit": "de22feee4457112bf44844bd45361a1412d12178",
+      "archiveSha256": "897350882e7b6213fda159e509d1859aeeaaaaa8ae516d24445356be0f9d7b24",
+      "task": "A failure while encoding an HTTP response bypasses the configured exception handlers and error routes.",
+      "category": "http",
+      "expectedFiles": [
+        "http-server/src/main/java/io/micronaut/http/server/ResponseLifecycle.java"
+      ],
+      "expectedRanges": [
+        {
+          "path": "http-server/src/main/java/io/micronaut/http/server/ResponseLifecycle.java",
+          "start": 124,
+          "end": 128,
+          "sha256": "387c39b4ab5fe96c21997b69e5675203387a27de200259c5cf20134972b8eb91"
+        },
+        {
+          "path": "http-server/src/main/java/io/micronaut/http/server/ResponseLifecycle.java",
+          "start": 666,
+          "end": 670,
+          "sha256": "4160f8b82beafaca7d15ae5509a417614374edf1c976a0583299178d9d1f7514"
+        },
+        {
+          "path": "http-server/src/main/java/io/micronaut/http/server/ResponseLifecycle.java",
+          "start": 711,
+          "end": 715,
+          "sha256": "a81992acf57ac16229d8f47ff787c8d2ed00b70db449ce114628e0546c97958e"
+        }
+      ],
+      "supportingFiles": [
+        "buffer-netty/src/test/java/io/micronaut/buffer/netty/NettyReadBufferTest.java",
+        "http-server-netty/src/test/groovy/io/micronaut/http/server/netty/errors/ErrorSpec.groovy",
+        "http-server-netty/src/test/java/io/micronaut/http/server/netty/WriterErrorHandlingTest.java",
+        "http-server/src/test/java/io/micronaut/http/server/ResponseLifecycleWriteErrorTest.java"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "http/src/main/java/io/micronaut/http/cookie/SameSite.java"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/micronaut-projects/micronaut-core/commit/de22feee4457112bf44844bd45361a1412d12178",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "dotnet--command-line-api-1",
+      "project": "dotnet/command-line-api",
+      "split": "eval",
+      "revision": "857b4c3eee18f878c1782771b5b961ac66cd8906",
+      "fixCommit": "99db1e31826f24ec672efe70b36074a59464c29a",
+      "archiveSha256": "9486cf11ca3b5d43a384db0b19cffcdc6d60f319a68ac93d13e2a4763ec5a139",
+      "task": "An option value equal to the executable name is incorrectly removed as if it were the command name.",
+      "category": "cli",
+      "expectedFiles": [
+        "src/System.CommandLine/Parsing/StringExtensions.cs"
+      ],
+      "expectedRanges": [
+        {
+          "path": "src/System.CommandLine/Parsing/StringExtensions.cs",
+          "start": 278,
+          "end": 282,
+          "sha256": "a521c5ebb8cb407150f2b35ab4fd2fdf04427a04cfb1b25c879471aadb096937"
+        }
+      ],
+      "supportingFiles": [
+        "src/System.CommandLine.Tests/ParserTests.RootCommandAndArg0.cs"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "src/System.CommandLine/Help/HelpContext.cs"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/dotnet/command-line-api/commit/99db1e31826f24ec672efe70b36074a59464c29a",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    },
+    {
+      "id": "vapor--vapor-1",
+      "project": "vapor/vapor",
+      "split": "eval",
+      "revision": "78324ded747529bc36e30ae4134816d3cc593c4d",
+      "fixCommit": "cc6fae975014e9290b61177e4c746bff15242abe",
+      "archiveSha256": "de6e51ce4ffd4591560a9ad1490a744fc4cc3b88bc8e700830468662f6586e59",
+      "task": "Rejecting HTTP Basic or bearer credentials does not advertise an authentication challenge, so clients cannot discover how to authenticate.",
+      "category": "authentication",
+      "expectedFiles": [
+        "Sources/Vapor/Authentication/Authenticator.swift"
+      ],
+      "expectedRanges": [
+        {
+          "path": "Sources/Vapor/Authentication/Authenticator.swift",
+          "start": 33,
+          "end": 37,
+          "sha256": "c6964259ce64dbbed89be92781d4bf4b9f0f9e05f69e7095d38775d8ff13098a"
+        },
+        {
+          "path": "Sources/Vapor/Authentication/Authenticator.swift",
+          "start": 49,
+          "end": 53,
+          "sha256": "f160515de629ce3d910cc504c79d272d98b89cad3e38bab4ab646120a98f118a"
+        },
+        {
+          "path": "Sources/Vapor/Authentication/Authenticator.swift",
+          "start": 19,
+          "end": 23,
+          "sha256": "c7684177799400d6147b31df7e3acfce45dec8562ac490102b0d36d695ad4c62"
+        }
+      ],
+      "supportingFiles": [
+        "Tests/VaporTests/AuthenticationTests.swift",
+        "Tests/VaporTests/HTTPHeaderTests.swift"
+      ],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "Sources/Vapor/Utilities/File.swift"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Pre-fix source windows and upstream patch reviewed before production retrieval changes or any retrieval on these repositories. Sparse agent-reviewed labels; not independently human-reviewed or exhaustive.",
+        "evidenceUrl": "https://github.com/vapor/vapor/commit/cc6fae975014e9290b61177e4c746bff15242abe",
+        "testAnnotation": "Existing cochanged test files present in the pinned archive are supporting file labels. No line labels are asserted for newly inserted tests or nearby unrelated assertions. Tests omitted by archive export rules are excluded."
+      }
+    }
+  ]
+}
