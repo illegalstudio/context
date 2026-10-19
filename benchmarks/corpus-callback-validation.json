@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "protocol": {
+    "description": "Four additional repositories and patch-derived task labels frozen before callback-test retrieval changes. Sparse agent-reviewed annotations; no independent reviewer was available. Corrective replays are regression data once scores have informed changes.",
+    "budgets": [
+      8000,
+      16000,
+      32000
+    ],
+    "tokenizer": "o200k_base",
+    "maxFiles": 25,
+    "maxLinesPerFile": 300,
+    "maxFileSize": 1048576,
+    "graphDepth": 2
+  },
+  "projects": [
+    {
+      "id": "slimphp/Slim",
+      "repository": "slimphp/Slim",
+      "url": "https://github.com/slimphp/Slim",
+      "language": "php",
+      "framework": "slim",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "5c98f59c102c63d1c2041accde4158572ee6a7ff9bb53e48106f2ec043581450",
+          "url": "https://github.com/slimphp/Slim/blob/3725590bc91ac859cf20d5beed82cc97bb1493e8/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "id": "koajs/koa",
+      "repository": "koajs/koa",
+      "url": "https://github.com/koajs/koa",
+      "language": "javascript",
+      "framework": "koa",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "16943a6ac79711e26289640dcca989be857059b938380b118bca5afc1ea4e7d7",
+          "url": "https://github.com/koajs/koa/blob/435534aa08afd7749b121664f5ab2b54421b276e/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "vitest-dev/vitest",
+      "repository": "vitest-dev/vitest",
+      "url": "https://github.com/vitest-dev/vitest",
+      "language": "typescript",
+      "framework": "vitest",
+      "kind": "test-framework",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "ddc110f3b89cc397cee99d3d64c4f746928b7a3bac02fed15101eb4d367079f6",
+          "url": "https://github.com/vitest-dev/vitest/blob/8e94427e9be5f8cd5e023979ddae60a770d69fb8/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "bottlepy/bottle",
+      "repository": "bottlepy/bottle",
+      "url": "https://github.com/bottlepy/bottle",
+      "language": "python",
+      "framework": "bottle",
+      "kind": "framework-library",
+      "split": "eval",
+      "sourceLicenseFiles": [
+        {
+          "path": "LICENSE",
+          "sha256": "af150257b1f7cce92b6207854f2e8f90ea9ae52d7cac758d13a47bd12e2a2443",
+          "url": "https://github.com/bottlepy/bottle/blob/c92516069e664efc9bac3746004402bd6f3cc9ec/LICENSE"
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "slimphp--Slim-callback-eval",
+      "project": "slimphp/Slim",
+      "split": "eval",
+      "revision": "3725590bc91ac859cf20d5beed82cc97bb1493e8",
+      "fixCommit": "80d741c3dd893b7fa747d5a68d8aea4e50710a28",
+      "archiveSha256": "6ff8d4a75c93a2753631334a368c647826b1ad4c091cd3ae83df6e25ba580ed8",
+      "task": "Routing a request with an empty URI raises a string-offset warning instead of dispatching the root path.",
+      "category": "behavior",
+      "expectedFiles": [
+        "Slim/Routing/RouteResolver.php"
+      ],
+      "expectedRanges": [
+        {
+          "path": "Slim/Routing/RouteResolver.php",
+          "start": 49,
+          "end": 55,
+          "sha256": "5f0189fbd039df47912694669764c08850fc8593383c111d9f37baf4ca9c765f"
+        }
+      ],
+      "supportingFiles": [],
+      "supportingRanges": [],
+      "forbiddenFiles": [
+        "Slim/Middleware/ContentLengthMiddleware.php"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Upstream patch and available parent-archive source windows reviewed before changing production retrieval or examining scores. Single-agent review, not independent or exhaustive.",
+        "evidenceUrl": "https://github.com/slimphp/Slim/commit/80d741c3dd893b7fa747d5a68d8aea4e50710a28",
+        "testAnnotation": "Only existing, related assertion windows in the parent archive are labeled; inserted post-fix regressions are not backported. Slim archives omit its tests."
+      }
+    },
+    {
+      "id": "koajs--koa-callback-eval",
+      "project": "koajs/koa",
+      "split": "eval",
+      "revision": "435534aa08afd7749b121664f5ab2b54421b276e",
+      "fixCommit": "185e701a8a1a1277d7df976a0598b7a27ebc789e",
+      "archiveSha256": "505fea2532ef2a28fc9480c1ee9d7798c5c605d9dd5ed2caae5c4beb8d8246de",
+      "task": "Redirecting to a URL with an uppercase HTTP scheme bypasses normalization and mishandles escaped authority characters.",
+      "category": "behavior",
+      "expectedFiles": [
+        "lib/response.js"
+      ],
+      "expectedRanges": [
+        {
+          "path": "lib/response.js",
+          "start": 266,
+          "end": 273,
+          "sha256": "9190efc44cb83a51b7d4bf92bed882766da0ef1d18a8b34f92f74ba2aaf31da5"
+        }
+      ],
+      "supportingFiles": [
+        "__tests__/response/redirect.js"
+      ],
+      "supportingRanges": [
+        {
+          "path": "__tests__/response/redirect.js",
+          "start": 16,
+          "end": 21,
+          "sha256": "d08d8b3a52758c2e2ca0ea68b26b260318b43802970096d6e64676713974e601"
+        }
+      ],
+      "forbiddenFiles": [
+        "lib/request.js"
+      ],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Upstream patch and available parent-archive source windows reviewed before changing production retrieval or examining scores. Single-agent review, not independent or exhaustive.",
+        "evidenceUrl": "https://github.com/koajs/koa/commit/185e701a8a1a1277d7df976a0598b7a27ebc789e",
+        "testAnnotation": "Only existing, related assertion windows in the parent archive are labeled; inserted post-fix regressions are not backported. Slim archives omit its tests."
+      }
+    },
+    {
+      "id": "vitest-dev--vitest-callback-eval",
+      "project": "vitest-dev/vitest",
+      "split": "eval",
+      "revision": "8e94427e9be5f8cd5e023979ddae60a770d69fb8",
+      "fixCommit": "b3e43d0452ac463e4fa521d6e6b5480bea097274",
+      "archiveSha256": "bb3689024f79f98bd633c574e2404ff3b4e39bb05b01f062a5a37751518c2ca6",
+      "task": "Creating a second spy on the same method loses the existing mock; restoring a mocked class method also fails.",
+      "category": "behavior",
+      "expectedFiles": [
+        "packages/spy/src/index.ts",
+        "packages/mocker/src/automocker.ts"
+      ],
+      "expectedRanges": [
+        {
+          "path": "packages/spy/src/index.ts",
+          "start": 442,
+          "end": 455,
+          "sha256": "267aef3b504dd8a41f0ecf172088aa25435ce9b600e2042f1d21a7c7790a1cbf"
+        },
+        {
+          "path": "packages/mocker/src/automocker.ts",
+          "start": 75,
+          "end": 84,
+          "sha256": "04c5d20f563bff76881787f401b2183d3deb43e565711ace93d297e87a7c60e6"
+        }
+      ],
+      "supportingFiles": [
+        "test/core/test/jest-mock.test.ts",
+        "test/core/test/mocked.test.ts"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/core/test/mocked.test.ts",
+          "start": 72,
+          "end": 81,
+          "sha256": "c70e2107bd119c0b67c3fc47ca4570c338bfcad8a06730499c0798766f627fc0"
+        }
+      ],
+      "forbiddenFiles": [],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Upstream patch and available parent-archive source windows reviewed before changing production retrieval or examining scores. Single-agent review, not independent or exhaustive.",
+        "evidenceUrl": "https://github.com/vitest-dev/vitest/commit/b3e43d0452ac463e4fa521d6e6b5480bea097274",
+        "testAnnotation": "Only existing, related assertion windows in the parent archive are labeled; inserted post-fix regressions are not backported. Slim archives omit its tests."
+      }
+    },
+    {
+      "id": "bottlepy--bottle-callback-eval",
+      "project": "bottlepy/bottle",
+      "split": "eval",
+      "revision": "c92516069e664efc9bac3746004402bd6f3cc9ec",
+      "fixCommit": "7a53615efc42cc521e6031bb363c4d754b8446a4",
+      "archiveSha256": "127ec887a07604d54ad90236b14063c8f8577945de41b53c6ce1cc12e3c53596",
+      "task": "Disabling catchall on an application instance fails because attribute assignment bypasses the configuration descriptor.",
+      "category": "behavior",
+      "expectedFiles": [
+        "bottle.py"
+      ],
+      "expectedRanges": [
+        {
+          "path": "bottle.py",
+          "start": 1122,
+          "end": 1125,
+          "sha256": "b0e5a4dc5fe764f629a785524cd12431bfc2ae32f77f861d2525376eb717006e"
+        }
+      ],
+      "supportingFiles": [
+        "test/test_exc.py"
+      ],
+      "supportingRanges": [
+        {
+          "path": "test/test_exc.py",
+          "start": 32,
+          "end": 38,
+          "sha256": "2b51adae96aec6ca1d942a88c0f0533b23abaa707392f50f3c4c9179b954ef23"
+        }
+      ],
+      "forbiddenFiles": [],
+      "review": {
+        "status": "source-reviewed",
+        "method": "Upstream patch and available parent-archive source windows reviewed before changing production retrieval or examining scores. Single-agent review, not independent or exhaustive.",
+        "evidenceUrl": "https://github.com/bottlepy/bottle/commit/7a53615efc42cc521e6031bb363c4d754b8446a4",
+        "testAnnotation": "Only existing, related assertion windows in the parent archive are labeled; inserted post-fix regressions are not backported. Slim archives omit its tests."
+      }
+    }
+  ]
+}

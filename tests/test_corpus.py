@@ -96,6 +96,16 @@ class CorpusTests(unittest.TestCase):
         self.assertEqual(summary["supportingRecall"], 0.5)
         self.assertIsNone(summary["supportingRangeCoverage"])
 
+    def test_callback_validation_preserves_repository_isolation(self):
+        root = Path(__file__).resolve().parents[1]
+        reserved = json.loads((root / "benchmarks/corpus-callback-validation.json").read_text())
+        corpus_io.validate(reserved)
+        previous = set()
+        for name in ["corpus.json", "corpus-domains.json", "corpus-validation.json"]:
+            previous.update(p["repository"].lower() for p in json.loads((root / "benchmarks" / name).read_text())["projects"])
+        self.assertTrue(previous.isdisjoint(p["repository"].lower() for p in reserved["projects"]))
+        self.assertTrue(all(c["review"]["status"] == "source-reviewed" for c in reserved["cases"]))
+
     def archive(self, root, entries):
         path = root / "archive.tar.gz"
         with tarfile.open(path, "w:gz") as archive:

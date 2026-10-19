@@ -91,9 +91,13 @@ pub fn parse(path: &str, content: &str, parser: &mut Parser) -> Result<Parsed> {
         .context("Incompatible parser grammar")?;
     let tree = parser.parse(content, None).context("Parsing cancelled")?;
     let language = language(path);
+    let tests = crate::test_cases::Api::new(tree.root_node(), path, language, content);
     let mut cursor = tree.walk();
     loop {
         let node = cursor.node();
+        if let Some(case) = tests.callback(node, path, content) {
+            result.symbols.push(case);
+        }
         inspect(node, path, language, content, &mut result);
         if cursor.goto_first_child() {
             continue;
@@ -303,6 +307,7 @@ fn inspect(node: Node<'_>, path: &str, language: &str, content: &str, result: &m
                 .chars()
                 .take(240)
                 .collect();
+            let is_test_case = crate::test_cases::named_case(node, path, language, name, content);
             result.symbols.push(Symbol {
                 file_path: path.into(),
                 name: name.into(),
@@ -310,7 +315,10 @@ fn inspect(node: Node<'_>, path: &str, language: &str, content: &str, result: &m
                 start_line: node.start_position().row + 1,
                 end_line: node.end_position().row + usize::from(node.end_position().column > 0),
                 signature,
-                is_test: crate::quality::is_test_path(path) || test_scope(node, language, content),
+                is_test: is_test_case
+                    || crate::quality::is_test_path(path)
+                    || test_scope(node, language, content),
+                is_test_case,
             });
         }
     }

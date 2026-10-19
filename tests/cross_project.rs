@@ -175,6 +175,7 @@ mod tests { fn more_checks() {} }
     );
     let legacy:Symbol=serde_json::from_value(serde_json::json!({"filePath":"x.rs","name":"old","kind":"function","startLine":1,"endLine":1,"signature":"old"})).unwrap();
     assert!(!legacy.is_test);
+    assert!(!legacy.is_test_case);
     for path in [
         "Lib.Tests/Foo.cs",
         "SourcesTests/Foo.swift",

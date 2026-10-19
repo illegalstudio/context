@@ -114,6 +114,49 @@ fn record(
         .push(evidence);
 }
 
+fn test_intent_weight(title: &str, term: &crate::terms::QueryTerm) -> f64 {
+    let mut position = 0;
+    for word in crate::terms::words(title) {
+        if matches!(
+            word.as_str(),
+            "without" | "before" | "after" | "unless" | "while" | "during"
+        ) {
+            break;
+        }
+        if matches!(
+            word.as_str(),
+            "test"
+                | "it"
+                | "should"
+                | "can"
+                | "must"
+                | "will"
+                | "does"
+                | "the"
+                | "a"
+                | "an"
+                | "to"
+                | "and"
+                | "of"
+                | "is"
+                | "be"
+                | "not"
+        ) {
+            continue;
+        }
+        let found = if term.origin == crate::terms::Origin::Literal {
+            word == term.term
+        } else {
+            search_terms(&word).contains(&term.term)
+        };
+        if found {
+            return term.weight / (1.0 + position as f64 / 2.0);
+        }
+        position += 1;
+    }
+    0.0
+}
+
 fn normalize(candidates: &mut [Candidate], highest: f64) {
     if highest > 0.0 {
         for candidate in candidates.iter_mut() {
@@ -238,6 +281,9 @@ fn build(
     let mut symbol_files: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     let mut term_files: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for symbol in &symbols {
+        if symbol.kind == "test" {
+            continue;
+        }
         symbol_files
             .entry(symbol.name.clone())
             .or_default()
@@ -263,6 +309,10 @@ fn build(
                 true,
             );
         }
+        // Human test descriptions are intent evidence, not program identifiers or graph seeds.
+        if symbol.kind == "test" {
+            continue;
+        }
         for (origin, terms) in matches(&symbol.name, &query) {
             let amount: f64 = terms
                 .iter()
@@ -280,6 +330,66 @@ fn build(
             entry.0 = entry.0.max(amount.min(1.0));
             entry.1.extend(terms.into_iter().map(|term| term.source));
         }
+    }
+    let mut implementation_terms = BTreeSet::new();
+    for path in files
+        .keys()
+        .filter(|p| !is_test(p) && !is_config(p) && !p.ends_with(".md"))
+    {
+        for term in matches(path, &query)
+            .into_values()
+            .flatten()
+            .filter(|t| t.weight >= 0.5)
+        {
+            implementation_terms.insert(term.source);
+        }
+    }
+    for symbol in symbols.iter().filter(|s| !s.is_test) {
+        for term in matches(&symbol.name, &query)
+            .into_values()
+            .flatten()
+            .filter(|t| t.weight >= 0.5)
+        {
+            implementation_terms.insert(term.source);
+        }
+    }
+    let mut intent = BTreeMap::<String, BTreeMap<String, f64>>::new();
+    for symbol in symbols
+        .iter()
+        .filter(|s| s.is_test_case && allowed(&s.file_path))
+    {
+        let matched: Vec<_> = matches(&symbol.name, &query)
+            .into_values()
+            .flatten()
+            .filter(|t| implementation_terms.contains(&t.source))
+            .collect();
+        let concepts: BTreeSet<_> = matched.iter().map(|t| &t.source).collect();
+        let coverage = concepts.len() as f64 / implementation_terms.len().max(1) as f64;
+        for term in matched {
+            let amount = test_intent_weight(&symbol.name, &term) * coverage;
+            if amount < 0.5 {
+                continue;
+            }
+            let weight = intent
+                .entry(symbol.file_path.clone())
+                .or_default()
+                .entry(term.source)
+                .or_default();
+            *weight = (*weight).max(amount);
+        }
+    }
+    for (path, terms) in &intent {
+        record(
+            &mut scores,
+            path,
+            0.0,
+            "test declaration matches task intent",
+            MatchEvidence {
+                signal: "test_intent".into(),
+                terms: terms.keys().cloned().collect(),
+                ..Default::default()
+            },
+        );
     }
     for ((path, origin), (amount, terms)) in symbol_matches {
         let reason = match origin {
@@ -450,7 +560,28 @@ fn build(
         })
         .cloned()
         .collect();
-    for contribution in crate::graph::expand(&dependencies, &seeds, &graph_allowed, graph_depth) {
+    let test_cases: BTreeSet<_> = symbols
+        .iter()
+        .filter(|s| s.is_test_case)
+        .map(|s| &s.file_path)
+        .collect();
+    let setup_helpers: BTreeSet<_> = graph_allowed
+        .iter()
+        .filter(|path| {
+            !task.domains.iter().any(|d| d == "testing")
+                && crate::quality::is_test_helper(path)
+                && !test_cases.contains(path)
+                && !scores.get(*path).is_some_and(|s| s.reserved)
+        })
+        .cloned()
+        .collect();
+    for contribution in crate::graph::expand(
+        &dependencies,
+        &seeds,
+        &graph_allowed,
+        graph_depth,
+        &setup_helpers,
+    ) {
         let reason = if contribution.evidence.signal == "outgoing_dependency" {
             "outgoing typed dependency"
         } else {
@@ -536,6 +667,27 @@ fn build(
                 contribution.evidence,
             );
         }
+    }
+    for (path, terms) in intent {
+        let score = &scores[&path];
+        let ceiling = score
+            .evidence
+            .iter()
+            .filter(|e| e.signal == "behavior_test")
+            .filter_map(|e| e.source_path.as_ref().and_then(|source| scores.get(source)))
+            .map(|s| s.value * 0.9)
+            .reduce(f64::max);
+        let amount = 1.6 * terms.values().sum::<f64>().min(1.5);
+        let amount = if task.domains.iter().any(|d| d == "testing") {
+            amount
+        } else {
+            ceiling.map_or(amount, |max| amount.min((max - score.value).max(0.0)))
+        };
+        let score = scores.get_mut(&path).unwrap();
+        score.value += amount;
+        score
+            .contributions
+            .insert("test declaration matches task intent".into(), amount);
     }
     let mut entity_files: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for path in files.keys().filter(|path| allowed(path)) {

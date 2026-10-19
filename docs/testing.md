@@ -73,3 +73,5 @@ Linux x86-64, release build, 2026-10-14. Each source file has a class, 12 method
 The first Rust benchmark exposed unindexed full-text deletions by path and an unindexed import-request lookup. Binding FTS row IDs to file row IDs and adding the import-request index reduced the 10,000-file initial index from 32.7 seconds to 1.38 seconds on this synthetic workload.
 
 The TypeScript comparison could not run: its better-sqlite3 11.10.0 module failed to load and failed rebuilding under local Node 26.7.0. These figures describe the Rust implementation and its own indexing optimization, not a Rust-versus-TypeScript speedup.
+
+`tests/callback_tests.rs` verifies whole callback ranges and literal titles across Pest, Playwright, Mocha-style globals, Vitest and CommonJS Node tests. It rejects dynamic/comment examples and shadowed APIs, checks incomplete UTF-8 input, recovers direct assertions against repeated setup callers, bounds duplicate behavior features, preserves explicit hints and testing focus, and distinguishes named tests from helpers in Rust, Python, Java and Go.

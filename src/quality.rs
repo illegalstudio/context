@@ -17,6 +17,27 @@ pub fn is_test_path(path: &str) -> bool {
             })
 }
 
+pub fn is_test_helper(path: &str) -> bool {
+    if !is_test_path(path) {
+        return false;
+    }
+    let lower = path.to_ascii_lowercase();
+    let name = lower
+        .rsplit('/')
+        .next()
+        .unwrap_or(&lower)
+        .split('.')
+        .next()
+        .unwrap_or("");
+    lower
+        .split('/')
+        .any(|part| matches!(part, "support" | "helpers" | "test-helpers" | "fixtures"))
+        || matches!(
+            name,
+            "env" | "setup" | "conftest" | "testcase" | "support" | "helpers" | "helper" | "utils"
+        )
+}
+
 pub fn generated(path: &str, content: &str) -> bool {
     if path
         .split('/')

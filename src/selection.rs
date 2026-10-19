@@ -35,7 +35,28 @@ fn features(
     features.insert(format!("role:{role}"));
     let mut matched_terms = BTreeSet::new();
     for evidence in &candidate.evidence {
-        if !matches!(evidence.signal.as_str(), "shared_symbol" | "behavior_test") {
+        if evidence.signal == "test_intent"
+            && (!candidate
+                .evidence
+                .iter()
+                .any(|e| e.signal == "behavior_test")
+                || candidate.evidence.iter().any(|e| {
+                    e.signal == "behavior_test"
+                        && e.source_path.as_ref().is_some_and(|p| selected.contains(p))
+                }))
+        {
+            let scope = scope_for(scopes, &candidate.path).map_or("", |s| s.path.as_str());
+            features.extend(
+                evidence
+                    .terms
+                    .iter()
+                    .map(|term| format!("behavior:{scope}:{term}")),
+            );
+        }
+        if !matches!(
+            evidence.signal.as_str(),
+            "shared_symbol" | "behavior_test" | "test_intent"
+        ) {
             for term in &evidence.terms {
                 features.insert(format!("query:{term}"));
                 matched_terms.insert(term.as_str());
@@ -156,7 +177,30 @@ pub fn choose(
     let top = candidates
         .iter()
         .filter(|candidate| !candidate.reserved)
-        .map(|candidate| candidate.score)
+        .map(|candidate| {
+            let intent = candidate
+                .contributions
+                .get("test declaration matches task intent")
+                .copied()
+                .unwrap_or(0.0);
+            if intent == 0.0 {
+                return candidate.score;
+            }
+            let boosts: f64 = [
+                "domain boost",
+                "git activity boost",
+                "generated or minified asset penalty",
+            ]
+            .iter()
+            .filter_map(|key| candidate.contributions.get(*key))
+            .sum();
+            let base = candidate.score - boosts;
+            if base > 0.0 {
+                candidate.score * (1.0 - intent / base).clamp(0.0, 1.0)
+            } else {
+                candidate.score
+            }
+        })
         .fold(0.0, f64::max);
     let floor = (top * 0.1).max(0.55);
     let test_limit = (max / 5).max(1);
@@ -178,10 +222,9 @@ pub fn choose(
             let evidence = features(candidate, scopes, &selected);
             if test
                 && !testing
-                && candidate
-                    .evidence
-                    .iter()
-                    .any(|evidence| evidence.signal == "behavior_test")
+                && candidate.evidence.iter().any(|evidence| {
+                    matches!(evidence.signal.as_str(), "behavior_test" | "test_intent")
+                })
                 && !evidence.difference(&covered).any(|feature| {
                     ["behavior:", "query:", "scope:", "dependency:", "runtime:"]
                         .iter()

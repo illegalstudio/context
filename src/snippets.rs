@@ -244,14 +244,17 @@ fn units(
                 3
             } else if pinned > 0.0 {
                 2
-            } else if mixed_tests
-                && !symbol.is_test
-                && symbol.kind != "class"
-                && !resolution
-                    .task
-                    .domains
-                    .iter()
-                    .any(|domain| domain == "testing")
+            } else if (symbol.kind == "test"
+                && name_score >= 0.5
+                && crate::quality::is_test_path(path))
+                || mixed_tests
+                    && !symbol.is_test
+                    && symbol.kind != "class"
+                    && !resolution
+                        .task
+                        .domains
+                        .iter()
+                        .any(|domain| domain == "testing")
             {
                 1
             } else {

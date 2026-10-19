@@ -185,3 +185,7 @@ The manual workflow accepts `suite: validation`. Existing primary and domain cas
 Supporting-file recall and supporting-line coverage are separate measurements. A cochanged test file can be a supporting label without a defensible pre-fix assertion window; the validation suite therefore has supporting files but no supporting ranges. Missing annotations are reported as unavailable, never as full coverage. Failed annotated cases contribute zero. GitHub archives can omit test sources through `export-ignore`, so label review must verify the actual archive rather than assume every upstream Git path is present.
 
 These remain sparse, agent-reviewed patch-derived labels. They do not establish general relevance precision, exhaustive behavior coverage or success at solving the underlying task. See the [cross-project improvement results](retrieval-improvements.md) for paired outcomes, costs and limitations.
+
+## Callback test validation
+
+`benchmarks/corpus-callback-validation.json` reserves four patch-derived cases on Slim, Koa, Vitest and Bottle, disjoint from the preceding 28 repositories. Tasks, pre-fix ranges, related existing test assertions and archive hashes were frozen before callback retrieval changes; both methods use the same three budgets. Labels were reviewed by the implementing agent, so this is not an independently reviewed cohort. The manual workflow accepts `suite: callbacks`. Preserve the first frozen candidate outcome, including failures, before using these cases for further corrections.

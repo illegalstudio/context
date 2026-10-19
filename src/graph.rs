@@ -47,6 +47,7 @@ pub fn expand(
     seeds: &[(String, f64)],
     allowed: &BTreeSet<String>,
     depth: usize,
+    setup_helpers: &BTreeSet<String>,
 ) -> Vec<Contribution> {
     if depth == 0 {
         return vec![];
@@ -128,6 +129,13 @@ pub fn expand(
         visited.insert(key, visit.strength);
         for edge in adjacency.get(&visit.path).into_iter().flatten() {
             if edge.target == visit.origin || !allowed.contains(&edge.target) {
+                continue;
+            }
+            // An imported setup utility does not establish the intent of its consumers.
+            if edge.incoming
+                && setup_helpers.contains(&visit.path)
+                && crate::quality::is_test_path(&edge.target)
+            {
                 continue;
             }
             let strength = visit.strength * edge.weight * if visit.depth == 0 { 1.0 } else { 0.65 };

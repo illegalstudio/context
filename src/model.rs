@@ -21,6 +21,8 @@ pub struct Symbol {
     pub signature: String,
     #[serde(default, skip_serializing_if = "is_false")]
     pub is_test: bool,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub is_test_case: bool,
 }
 
 fn is_false(value: &bool) -> bool {
