@@ -113,6 +113,141 @@ fn code_lines(lines: &[String]) -> Vec<bool> {
         .collect()
 }
 
+fn test_context(
+    path: &str,
+    lines: &[String],
+    symbols: &[&Symbol],
+    resolution: &Resolution,
+    anchors: &BTreeMap<usize, f64>,
+) -> Option<crate::test_context::Context> {
+    if !crate::quality::is_test_path(path)
+        || resolution.task.domains.iter().any(|d| d == "testing")
+        || resolution.task.files_hint.iter().any(|hint| {
+            let relative = hint.trim_start_matches("./");
+            (relative == path || path.ends_with(&format!("/{relative}")))
+                && (resolution.task.raw.contains(hint)
+                    || !resolution.stacktrace.iter().any(|s| s.file == *hint)
+                        && !resolution.diff.iter().any(|d| d.file == *hint))
+        })
+        || symbols.iter().any(|symbol| {
+            !symbol.is_test_case
+                && (resolution
+                    .task
+                    .symbols
+                    .iter()
+                    .any(|name| name.eq_ignore_ascii_case(&symbol.name))
+                    || symbol.kind != "class"
+                        && anchors
+                            .range(symbol.start_line.saturating_sub(1)..symbol.end_line)
+                            .next()
+                            .is_some())
+        })
+    {
+        return None;
+    }
+    let selected: Vec<_> = symbols
+        .iter()
+        .filter(|symbol| symbol.is_test_case)
+        .filter(|symbol| {
+            evidence(&symbol.name, &resolution.task)
+                .values()
+                .sum::<f64>()
+                >= 0.5
+                || resolution
+                    .task
+                    .symbols
+                    .iter()
+                    .any(|name| name.eq_ignore_ascii_case(&symbol.name))
+                || anchors
+                    .range(symbol.start_line.saturating_sub(1)..symbol.end_line)
+                    .next()
+                    .is_some()
+        })
+        .map(|symbol| symbol.start_line.saturating_sub(1)..symbol.end_line)
+        .collect();
+    if selected.is_empty() {
+        return None;
+    }
+    crate::test_context::analyze(path, &lines.join("\n"), symbols, &selected)
+}
+
+fn focus_tests(
+    mut units: Vec<Unit>,
+    context: crate::test_context::Context,
+    lines: &[String],
+) -> Vec<Unit> {
+    // Keep one strongest case before its required setup. Extra cases and
+    // enclosing context can then use the remaining per-file allowance.
+    let primary = if units.iter().any(|unit| unit.priority >= 2) {
+        None
+    } else {
+        units
+            .iter()
+            .enumerate()
+            .filter(|(_, unit)| unit.priority == 1)
+            .max_by(|(_, a), (_, b)| a.score.total_cmp(&b.score).then(b.start.cmp(&a.start)))
+            .map(|(index, _)| index)
+    };
+    for (index, unit) in units.iter_mut().enumerate() {
+        if unit.priority == 1 {
+            unit.priority = if primary == Some(index) { 2 } else { 0 };
+        }
+    }
+    for support in context.support {
+        let range = support.range;
+        if range.start >= range.end || range.end > lines.len() {
+            continue;
+        }
+        units.push(Unit {
+            start: range.start,
+            end: range.end,
+            anchor: range.start,
+            score: 1.0,
+            priority: u8::from(support.required),
+            truncated: false,
+        });
+    }
+    let mut result = vec![];
+    for unit in units {
+        let mut ranges: Vec<_> = std::iter::once(unit.start..unit.end).collect();
+        for excluded in &context.excluded {
+            let start = context_start(lines, excluded.start);
+            ranges = ranges
+                .into_iter()
+                .flat_map(|range| {
+                    if start >= range.end || excluded.end <= range.start {
+                        return vec![range];
+                    }
+                    let mut parts = vec![];
+                    if range.start < start {
+                        parts.push(range.start..start);
+                    }
+                    if range.end > excluded.end {
+                        parts.push(excluded.end..range.end);
+                    }
+                    parts
+                })
+                .collect();
+        }
+        for range in ranges {
+            if lines[range.clone()]
+                .iter()
+                .all(|line| line.trim().is_empty())
+            {
+                continue;
+            }
+            result.push(Unit {
+                anchor: unit.anchor.clamp(range.start, range.end - 1),
+                truncated: unit.truncated || range.start != unit.start || range.end != unit.end,
+                start: range.start,
+                end: range.end,
+                ..unit.clone()
+            });
+        }
+    }
+    result
+}
+
 fn units(
     path: &str,
     lines: &[String],
@@ -173,6 +308,7 @@ fn units(
                 .or_insert(20.0);
         }
     }
+    let test_context = test_context(path, lines, &symbols, resolution, &anchors);
     let mut result = vec![];
     for symbol in &symbols {
         let start = symbol.start_line.saturating_sub(1).min(lines.len() - 1);
@@ -244,7 +380,7 @@ fn units(
                 3
             } else if pinned > 0.0 {
                 2
-            } else if (symbol.kind == "test"
+            } else if ((symbol.kind == "test" || test_context.is_some() && symbol.is_test_case)
                 && name_score >= 0.5
                 && crate::quality::is_test_path(path))
                 || mixed_tests
@@ -412,6 +548,9 @@ fn units(
                 priority: 0,
             });
         }
+    }
+    if let Some(context) = test_context {
+        result = focus_tests(result, context, lines);
     }
     result.sort_by(|a, b| {
         b.priority

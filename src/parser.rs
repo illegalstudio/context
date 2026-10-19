@@ -55,7 +55,7 @@ pub fn language(path: &str) -> &'static str {
     }
 }
 
-fn grammar(path: &str) -> Option<Language> {
+pub(crate) fn grammar(path: &str) -> Option<Language> {
     Some(match language(path) {
         "typescript" if path.ends_with(".tsx") => tree_sitter_typescript::LANGUAGE_TSX.into(),
         "typescript" => tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into(),

@@ -22,4 +22,5 @@ pub mod snippets;
 mod source;
 pub mod terms;
 mod test_cases;
+mod test_context;
 pub mod tokens;

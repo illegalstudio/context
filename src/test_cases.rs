@@ -180,21 +180,49 @@ pub fn named_case(node: Node<'_>, path: &str, language: &str, name: &str, source
 pub(crate) struct Api {
     names: BTreeSet<String>,
     namespaces: BTreeSet<String>,
+    members: BTreeSet<String>,
     enabled: bool,
 }
 
 impl Api {
     pub fn new(root: Node<'_>, path: &str, language: &str, source: &str) -> Self {
+        Self::with_names(root, path, language, source, &["test", "it", "specify"])
+    }
+
+    pub fn hooks(root: Node<'_>, path: &str, language: &str, source: &str) -> Self {
+        Self::with_names(
+            root,
+            path,
+            language,
+            source,
+            &[
+                "beforeEach",
+                "afterEach",
+                "beforeAll",
+                "afterAll",
+                "before",
+                "after",
+                "pest",
+                "uses",
+            ],
+        )
+    }
+
+    fn with_names(
+        root: Node<'_>,
+        path: &str,
+        language: &str,
+        source: &str,
+        members: &[&str],
+    ) -> Self {
         let mut api = Self {
             names: if is_test_path(path) {
-                ["test", "it", "specify"]
-                    .into_iter()
-                    .map(str::to_owned)
-                    .collect()
+                members.iter().map(|name| (*name).to_owned()).collect()
             } else {
                 BTreeSet::new()
             },
             namespaces: BTreeSet::new(),
+            members: members.iter().map(|name| (*name).to_owned()).collect(),
             enabled: matches!(language, "php" | "javascript" | "typescript"),
         };
         if !api.enabled {
@@ -224,6 +252,7 @@ impl Api {
                     if module
                         .as_deref()
                         .is_some_and(|m| matches!(m, "node:test" | "ava" | "tape"))
+                        && members.contains(&"test")
                     {
                         imported.insert(text(name, source).to_owned());
                     }
@@ -240,7 +269,10 @@ impl Api {
                         };
                         if let Some((key, alias)) = pair {
                             api.names.remove(text(alias, source));
-                            if known && matches!(text(key, source), "test" | "it" | "specify") {
+                            if known && !members.contains(&"test") && text(key, source) == "test" {
+                                namespaces.insert(text(alias, source).to_owned());
+                            }
+                            if known && members.contains(&text(key, source)) {
                                 imported.insert(text(alias, source).to_owned());
                             }
                         }
@@ -259,8 +291,13 @@ impl Api {
                             if let Some(name) = part.child_by_field_name("name") {
                                 let alias = part.child_by_field_name("alias").unwrap_or(name);
                                 api.names.remove(text(alias, source));
-                                if known && matches!(text(name, source), "test" | "it" | "specify")
+                                if known
+                                    && !members.contains(&"test")
+                                    && text(name, source) == "test"
                                 {
+                                    namespaces.insert(text(alias, source).to_owned());
+                                }
+                                if known && members.contains(&text(name, source)) {
                                     imported.insert(text(alias, source).to_owned());
                                 }
                             }
@@ -276,7 +313,12 @@ impl Api {
                                 .as_deref()
                                 .is_some_and(|m| matches!(m, "node:test" | "ava" | "tape"))
                             {
-                                imported.insert(text(part, source).to_owned());
+                                if members.contains(&"test") {
+                                    imported.insert(text(part, source).to_owned());
+                                }
+                                if !members.contains(&"test") {
+                                    namespaces.insert(text(part, source).to_owned());
+                                }
                             }
                         } else {
                             let mut c = part.walk();
@@ -315,7 +357,7 @@ impl Api {
                 };
                 let property = text(property, source);
                 if self.namespaces.contains(text(object, source)) {
-                    matches!(property, "test" | "it" | "specify")
+                    self.members.contains(property)
                 } else {
                     matches!(
                         property,
@@ -327,16 +369,28 @@ impl Api {
         }
     }
 
-    pub fn callback(&self, node: Node<'_>, path: &str, source: &str) -> Option<Symbol> {
+    pub fn matches_call(&self, node: Node<'_>, source: &str) -> bool {
         if !self.enabled || !matches!(node.kind(), "call_expression" | "function_call_expression") {
-            return None;
+            return false;
         }
-        let function = node.child_by_field_name("function")?;
+        let Some(function) = node.child_by_field_name("function") else {
+            return false;
+        };
         let mut binding = function;
         while binding.kind() == "member_expression" {
-            binding = binding.child_by_field_name("object")?;
+            let Some(object) = binding.child_by_field_name("object") else {
+                return false;
+            };
+            binding = object;
         }
         if !self.function(function, source) || shadowed(node, text(binding, source), source) {
+            return false;
+        }
+        true
+    }
+
+    pub fn callback(&self, node: Node<'_>, path: &str, source: &str) -> Option<Symbol> {
+        if !self.matches_call(node, source) {
             return None;
         }
         let args = node.child_by_field_name("arguments")?;

@@ -12,7 +12,7 @@ use std::{
 };
 
 // Bump when excerpt selection or token allocation semantics change.
-const EXCERPT_STRATEGY_VERSION: u32 = 2;
+const EXCERPT_STRATEGY_VERSION: u32 = 3;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

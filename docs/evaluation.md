@@ -188,4 +188,6 @@ These remain sparse, agent-reviewed patch-derived labels. They do not establish 
 
 ## Callback test validation
 
+The subsequent [focused-test excerpt replay](test-excerpt-results.md) compares the same 106 known tasks on unchanged manifests. It is regression evidence for excerpt precision, not a new unseen cohort. The separate independent-review task remains open.
+
 `benchmarks/corpus-callback-validation.json` reserves four patch-derived cases on Slim, Koa, Vitest and Bottle, disjoint from the preceding 28 repositories. Tasks, pre-fix ranges, related existing test assertions and archive hashes were frozen before callback retrieval changes; both methods use the same three budgets. Labels were reviewed by the implementing agent, so this is not an independently reviewed cohort. The manual workflow accepts `suite: callbacks`. Preserve the first frozen candidate outcome, including failures, before using these cases for further corrections.

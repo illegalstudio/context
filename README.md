@@ -157,7 +157,7 @@ Packs are published atomically after all files and the archive have been written
 - **Project relationships:** Inherited and nested TypeScript configs, project references, local package exports, Rust crate roots, Composer namespaces, Laravel views, Inertia pages and Statamic templates/blueprints.
 - **Agent integration:** Search and numerical ranking explanations through CLI/JSON and an MCP stdio server with tools and saved-pack resources.
 - **Incremental packs:** Update a previous pack with changed/new context, removed files and obsolete relationships while retaining unchanged excerpts through the parent reference.
-- **Quality evaluation:** Historical tasks from 32 public repositories across eight parsed languages and C#/Swift text fallback, repository-isolated splits, excerpt coverage, omissions, token costs and a literal-search baseline. See the [cross-project protocol](docs/evaluation.md#cross-project-corpus) and [paired results and limitations](docs/retrieval-improvements.md), plus the [direct-test update](docs/callback-test-results.md).
+- **Quality evaluation:** Historical tasks from 32 public repositories across eight parsed languages and C#/Swift text fallback, repository-isolated splits, excerpt coverage, omissions, token costs and a literal-search baseline. See the [cross-project protocol](docs/evaluation.md#cross-project-corpus) and [paired results and limitations](docs/retrieval-improvements.md), plus the [direct-test update](docs/callback-test-results.md) and [focused-test excerpts](docs/test-excerpt-results.md).
 - **Automation:** JSON output for indexing, packs, listing and domains; `--root` selects the project directory.
 
 ## Commands
